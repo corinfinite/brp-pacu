@@ -24,6 +24,8 @@ git push origin master
 # git clone git://brp-pacu.git.sourceforge.net/gitroot/brp-pacu
 
 # If you have a sf account and git write access then this should work:
+# git config user.name "YOUR NAME"
+# git config user.email "SF_USERNAME@users.sourceforge.net"
 # git remote rm origin
 # git remote add origin ssh://SF_USERNAME@brp-pacu.git.sourceforge.net/gitroot/brp-pacu
 
