@@ -1,0 +1,92 @@
+Version 2.0.7 03/23/2009
+   Buffer Management
+      *Added capability to automatically save the capture buffers and load them
+      from $HOME/.BRP_PACU/buff_store at startup if it exists
+      *Added Open, Save, and Save-As dialogs, functionality to store buffers
+      for later usage/reference
+      *Added functionality for opening data files by double-clicking or dragging
+      into the application icon (Mac only)
+   HCI 
+      *Put more user friendly name onto Transfer Function Button (formerly
+      H(z)
+      *Changed Buffer names to not start at 0, but 1, updated accelerators
+      accordingly 
+      *Removed menu pictures because they hid the accelerator shortcut help in
+      the menus for some reason
+   Keyboard Accelerators
+      *Thanks to Andreas for fixing the Mac key accelerators and suggesting the
+      use of Control keys instead of Alt keys
+Version 2.0.6 02/01/2009
+   Thanks to Andreas Schwab for fix to Makefile.am to detect gtk and noticing that
+   the Jack callback Fill_buffer had no return value
+Version 2.0.6 01/10/2009
+   *Apply patch created by J Walton, aka tehgooroo so that it will compile using Macports
+   under Mac OS-X.  Thanks J!
+
+   *Fix minor problem in the impulse response algorithm caused by delay fix.
+
+01/05/2009
+   Fix bug in delay introduced by another bug fix.
+
+01/04/2009
+   Fix minor install error with gui.glade
+   Starts jack transport automatically
+
+12/31/2008
+   Fix Jack call back to avoid mutex collisions
+
+Version 2.0.0 12/31/2008
+   Pink Noise and Jack Support
+
+   Added Pink Noise Output
+
+      *Mute/Unmute and adjust levels
+   
+   Add Jack Audio Connection Kit support and removed alsa
+   
+      *Automatically connects Reference and Measured to Channel 2 and Channel 1
+   
+      *Automatically connects Pink Noise Output to Reference Input
+
+   Removed header install as part of installation (This was an accidental feature in previous
+   versions, sorry)
+
+12/20/2008
+   Major GUI and UI update!
+
+   *Delay function now resets delay before each capture, resulting in a much
+      more intuitive delay finding procedure.
+
+   *Rewrote buffer capture interface so that it makes more sense and works
+      consistently.
+
+   *Rewrote keyboard shortcuts so they don't interfere with the Avg gain.
+
+   *Added default zoom button to return to original zoom settings.
+
+   *Added inserted delay size status on the status bar.
+
+   *Added "about" and "general help" windows
+
+   *TODO: add pink noise generator and ability to save buffers to a file.
+      This will allow soundcards with only one input channel to do the transfer
+      function.
+
+11/26/2008
+   Fixed compilation erors with latest version of gtkkdatabox library.
+   Certain API calls were removed or changed.  This update allows
+   compatibility with the latest version.
+02/22/2008
+   Fixed delay dialog units.  Fixed delay algorithm bug.
+   Fixed Broken automake links in tarball (Thanks to Dan for pointing them
+   out).
+02/04/2008
+   Added "LED" signal indicators for audio inputs.  Changed soundcard buffer
+   handling to prevent oops messages.
+   Fixed various minor UI issues such as delay dialog problems.
+01/28/2008
+   Changed the thread sound read and the fft function to fix likely
+   buffer over/underflows.  
+01/28/2008
+   Changed Smoothing function to work properly.  This feature was broken in an
+   unreleased version by an upgrade to gtkdatabox-0.8.2.2
