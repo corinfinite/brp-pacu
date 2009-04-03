@@ -63,6 +63,7 @@ static GtkWidget *impulse_window = NULL;
 static GtkWidget *volume_pink_gui = NULL;
 static GtkWidget *pinknoise_button = NULL;
 static GtkWidget *transfer_function_toggle = NULL;
+static GtkWidget *transfer_function_menu = NULL;
 static GtkWidget *buffer_button[N_BUFF] = { NULL, NULL, NULL, NULL, NULL };
 static GtkWidget *buffer_menu[N_BUFF] = { NULL, NULL, NULL, NULL, NULL };
 static gfloat volume_pink_value = 0;
@@ -117,48 +118,6 @@ static   GdkColor line_color[N_BUFF] = {
    };
 static GdkColor myColor1 =    { 0, 0x3333, 0x3333, 0x3333 };
 static GdkColor myColor2 =    { 0, 0x3333, 0x3333, 0x3333 };
-
-#ifdef __APPLE__
-static UInt8 strBuffer[PATH_MAX]; 
-// Handler function for opening files from the OS X finder
-// such as double-click on a data file
-OSErr
-openAndPrintDocsEventHandler(theAppleEvent ,reply, handlerRefcon)
-{
-   AEDescList  docList;
-   FSRef       theFSRef;
-   long        index = 1;
-   long        count = 0;
-   OSErr       osError;
- 
-   osError = AEGetParamDesc(theAppleEvent, keyDirectObject,
-                         typeAEList, &docList);
-   if (osError == noErr)
-      osError = AECountItems(&docList, &count);
-   if (osError == noErr)
-   {
-      if (count == 1)
-      {
-         if (osError == noErr)
-         osError = AEGetNthPtr(&docList, index, typeFSRef,
-                        NULL, NULL, &theFSRef,
-                        sizeof(FSRef), NULL);
-         if (osError == noErr)
-            osError = FSRefMakePath(&theFSRef, strBuffer, PATH_MAX);
-         if (osError == noErr)
-         {
-            open_file(strBuffer);
-            return(0);
-         }
-      }
-      else
-          fprintf(stderr, "Cannot open more than one file at a time\n");
-      return(0);
-   }
-   fprintf(stderr, "OS X error %d\n", (int)osError);
-   return(0);   
-}
-#endif
                                     
 gboolean
 gui_idle_func (struct FFT_Frame *data)
@@ -409,16 +368,45 @@ about_me_cb(GtkWidget *widget)// , gtkwidget *widget)
 }
 // Trigger the gui to do the transfer function
 static void
-transfer_fxn_cb(GtkWidget *widget)// , gtkwidget *widget)
+transfer_function_toggled_cb(GtkWidget *widget)
 {
-   tf = (tf == 0);
+   if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (transfer_function_toggle)))
+   {
+      if (tf == 0) //Don't do anything if initiated by transfer_fxn_cb()
+      {
+         tf = 1;  
+         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(transfer_function_menu), TRUE);
+      }
+   }
+   else
+   {
+      if (tf != 0) //Don't do anything if initiated by transfer_fxn_cb()
+      {
+         tf = 0;
+         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(transfer_function_menu), FALSE);
+      }
+   }
 }
 
 static void
-transfer_function_toggled_cb(GtkWidget *widget)// , gtkwidget *widget)
+transfer_fxn_cb(GtkWidget *widget)
 {
-
-   gtk_toggle_button_set_active(transfer_function_toggle, !gtk_toggle_button_get_active(transfer_function_toggle));
+   if (gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (transfer_function_menu)))
+   {
+      if (tf != 1) //Don't do anything if initiated by transfer_function_toggled_cb()
+      {   
+         tf = 1;  
+         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(transfer_function_toggle), TRUE);
+      }
+   }
+   else
+   {
+      if (tf == 1) //Don't do anything if initiated by transfer_function_toggled_cb()
+      {
+         tf = 0;
+         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(transfer_function_toggle), FALSE);
+      }
+   }
 }
 
 // capture call back
@@ -598,47 +586,6 @@ open_file(char *fn)
          fprintf (stderr, "Couldn't open file %s for reading\n", save_name);
       fclose(file_handle);
 }
-   
-static void
-open_cb(GtkWidget *widget, char *data)
-{
-
-   GtkFileFilter *file_filter= NULL;
-   gint result;
-
-   if (open_dialog != NULL)
-   {
-      gtk_window_present (open_dialog);
-      return(0);
-   }
-
-   open_dialog = gtk_file_chooser_dialog_new ("Open Capture Buffers From", GTK_WINDOW(bkg_dialog), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
-   if(save_name)
-      gtk_file_chooser_select_filename(GTK_FILE_CHOOSER(open_dialog),save_name);
-   else
-      gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(open_dialog),home_string);
-   file_filter = gtk_file_filter_new   ();
-   gtk_file_filter_add_pattern (file_filter, "*.brp");
-   gtk_file_filter_set_name(file_filter, "BRP-PACU files");
-   gtk_file_chooser_set_filter (GTK_FILE_CHOOSER(open_dialog), GTK_FILE_FILTER(file_filter));
-
-   gtk_widget_set_sensitive(save_as, 0);
-   gtk_widget_set_sensitive(save_now, 0);
-   result = gtk_dialog_run (GTK_DIALOG (open_dialog));
-   switch (result)
-   {
-   case GTK_RESPONSE_ACCEPT:
-      open_file(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(open_dialog)));
-      break;
-   default:
-      break;
-   }
-   gtk_widget_destroy (open_dialog);
-   gtk_widget_set_sensitive(save_as, 1);
-   gtk_widget_set_sensitive(save_now, 1);
-   open_dialog = NULL;
-   return(0);
-}
 
 static void
 save_file(char* fn)
@@ -666,6 +613,270 @@ save_file(char* fn)
 
 }
 
+#ifdef __APPLE__
+
+static UInt8 strBuffer[PATH_MAX]; 
+
+// To open a file, pass docList containing one record with the file to open
+//     and set basename to NULL.  
+// To save a flle, pass basename with the file name
+//     and docList containing one record with the encloseing folder
+// doclist must contain exactly one entry.
+
+static OSStatus DoOpenSave(AEDescList docList, CFStringRef basename)
+
+{
+   FSRef       theFSRef;
+   long        index = 1;
+   long        count = 0;
+   OSErr       osError;
+   char        bn[256];
+
+   osError = AECountItems(&docList, &count);
+   if (osError == noErr)
+   {
+      if (count == 1)
+      {
+         if (osError == noErr)
+         osError = AEGetNthPtr(&docList, index, typeFSRef,
+                        NULL, NULL, &theFSRef,
+                        sizeof(FSRef), NULL);
+         if (osError == noErr)
+            osError = FSRefMakePath(&theFSRef, strBuffer, PATH_MAX);
+         if (osError == noErr)
+         {
+            if (basename)
+            {
+               if (CFStringGetCString(basename,bn,256,kCFStringEncodingUTF8))
+               {
+                  strcat(strBuffer,"/");
+                  strcat(strBuffer, bn);
+               }
+               save_file(strBuffer);
+            }
+            else
+               open_file(strBuffer);
+            return(0);
+         }
+      }
+      else
+          fprintf(stderr, "Cannot open more than one file at a time\n");
+      return(0);
+   }
+   fprintf(stderr, "OS X error %d\n", (int)osError);
+   return(0);   
+}
+
+// Handler function for opening files from the OS X finder
+// such as double-click on a data file
+OSErr
+openAndPrintDocsEventHandler(theAppleEvent ,reply, handlerRefcon)
+{
+   AEDescList  docList;
+   FSRef       theFSRef;
+   long        index = 1;
+   long        count = 0;
+   OSErr       osError;
+ 
+   osError = AEGetParamDesc(theAppleEvent, keyDirectObject,
+                         typeAEList, &docList);
+   
+   if (osError == noErr)
+       osError = DoOpenSave(docList, NULL);
+   fprintf(stderr, "OS X error %d\n", (int)osError);
+   return(0);   
+}
+
+static void
+open_cb(GtkWidget *widget, char *data)
+{
+	OSStatus status;
+    NavDialogCreationOptions navOptions;
+    CFStringRef              uti;
+    CFMutableArrayRef		 identifiers;
+	NavDialogRef             theDialog = NULL;
+    
+	status = NavGetDefaultDialogCreationOptions(&navOptions);
+	require_noerr(status, NavGetDefaultDialogCreationOptions);
+	
+	navOptions.preferenceKey = 1;
+    navOptions.optionFlags &= ~kNavAllowMultipleFiles;
+	
+    gtk_widget_set_sensitive(open_menuitem, 0);
+    gtk_widget_set_sensitive(save_as, 0);
+    gtk_widget_set_sensitive(save_now, 0);
+    
+	status = NavCreateGetFileDialog(&navOptions, NULL, NULL, NULL, NULL, NULL, &theDialog);
+	require_noerr(status, NavCreateChooseFileDialog);
+	
+	// BRP-PACU can open files with the ".brp" extension
+	identifiers = CFArrayCreateMutable( kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks );
+	require_action( identifiers != NULL, CantCreateChooseFileFilterIdentifiers, status = coreFoundationUnknownErr );
+	
+	// create the image browser UTI conforming to "public.data" because it's a data file rather than a bundle 
+	uti = UTTypeCreatePreferredIdentifierForTag( kUTTagClassFilenameExtension, CFSTR("brp"),
+																kUTTypeData );
+	require_action( uti != NULL, CantCreateImageBrowserUTI, status = coreFoundationUnknownErr );
+	
+	CFArrayAppendValue( identifiers, uti );
+	
+	// filter by image browser UTI
+	status = NavDialogSetFilterTypeIdentifiers( theDialog, identifiers );
+	require_noerr( status, CantSetChooseFileFilterIdentifiers );
+	
+    status = NavDialogRun(theDialog);
+	require_noerr(status, NavDialogRun);
+	
+	NavReplyRecord aNavReplyRecord;
+	status = NavDialogGetReply(theDialog, &aNavReplyRecord);
+	require((status == noErr) || (status == userCanceledErr), NavDialogGetReply);
+	
+	if (aNavReplyRecord.validRecord)
+		status = DoOpenSave(aNavReplyRecord.selection, NULL);
+	else
+		status = userCanceledErr;
+	
+NavDialogGetReply:
+	
+	NavDisposeReply(&aNavReplyRecord);
+
+CantCreateChooseFileFilterIdentifiers:
+CantCreateImageBrowserUTI:
+coreFoundationUnknownErr:
+CantSetChooseFileFilterIdentifiers:
+NavDialogRun:
+NavCreateChooseFileDialog:
+NavGetDefaultDialogCreationOptions:
+
+    if (status && status != userCanceledErr)
+        fprintf(stderr, "OS X error %d\n", (int) status);
+	if (theDialog != NULL)
+		NavDialogDispose(theDialog);
+		
+    gtk_widget_set_sensitive(save_as, 1);
+    gtk_widget_set_sensitive(save_now, 1);
+    gtk_widget_set_sensitive(open_menuitem, 1);
+	return status;
+}
+
+// static OSStatus Do_SaveAs(WindowRef inWindow)
+static void
+save_as_cb(GtkWidget *widget, char *data)   
+{
+	OSStatus status = noErr;
+    CFStringRef theFileName;
+	
+	NavDialogCreationOptions navOptions;
+	status = NavGetDefaultDialogCreationOptions(&navOptions);
+	require_noerr(status, NavGetDefaultDialogCreationOptions);
+	
+    theFileName = CFStringCreateWithCString (NULL, save_name?strrchr(save_name,'/')+1:"Untitled.brp",
+                     kCFStringEncodingUTF8);
+    CFMutableStringRef newFileName = CFStringCreateMutableCopy(NULL, 0, theFileName);
+    CFRelease(theFileName);
+    
+    CFIndex len = CFStringGetLength(newFileName);
+    if (len > 255)
+        len = 255;
+    
+    UniChar buffer[255];
+    CFStringGetCharacters(newFileName, CFRangeMake(0, len), buffer);
+    
+    UniCharCount extIndex;
+    status = LSGetExtensionInfo(len, buffer, &extIndex);
+    require_noerr(status, LSGetExtensionInfo);
+    
+    if (extIndex != kLSInvalidExtensionIndex)
+        CFStringReplace(newFileName, CFRangeMake(extIndex, len-extIndex), CFSTR("brp"));
+    else
+        CFStringAppend(newFileName, CFSTR(".brp"));
+    
+    navOptions.preferenceKey = 2;
+    navOptions.optionFlags |= kNavPreserveSaveFileExtension;
+    navOptions.saveFileName = newFileName;
+	
+	NavDialogRef theDialog = NULL;
+    gtk_widget_set_sensitive(open_menuitem, 0);
+    gtk_widget_set_sensitive(save_as, 0);
+    gtk_widget_set_sensitive(save_now, 0);
+
+	status = NavCreatePutFileDialog(&navOptions, NULL, "BRPP", NULL, NULL, &theDialog);
+	CFRelease(newFileName);
+	require_noerr(status, NavCreatePutFileDialog);
+	
+	status = NavDialogRun(theDialog);
+	require_noerr(status, NavDialogRun);
+    
+	NavReplyRecord aNavReplyRecord;
+	status = NavDialogGetReply(theDialog, &aNavReplyRecord);
+	require((status == noErr) || (status == userCanceledErr), NavDialogGetReply);
+
+	if (aNavReplyRecord.validRecord)
+       status = DoOpenSave(aNavReplyRecord.selection, aNavReplyRecord.saveFileName);
+    else
+        status = userCanceledErr;
+	
+NavDialogRun:
+NavCreatePutFileDialog:
+LSGetExtensionInfo:
+NavGetDefaultDialogCreationOptions:
+NavDialogGetReply:
+
+    if (status && status != userCanceledErr)
+        fprintf(stderr, "OS X error %d\n", (int) status);
+	if (theDialog != NULL) 
+		NavDialogDispose(theDialog);
+
+    gtk_widget_set_sensitive(save_as, 1);
+    gtk_widget_set_sensitive(save_now, 1);
+    gtk_widget_set_sensitive(open_menuitem, 1);
+	return status;
+}   // Do_SaveAs
+
+#else  
+static void
+open_cb(GtkWidget *widget, char *data)
+{
+
+   GtkFileFilter *file_filter= NULL;
+   gint result;
+
+   if (open_dialog != NULL)
+   {
+      gtk_window_present (open_dialog);
+      return(0);
+   }
+
+   open_dialog = gtk_file_chooser_dialog_new ("Open Capture Buffers From", GTK_WINDOW(bkg_dialog), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+//   if(save_name)
+//   {
+//      gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(open_dialog),save_name);
+//   }
+//   else
+//      gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(open_dialog),home_string);
+   file_filter = gtk_file_filter_new   ();
+   gtk_file_filter_add_pattern (file_filter, "*.brp");
+   gtk_file_filter_set_name(file_filter, "BRP-PACU files");
+   gtk_file_chooser_set_filter (GTK_FILE_CHOOSER(open_dialog), GTK_FILE_FILTER(file_filter));
+
+   gtk_widget_set_sensitive(save_as, 0);
+   gtk_widget_set_sensitive(save_now, 0);
+   result = gtk_dialog_run (GTK_DIALOG (open_dialog));
+   switch (result)
+   {
+   case GTK_RESPONSE_ACCEPT:
+      open_file(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(open_dialog)));
+      break;
+   default:
+      break;
+   }
+   gtk_widget_destroy (open_dialog);
+   gtk_widget_set_sensitive(save_as, 1);
+   gtk_widget_set_sensitive(save_now, 1);
+   open_dialog = NULL;
+   return(0);
+}
+
 static void
 save_as_cb(GtkWidget *widget, char *data)
 {
@@ -673,6 +884,8 @@ save_as_cb(GtkWidget *widget, char *data)
    int k;
    gint result;
    GtkFileFilter *file_filter= NULL;
+   char* file_name, * extension;
+   char file_name_ext[PATH_MAX];
    
    if (save_as_dialog != NULL)
    {
@@ -681,11 +894,8 @@ save_as_cb(GtkWidget *widget, char *data)
    }
 
    save_as_dialog = gtk_file_chooser_dialog_new ("Save Capture Buffers As (*.brp recommended)", GTK_WINDOW(bkg_dialog), GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE_AS, GTK_RESPONSE_ACCEPT, NULL);
-   
-   if(!gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(save_as_dialog),save_name))
-      gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(save_as_dialog),home_string);
-   gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(save_as_dialog),
-       save_name==NULL?"Untitled.brp":strrchr(save_name,'/')+1);
+   if(save_name)
+      gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(save_as_dialog),save_name);
          
    file_filter = gtk_file_filter_new   ();
    gtk_file_filter_add_pattern (file_filter, "*.brp");
@@ -695,11 +905,26 @@ save_as_cb(GtkWidget *widget, char *data)
    gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (save_as_dialog), TRUE);
 
    gtk_widget_set_sensitive(open_menuitem, 0);
-   result = gtk_dialog_run (GTK_DIALOG (save_as_dialog));
-   switch (result)
+   strcpy(file_name_ext, save_name?save_name:"Untitled.brp");
+   while (TRUE)
+   {
+   file_name = strrchr(file_name_ext,'/');
+   file_name = file_name?file_name +1:file_name_ext;
+      gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(save_as_dialog),file_name);
+      result = gtk_dialog_run (GTK_DIALOG (save_as_dialog));
+      file_name = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(save_as_dialog));
+      strcpy(file_name_ext, file_name);
+      extension = strrchr(file_name_ext,'.');    
+      if (extension && !strcmp(extension, ".brp")) break;
+      if (extension) 
+         strcpy(extension, ".brp"); // replace extension
+      else
+         strcat(file_name_ext, ".brp"); // append extension
+    }
+  switch (result)
    {
    case GTK_RESPONSE_ACCEPT:
-      save_file(gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(save_as_dialog)));
+      save_file(file_name);
       break;
    default:
       break;
@@ -709,7 +934,7 @@ save_as_cb(GtkWidget *widget, char *data)
    gtk_widget_set_sensitive(open_menuitem, 1);
    return(0);
 }
-
+#endif
 static void
 save_now_cb(GtkWidget *widget, char *data)
 {
@@ -726,7 +951,7 @@ static void
 impulse_cb(GtkWidget *widget, struct FFT_Frame * data)// , gtkwidget *widget)
 {
    gtk_widget_show_all(GTK_DIALOG(impulse_window));
-   gtk_widget_show_all(GTK_DIALOG(impulse_window));
+   gtk_window_present(impulse_window);
    data->find_impulse = 1;  // signal for Fill_Buffer fxn to find delay
    data->find_delay = 1;  // signal for Fill_Buffer fxn to find delay
 }
@@ -930,16 +1155,7 @@ create_gui (struct FFT_Frame * data)
    volume_pink_gui = glade_xml_get_widget (xml, "volumebutton1");
    pinknoise_button = glade_xml_get_widget (xml, "pinknoise_button");
    transfer_function_toggle = glade_xml_get_widget (xml, "TransferFxn");
-   buffer_button[0] = glade_xml_get_widget (xml, "buff0");
-   buffer_button[1] = glade_xml_get_widget (xml, "buff1");
-   buffer_button[2] = glade_xml_get_widget (xml, "buff2");
-   buffer_button[3] = glade_xml_get_widget (xml, "buff3");
-   buffer_button[4] = glade_xml_get_widget (xml, "buffAvg");
-   buffer_menu[0] = glade_xml_get_widget (xml, "buff0_m");
-   buffer_menu[1] = glade_xml_get_widget (xml, "buff1_m");
-   buffer_menu[2] = glade_xml_get_widget (xml, "buff2_m");
-   buffer_menu[3] = glade_xml_get_widget (xml, "buff3_m");
-   buffer_menu[4] = glade_xml_get_widget (xml, "buffAvg_m");
+   transfer_function_menu = glade_xml_get_widget (xml, "transfer_fxn");
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "pinknoise_button")), "clicked", G_CALLBACK (pinknoise_mute), NULL);
    //g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "volumebutton1")), "popdown", G_CALLBACK (volume_popdown_gui), NULL);
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "volumebutton1")), "value-changed", G_CALLBACK (volume_gui), NULL);
@@ -952,8 +1168,8 @@ create_gui (struct FFT_Frame * data)
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "about_me")), "activate", G_CALLBACK (about_me_cb), NULL);
    g_signal_connect (G_OBJECT (about_me_window), "delete_event", G_CALLBACK (about_ok_cb), NULL);
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "about_ok")), "clicked", G_CALLBACK (about_ok_cb), NULL);
-   g_signal_connect (G_OBJECT (transfer_function_toggle), "toggled", G_CALLBACK (transfer_fxn_cb), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "transfer_fxn")), "activate", G_CALLBACK (transfer_function_toggled_cb), NULL);
+   g_signal_connect (G_OBJECT (transfer_function_menu), "activate", G_CALLBACK (transfer_fxn_cb), NULL);
+   g_signal_connect (G_OBJECT (transfer_function_toggle), "clicked", G_CALLBACK (transfer_function_toggled_cb), NULL);
    g_signal_connect (GTK_BUTTON (glade_xml_get_widget (xml, "find_delay")), "clicked", G_CALLBACK (delay_cb), data);
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "find_delay_m")), "activate", G_CALLBACK (delay_cb), data);
    g_signal_connect (GTK_OBJECT (window), "destroy", G_CALLBACK (cleanup_gui), NULL);
