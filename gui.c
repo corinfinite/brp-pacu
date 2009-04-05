@@ -73,7 +73,8 @@ static gfloat *gui_impulse_Y = NULL;
 static gfloat *gui_impulse_X = NULL;
 static gfloat guiYBuf[N_BUFF][PLOT_PTS];
 static gfloat guiYBufAvgHold[PLOT_PTS];
-static char* save_name = NULL;
+static GString *file_name_str = NULL;
+static GString *save_name_str = NULL;
 static char * home_string, *file_path1, *file_path2;
 
 static char pinknoise_muted = 0;
@@ -577,13 +578,16 @@ open_file(char *fn)
          {
             for (k = 0; k < N_BUFF; k++)
                fread (guiYBuf[k], sizeof(gfloat), PLOT_PTS, file_handle );
-            save_name = fn;
+            if (save_name_str)
+                g_string_assign(save_name_str, fn);
+            else
+                save_name_str = g_string_new(fn);
          }
          else
             fprintf (stderr, "PLOT_PTS is different from PLOT_PTS last captured size, N has been changed from N=%d * 2 since your last capture.\n", read_plot_pts  );
       }
       else
-         fprintf (stderr, "Couldn't open file %s for reading\n", save_name);
+         fprintf (stderr, "Couldn't open file %s for reading\n", save_name_str->str);
       fclose(file_handle);
 }
 
@@ -605,11 +609,14 @@ save_file(char* fn)
       fwrite (tmp_array, sizeof(gint), 1, file_handle );
       for (k = 0; k < N_BUFF; k++)
          fwrite (guiYBuf[k], sizeof(gfloat), PLOT_PTS, file_handle );
-      save_name = fn;
+      if (save_name_str)
+         g_string_assign(save_name_str, fn);
+      else
+         save_name_str = g_string_new(fn);
       fclose(file_handle);
    }
    else
-      fprintf (stderr, "Couldn't open file %s for writing.  Usually this is a permissions issue\n", save_name);
+      fprintf (stderr, "Couldn't open file %s for writing.  Usually this is a permissions issue\n", save_name_str->str);
 
 }
 
@@ -770,7 +777,8 @@ save_as_cb(GtkWidget *widget, char *data)
 	status = NavGetDefaultDialogCreationOptions(&navOptions);
 	require_noerr(status, NavGetDefaultDialogCreationOptions);
 	
-    theFileName = CFStringCreateWithCString (NULL, save_name?strrchr(save_name,'/')+1:"Untitled.brp",
+    theFileName = CFStringCreateWithCString
+                     (NULL, save_name_str?strrchr(save_name_str->str,'/')+1:"Untitled.brp",
                      kCFStringEncodingUTF8);
     CFMutableStringRef newFileName = CFStringCreateMutableCopy(NULL, 0, theFileName);
     CFRelease(theFileName);
@@ -848,10 +856,8 @@ open_cb(GtkWidget *widget, char *data)
    }
 
    open_dialog = gtk_file_chooser_dialog_new ("Open Capture Buffers From", GTK_WINDOW(bkg_dialog), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
-//   if(save_name)
-//   {
-//      gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(open_dialog),save_name);
-//   }
+//   if(save_name_str)
+//      gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(open_dialog),save_name_str->str);
 //   else
 //      gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(open_dialog),home_string);
    file_filter = gtk_file_filter_new   ();
@@ -885,7 +891,6 @@ save_as_cb(GtkWidget *widget, char *data)
    gint result;
    GtkFileFilter *file_filter= NULL;
    char* file_name, * extension;
-   char file_name_ext[PATH_MAX];
    
    if (save_as_dialog != NULL)
    {
@@ -894,8 +899,8 @@ save_as_cb(GtkWidget *widget, char *data)
    }
 
    save_as_dialog = gtk_file_chooser_dialog_new ("Save Capture Buffers As (*.brp recommended)", GTK_WINDOW(bkg_dialog), GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE_AS, GTK_RESPONSE_ACCEPT, NULL);
-   if(save_name)
-      gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(save_as_dialog),save_name);
+   if(save_name_str)
+      gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(save_as_dialog),save_name_str->str);
          
    file_filter = gtk_file_filter_new   ();
    gtk_file_filter_add_pattern (file_filter, "*.brp");
@@ -905,22 +910,20 @@ save_as_cb(GtkWidget *widget, char *data)
    gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (save_as_dialog), TRUE);
 
    gtk_widget_set_sensitive(open_menuitem, 0);
-   strcpy(file_name_ext, save_name?save_name:"Untitled.brp");
+   if (save_name_str) g_string_assign(file_name_str, save_name_str->str);
    while (TRUE)
    {
-   file_name = strrchr(file_name_ext,'/');
-   file_name = file_name?file_name +1:file_name_ext;
+   file_name = strrchr(file_name_str->str,'/');
+   file_name = file_name?file_name +1:file_name_str->str;
       gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(save_as_dialog),file_name);
       result = gtk_dialog_run (GTK_DIALOG (save_as_dialog));
       file_name = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(save_as_dialog));
-      strcpy(file_name_ext, file_name);
-      extension = strrchr(file_name_ext,'.');    
+      g_string_assign(file_name_str, file_name);
+      file_name = file_name_str->str;
+      extension = strrchr(file_name,'.');    
       if (extension && !strcmp(extension, ".brp")) break;
-      if (extension) 
-         strcpy(extension, ".brp"); // replace extension
-      else
-         strcat(file_name_ext, ".brp"); // append extension
-    }
+      g_string_append(file_name_str, ".brp");     
+   }
   switch (result)
    {
    case GTK_RESPONSE_ACCEPT:
@@ -938,12 +941,10 @@ save_as_cb(GtkWidget *widget, char *data)
 static void
 save_now_cb(GtkWidget *widget, char *data)
 {
-   if (save_name == NULL)
-   {
-      save_as_cb(widget, data);
-   }   
+   if (save_name_str)
+      save_file(save_name_str->str);
    else
-      save_file(save_name);
+      save_as_cb(widget, data);
 }
 
 // Trigger the gtk callback to find the impulse response in BRP_PACU.c
@@ -1097,6 +1098,7 @@ create_gui (struct FFT_Frame * data)
 
    FILE * file_handle;
    gint read_plot_pts[1];
+   file_name_str = g_string_new("Untitiled.brp");
 
    char tmp_string[] = "BRP-PACU vxx.xx.xx ";
    graph = g_new0 (GtkDataboxGraph *, 10);  // allocate memory graph array
