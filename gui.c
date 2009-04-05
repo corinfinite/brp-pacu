@@ -1098,7 +1098,7 @@ create_gui (struct FFT_Frame * data)
 
    FILE * file_handle;
    gint read_plot_pts[1];
-   file_name_str = g_string_new("Untitiled.brp");
+   file_name_str = g_string_new("Untitled.brp");
 
    char tmp_string[] = "BRP-PACU vxx.xx.xx ";
    graph = g_new0 (GtkDataboxGraph *, 10);  // allocate memory graph array
