@@ -1,0 +1,5 @@
+Maybe a menu item with an accelerator for Pink Noise
+
+The program should not quit when Jack does not start but stay on hold until jack is fixed and/or started manually. Also, it should not crash when Jack is stopped manually.
+
+Messages written with printf and fprintf to the console will not be read by the average user. These messages are only useful for debugging. Messages that are meant for the user should appear in alert windows.
