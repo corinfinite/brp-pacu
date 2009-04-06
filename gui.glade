@@ -647,6 +647,8 @@
     <property name="urgency_hint">True</property>
     <property name="gravity">GDK_GRAVITY_CENTER</property>
     <property name="has_separator">False</property>
+    <property name="transient_for">window1</property>
+    <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>

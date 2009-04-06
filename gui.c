@@ -54,6 +54,7 @@ static  GtkWidget *reference_draw;
 /////////////////////////////////////////////
 static GtkDataboxGraph **graph;
 static GtkDataboxGraph *graph_impulse;
+static GtkWidget *window = NULL;
 static GtkWidget *box;
 static GtkWidget *impulse_box;
 static GtkWidget *about_me_window = NULL;
@@ -119,6 +120,23 @@ static   GdkColor line_color[N_BUFF] = {
    };
 static GdkColor myColor1 =    { 0, 0x3333, 0x3333, 0x3333 };
 static GdkColor myColor2 =    { 0, 0x3333, 0x3333, 0x3333 };
+
+void message(char * format, char* text, gboolean error)
+{
+      fprintf(stderr, format, text);
+      fprintf(stderr, "\n");
+      GtkWidget* dialog = gtk_message_dialog_new (window,
+                                  GTK_DIALOG_DESTROY_WITH_PARENT,
+                                  error?GTK_MESSAGE_ERROR:GTK_MESSAGE_WARNING,
+                                  GTK_BUTTONS_CLOSE,
+                                  format,
+                                  text);
+      gtk_window_set_position(dialog, GTK_WIN_POS_CENTER);
+      gtk_window_set_decorated (dialog, FALSE);
+      gtk_window_present (dialog);
+      gtk_dialog_run (GTK_DIALOG (dialog));
+      gtk_widget_destroy (dialog);
+}
                                     
 gboolean
 gui_idle_func (struct FFT_Frame *data)
@@ -455,13 +473,13 @@ capture_cb(GtkWidget *widget, GtkWidget *box)// , gtkwidget *widget)
       if (file_handle == NULL)
       {
          write_output = 0;
-         fprintf(stderr, "Could not open file %s, permissions issue?\n", file_path2);
+         message("Could not open file %s, permissions issue?", file_path2, TRUE);
       }
    }
    if (write_output == 1)
    {
       tmp_array[0] = PLOT_PTS;
-      fprintf(stderr, "Writing %d elements per buffer to %s\n",  tmp_array[0], file_path2);
+      printf("Writing %d elements per buffer to %s\n",  tmp_array[0], file_path2);
       fwrite (tmp_array, sizeof(gint), 1, file_handle );
       for (i = 0; i < N_BUFF; i++)
          fwrite (guiYBuf[i], sizeof(gfloat), PLOT_PTS, file_handle );
@@ -584,10 +602,14 @@ open_file(char *fn)
                 save_name_str = g_string_new(fn);
          }
          else
-            fprintf (stderr, "PLOT_PTS is different from PLOT_PTS last captured size, N has been changed from N=%d * 2 since your last capture.\n", read_plot_pts  );
+         {
+            message("Wrong file format", NULL, TRUE);
+            fprintf (stderr, "PLOT_PTS is different from PLOT_PTS last captured size."); 
+            fprintf (stderr, "N has been changed from N=%d * 2 since your last capture.\n", read_plot_pts  );
+         }
       }
       else
-         fprintf (stderr, "Couldn't open file %s for reading\n", save_name_str->str);
+         message("Couldn't open file %s for reading\n", fn, TRUE);
       fclose(file_handle);
 }
 
@@ -616,8 +638,7 @@ save_file(char* fn)
       fclose(file_handle);
    }
    else
-      fprintf (stderr, "Couldn't open file %s for writing.  Usually this is a permissions issue\n", save_name_str->str);
-
+      message("Couldn't open file %s for writing. Usually this is a permissions issue.", fn, TRUE);
 }
 
 #ifdef __APPLE__
@@ -667,7 +688,7 @@ static OSStatus DoOpenSave(AEDescList docList, CFStringRef basename)
          }
       }
       else
-          fprintf(stderr, "Cannot open more than one file at a time\n");
+          message("Cannot open more than one file at a time.", NULL, TRUE);
       return(0);
    }
    fprintf(stderr, "OS X error %d\n", (int)osError);
@@ -864,7 +885,7 @@ open_cb(GtkWidget *widget, char *data)
    gtk_file_filter_add_pattern (file_filter, "*.brp");
    gtk_file_filter_set_name(file_filter, "BRP-PACU files");
    gtk_file_chooser_set_filter (GTK_FILE_CHOOSER(open_dialog), GTK_FILE_FILTER(file_filter));
-
+   gtk_window_set_transient_for(open_dialog, window);
    gtk_widget_set_sensitive(save_as, 0);
    gtk_widget_set_sensitive(save_now, 0);
    result = gtk_dialog_run (GTK_DIALOG (open_dialog));
@@ -906,6 +927,7 @@ save_as_cb(GtkWidget *widget, char *data)
    gtk_file_filter_add_pattern (file_filter, "*.brp");
    gtk_file_filter_set_name(file_filter, "BRP-PACU files");
    gtk_file_chooser_set_filter (GTK_FILE_CHOOSER(save_as_dialog), GTK_FILE_FILTER(file_filter));
+   gtk_window_set_transient_for(save_as_dialog, window);
 
    gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (save_as_dialog), TRUE);
 
@@ -961,6 +983,8 @@ impulse_cb(GtkWidget *widget, struct FFT_Frame * data)// , gtkwidget *widget)
 static void
 delay_cb(GtkWidget *widget, struct FFT_Frame * data)// , gtkwidget *widget)
 {
+   gtk_window_set_transient_for(delay_window, window);
+   gtk_window_set_decorated (delay_window, FALSE);
    gtk_widget_show_all(GTK_DIALOG(delay_window));
    gtk_window_present (delay_window);
 
@@ -1085,7 +1109,6 @@ static gboolean configure_event_reference( GtkWidget         *widget,
 gboolean
 create_gui (struct FFT_Frame * data)
 {
-   GtkWidget *window = NULL;
    GtkWidget *box_container;
    GtkWidget *box_container_impulse;
 /////   GtkWidget *label;
@@ -1131,7 +1154,7 @@ create_gui (struct FFT_Frame * data)
       xml = glade_xml_new (DATADIR"/BRP_PACU/gui.glade", NULL, NULL);
       if (!xml)
       {
-         fprintf(stderr, "Couldn't find glade file\n"); // glade_xml_new throws error about the path
+         message("Couldn't find glade file.", NULL, TRUE); // glade_xml_new throws error about the path
          return(FALSE);
       }
    }
@@ -1324,31 +1347,6 @@ create_gui (struct FFT_Frame * data)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-   home_string = getenv ("HOME");
-   file_path1 = malloc(sizeof(home_string) + 30);
-   file_path2 = malloc(sizeof(home_string) + 50);
-
-#ifdef __APPLE__
-   sprintf(file_path1, "%s/Library/Caches/BRP-PACU", home_string);
-#else
-   sprintf(file_path1, "%s/.BRP_PACU", home_string);
-#endif
-   sprintf(file_path2, "%s/buff_store.brp", file_path1 );
-   if ((file_handle = fopen(file_path2, "rb")) <= 0)
-      fprintf(stderr, "\n\nNo BRP_PACU initialization file yet\nAre you running BRP_PACU for the 1st time?\nIf so, a file will be created for you on your next capture\n\n");
-   else
-   {
-      fread (read_plot_pts, sizeof(gint), 1, file_handle );
-      if (read_plot_pts[0] == PLOT_PTS)
-      {
-         for (i = 0; i < N_BUFF; i++)
-            fread (guiYBuf[i], sizeof(gfloat), PLOT_PTS, file_handle );
-      }
-      else
-         fprintf (stderr, "PLOT_PTS is different from PLOT_PTS saved size, this is because you have changed N since your last capture.  Please change it back to %d * 2. Otherwise making a new capture should overwrite the old file\n", read_plot_pts  );
-      fclose(file_handle);
-   }
-
 #ifdef __APPLE__
    GtkWidget *menubar1;
    GtkWidget *quit_ap;
@@ -1387,6 +1385,33 @@ create_gui (struct FFT_Frame * data)
       fprintf(stderr, "OS X error %d\n", (int)osError);
 //                  RunApplicationEventLoop();
 #endif
+   home_string = getenv ("HOME");
+   file_path1 = malloc(sizeof(home_string) + 30);
+   file_path2 = malloc(sizeof(home_string) + 50);
+
+#ifdef __APPLE__
+   sprintf(file_path1, "%s/Library/Caches/BRP-PACU", home_string);
+#else
+   sprintf(file_path1, "%s/.BRP_PACU", home_string);
+#endif
+   sprintf(file_path2, "%s/buff_store.brp", file_path1 );
+   if ((file_handle = fopen(file_path2, "rb")) <= 0)
+      message("No BRP_PACU initialization file yet\nAre you running BRP_PACU for the 1st time?\nIf so, a file will be created for you on your next capture.", NULL, FALSE);
+   else
+   {
+      fread (read_plot_pts, sizeof(gint), 1, file_handle );
+      if (read_plot_pts[0] == PLOT_PTS)
+      {
+         for (i = 0; i < N_BUFF; i++)
+            fread (guiYBuf[i], sizeof(gfloat), PLOT_PTS, file_handle );
+      }
+      else
+      {
+      message("The BRP_PACU initialization file has the wrong format. An initialization file will be created for you on your next capture.", NULL, FALSE);
+         fprintf (stderr, "PLOT_PTS is different from PLOT_PTS saved size, this is because you have changed N since your last capture.  Please change it back to %d * 2. Otherwise making a new capture should overwrite the old file\n", read_plot_pts  );
+      }
+      fclose(file_handle);
+   }
    g_object_unref (G_OBJECT(xml));
    return(TRUE);
 
