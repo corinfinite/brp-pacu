@@ -63,6 +63,7 @@ static GtkWidget *delay_window = NULL;
 static GtkWidget *impulse_window = NULL;
 static GtkWidget *volume_pink_gui = NULL;
 static GtkWidget *pinknoise_button = NULL;
+static GtkWidget *pinknoise_menu_item = NULL;
 static GtkWidget *transfer_function_toggle = NULL;
 static GtkWidget *transfer_function_menu = NULL;
 static GtkWidget *buffer_button[N_BUFF] = { NULL, NULL, NULL, NULL, NULL };
@@ -360,9 +361,25 @@ delay_custom_cb(GtkWidget *widget)// , gtkwidget *widget)
    update_delay = 1;
 }
 static void
-pinknoise_mute(GtkWidget *widget)// , gtkwidget *widget)
+pinknoise_mute(GtkWidget *widget, char * data)// , gtkwidget *widget)
 {
-   pinknoise_muted ^= 1;
+   if (strcmp(data,"menu")==0) // what button was pressed
+   {
+      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button))!=  gtk_check_menu_item_get_active(GTK_MENU_ITEM (pinknoise_menu_item)) )  // is this the first call
+      {
+         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pinknoise_button), !gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button)) );
+         pinknoise_muted ^= 1;
+      }
+   }
+   else
+   {
+      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button)) !=  gtk_check_menu_item_get_active(GTK_MENU_ITEM (pinknoise_menu_item)) ) // is this the first call
+      {
+         gtk_check_menu_item_set_active(GTK_MENU_ITEM (pinknoise_menu_item), !gtk_check_menu_item_get_active(GTK_MENU_ITEM (pinknoise_menu_item)) );
+         pinknoise_muted ^= 1;
+      }
+   }
+
 }
 static void
 volume_gui(GtkWidget *widget)// , gtkwidget *widget)
@@ -1179,9 +1196,10 @@ create_gui (struct FFT_Frame * data)
    gui_status_delay_label = glade_xml_get_widget (xml, "delay_status_label");
    volume_pink_gui = glade_xml_get_widget (xml, "volumebutton1");
    pinknoise_button = glade_xml_get_widget (xml, "pinknoise_button");
+   pinknoise_menu_item = glade_xml_get_widget (xml, "pink_noise");
    transfer_function_toggle = glade_xml_get_widget (xml, "TransferFxn");
    transfer_function_menu = glade_xml_get_widget (xml, "transfer_fxn");
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "pinknoise_button")), "clicked", G_CALLBACK (pinknoise_mute), NULL);
+   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "pinknoise_button")), "clicked", G_CALLBACK (pinknoise_mute), "button");
    //g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "volumebutton1")), "popdown", G_CALLBACK (volume_popdown_gui), NULL);
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "volumebutton1")), "value-changed", G_CALLBACK (volume_gui), NULL);
 //  g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "volumebutton1")), "clicked", G_CALLBACK (volume_popup_gui), NULL);
@@ -1204,6 +1222,7 @@ create_gui (struct FFT_Frame * data)
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "impulse_response")), "activate", G_CALLBACK (impulse_cb), data);
    g_signal_connect (GTK_OBJECT (impulse_window), "delete_event", G_CALLBACK (impulse_hide), NULL);
 
+   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "pink_noise")), "activate", G_CALLBACK (pinknoise_mute), "menu");
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "delay_custom_button")), "clicked", G_CALLBACK (delay_custom_cb), NULL);
 
    gui_frequency = 0;

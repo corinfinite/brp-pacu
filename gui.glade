@@ -186,6 +186,14 @@
                       </widget>
                     </child>
                     <child>
+                      <widget class="GtkCheckMenuItem" id="pink_noise">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Pink Noise</property>
+                        <property name="use_underline">True</property>
+                        <accelerator key="p" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </widget>
+                    </child>
+                    <child>
                       <widget class="GtkCheckMenuItem" id="transfer_fxn">
                         <property name="visible">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
@@ -646,7 +654,6 @@
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
     <property name="urgency_hint">True</property>
     <property name="gravity">GDK_GRAVITY_CENTER</property>
-    <property name="has_separator">False</property>
     <property name="transient_for">window1</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">

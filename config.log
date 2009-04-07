@@ -130,6 +130,7 @@ on thepackage
 
 config.status:635: creating Makefile
 config.status:635: creating config.h
+config.status:851: config.h is unchanged
 config.status:897: executing depfiles commands
 configure:4730: checking for cos in -lm
 configure:4765: gcc -o conftest -g -O2   conftest.c -lm   >&5
@@ -270,16 +271,16 @@ pkg_cv_PANGO_LIBS='-lpango-1.0 -lgobject-2.0 -lgmodule-2.0 -lglib-2.0  '
 ## Output variables. ##
 ## ----------------- ##
 
-ACLOCAL='${SHELL} /home/brphelps/BRP-PACU-Staging/BRP_PACU-2.0.7/missing --run aclocal-1.10'
+ACLOCAL='${SHELL} /home/brphelps/BRP-PACU-Staging/git_tree/brp-pacu/missing --run aclocal-1.10'
 AMDEPBACKSLASH='\'
 AMDEP_FALSE='#'
 AMDEP_TRUE=''
-AMTAR='${SHELL} /home/brphelps/BRP-PACU-Staging/BRP_PACU-2.0.7/missing --run tar'
+AMTAR='${SHELL} /home/brphelps/BRP-PACU-Staging/git_tree/brp-pacu/missing --run tar'
 APPLE_FALSE=''
 APPLE_TRUE='#'
-AUTOCONF='${SHELL} /home/brphelps/BRP-PACU-Staging/BRP_PACU-2.0.7/missing --run autoconf'
-AUTOHEADER='${SHELL} /home/brphelps/BRP-PACU-Staging/BRP_PACU-2.0.7/missing --run autoheader'
-AUTOMAKE='${SHELL} /home/brphelps/BRP-PACU-Staging/BRP_PACU-2.0.7/missing --run automake-1.10'
+AUTOCONF='${SHELL} /home/brphelps/BRP-PACU-Staging/git_tree/brp-pacu/missing --run autoconf'
+AUTOHEADER='${SHELL} /home/brphelps/BRP-PACU-Staging/git_tree/brp-pacu/missing --run autoheader'
+AUTOMAKE='${SHELL} /home/brphelps/BRP-PACU-Staging/git_tree/brp-pacu/missing --run automake-1.10'
 AWK='gawk'
 CAIRO_CFLAGS='-I/usr/include/cairo -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12  '
 CAIRO_LIBS='-lcairo  '
@@ -312,7 +313,7 @@ LIBGLADE_LIBS='-L/usr/local/lib -lglade-2.0 -lgtk-x11-2.0 -lxml2 -lgdk-x11-2.0 -
 LIBOBJS=''
 LIBS='-lfftw -lm '
 LTLIBOBJS=''
-MAKEINFO='${SHELL} /home/brphelps/BRP-PACU-Staging/BRP_PACU-2.0.7/missing --run makeinfo'
+MAKEINFO='${SHELL} /home/brphelps/BRP-PACU-Staging/git_tree/brp-pacu/missing --run makeinfo'
 OBJEXT='o'
 PACKAGE='BRP_PACU'
 PACKAGE_BUGREPORT=''
@@ -349,7 +350,7 @@ host_alias=''
 htmldir='${docdir}'
 includedir='${prefix}/include'
 infodir='${datarootdir}/info'
-install_sh='$(SHELL) /home/brphelps/BRP-PACU-Staging/BRP_PACU-2.0.7/install-sh'
+install_sh='$(SHELL) /home/brphelps/BRP-PACU-Staging/git_tree/brp-pacu/install-sh'
 libdir='${exec_prefix}/lib'
 libexecdir='${exec_prefix}/libexec'
 localedir='${datarootdir}/locale'
