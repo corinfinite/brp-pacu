@@ -4,4 +4,6 @@ The program should not quit when Jack does not start but stay on hold until jack
 
 Change const N to another name like N_FFT because it may cause symbol collisions
 
+Change gui to not use N datapoints because this drastically increases processor usage to draw points that aren't visible or useful
+
 #Messages written with printf and fprintf to the console will not be read by the average user. These messages are only useful for debugging. Messages that are meant for the user should appear in alert windows.
