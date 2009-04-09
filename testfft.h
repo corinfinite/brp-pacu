@@ -22,16 +22,17 @@
 #include <fftw.h>
 #include <math.h>
 #include "main.h"
-#define N 8192
+#define N_FFT 8192
+#define RATIO 2
 #define AVG_NUM 32
 #define BUFF_NUM 32
 #define FSAMP 44100
 #define SCALEF 32765
 #define NYQUIST FSAMP/2
-#define FBIN (float) ((float) FSAMP)/( ((float)N)/1.0)
-#define PLOT_PTS N/2
+#define PLOT_PTS (N_FFT)/RATIO
+#define FBIN (float) ((float) FSAMP)/( ((float)PLOT_PTS)/1.0)
 #define BUFSIZE 256
-#define B_N N/BUFSIZE
+#define B_N N_FFT/BUFSIZE
 
 #ifndef TESTFFT_H
 #define TESTFFT_H

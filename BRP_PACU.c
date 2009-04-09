@@ -132,26 +132,26 @@ Fill_Buffer(jack_nframes_t nframes, void *arg)
       //fprintf(stderr, "The period size is %d\n",period_size);
       //
       // Fill delay with old data
-      for ( k = 0; k < (N - period_size); k++)
+      for ( k = 0; k < (N_FFT - period_size); k++)
       {
          // Rotate dellay data to the left to make room for new samples
          fill_it->delay[k] = fill_it->delay[k + period_size];
       }
-      for ( k = N - period_size; k < N; k++)
+      for ( k = N_FFT - period_size; k < N_FFT; k++)
       {
          // Copy old delay data to end of delayed buffer 2
-         fill_it->delay[k] = fill_it->prewin_buffer_data_2[k - N + period_size ];
+         fill_it->delay[k] = fill_it->prewin_buffer_data_2[k - N_FFT + period_size ];
       }
 
       // Rotate data to the left to make room for new samples
-      for ( k = 0; k < (N - period_size ); k++)
+      for ( k = 0; k < (N_FFT - period_size ); k++)
       {
          fill_it->prewin_buffer_data_1[k ] = fill_it->prewin_buffer_data_1[k + period_size ];
          fill_it->prewin_buffer_data_2[k ] = fill_it->prewin_buffer_data_2[k + period_size ];
       }
 
       j = 0;
-      for (k = N - period_size; k < N ; k++)
+      for (k = N_FFT - period_size; k < N_FFT ; k++)
       {
          // copy channels to the end of the data
 
@@ -161,7 +161,7 @@ Fill_Buffer(jack_nframes_t nframes, void *arg)
       }
 
 
-      for (k = 0; k < N; k++)
+      for (k = 0; k < N_FFT; k++)
       {
          // Copy data to working buffer #2
          fill_it->buffer_data_1[k] = fill_it->prewin_buffer_data_1[k];
@@ -169,20 +169,20 @@ Fill_Buffer(jack_nframes_t nframes, void *arg)
          if (k - fill_it->delay_size >= 0)
             fill_it->buffer_data_2[k] = fill_it->prewin_buffer_data_2[k - fill_it->delay_size]; // copy end of normal buffer to working buffer
          else
-            fill_it->buffer_data_2[k] = fill_it->delay[k + N - fill_it->delay_size];  // copy most recent samples of the delay buffer to beginning (oldest) buffer_data_2
+            fill_it->buffer_data_2[k] = fill_it->delay[k + N_FFT - fill_it->delay_size];  // copy most recent samples of the delay buffer to beginning (oldest) buffer_data_2
       }
-      //for (k = 0; k < N; k++)
+      //for (k = 0; k < N_FFT; k++)
       //{
-         // Apply Window function
-         // Blackman window
-         // For some reason this causes errors in the response, maybe someone knows better than me why?
-         //fill_it->buffer_data_1[k] = (short)(\
-         //      ( ((float)fill_it->buffer_data_1[k])*(0.42 - 0.5 * cos(2.0 * pi * ((float)k) / (  ((float)N) - 1.0)) \
-         //        + 0.08 * cos(4.0 * pi * ((float)k) / (((float)N) - 1.0)))  ));
-         //fill_it->buffer_data_2[k] = (short)(\
-         //   ((float)fill_it->buffer_data_2[k])*(0.42 - 0.5 * cos(2.0 * pi * ((float)k) / (  ((float)N) - 1.0))\
-         //    + 0.08 * cos(4.0 * pi * ((float)k) / (((float)N) - 1.0))));
-         //
+      // Apply Window function
+      // Blackman window
+      // For some reason this causes errors in the response, maybe someone knows better than me why?
+      //fill_it->buffer_data_1[k] = (short)(\
+      //      ( ((float)fill_it->buffer_data_1[k])*(0.42 - 0.5 * cos(2.0 * pi * ((float)k) / (  ((float)N) - 1.0)) \
+      //        + 0.08 * cos(4.0 * pi * ((float)k) / (((float)N) - 1.0)))  ));
+      //fill_it->buffer_data_2[k] = (short)(\
+      //   ((float)fill_it->buffer_data_2[k])*(0.42 - 0.5 * cos(2.0 * pi * ((float)k) / (  ((float)N) - 1.0))\
+      //    + 0.08 * cos(4.0 * pi * ((float)k) / (((float)N) - 1.0))));
+      //
       //}
    }
    pthread_mutex_unlock(&p_mutex);
@@ -197,15 +197,15 @@ MyGTKFunction (struct FFT_Frame * frame_data)
    double max, tmp;
 
    pthread_mutex_lock(&p_mutex);
-   memcpy(temp_frame_data->buffer_data_1, frame_data->buffer_data_1, N*sizeof(short));
-   memcpy(temp_frame_data->buffer_data_2, frame_data->buffer_data_2, N*sizeof(short));
+   memcpy(temp_frame_data->buffer_data_1, frame_data->buffer_data_1, N_FFT*sizeof(short));
+   memcpy(temp_frame_data->buffer_data_2, frame_data->buffer_data_2, N_FFT*sizeof(short));
    memcpy(temp_frame_data->plan, frame_data->plan, sizeof(frame_data->plan));
    pthread_mutex_unlock(&p_mutex);
    fft_capture(temp_frame_data);  // This fxn does the FFT, frame_data->buffer_data_n is used to get frame_data->fft_returned_n
 
    pthread_mutex_lock(&p_mutex);
-   memcpy(frame_data->fft_returned_1, temp_frame_data->fft_returned_1, N*sizeof(double));
-   memcpy(frame_data->fft_returned_2, temp_frame_data->fft_returned_2, N*sizeof(double));
+   memcpy(frame_data->fft_returned_1, temp_frame_data->fft_returned_1, N_FFT*sizeof(double));
+   memcpy(frame_data->fft_returned_2, temp_frame_data->fft_returned_2, N_FFT*sizeof(double));
    pthread_mutex_unlock(&p_mutex);
 
    if (frame_data->find_delay == 1) // Delay button pressed, set delay to new value
@@ -226,7 +226,7 @@ MyGTKFunction (struct FFT_Frame * frame_data)
       impulse_capture(frame_data);
       pthread_mutex_unlock(&p_mutex);
       max = 0.0;
-      for (j = 0; j < N; j++)
+      for (j = 0; j < N_FFT; j++)
       {
          tmp = frame_data->rfft_returned_1[j];
          // find the maximum impulse response sample to find the delay.
@@ -241,7 +241,7 @@ MyGTKFunction (struct FFT_Frame * frame_data)
       printf("Done Finding delay\n");
       printf("min value is %f, min time is %f\n", max, ((float)max_index)*(1.0 / ((float)FSAMP))  );
       //frame_data->delay_size=10000;
-      if ( max_index < N) // Protect against delay being larger than malloc'd size of N
+      if ( max_index < N_FFT) // Protect against delay being larger than malloc'd size of N
          frame_data->delay_size = max_index;
       timer_id = gtk_timeout_add(90, MyGTKFunction, (gpointer) frame_data ); // Start back to normal
       frame_data->find_delay = 2;  // Indicate to gui that we are done finding the delay
@@ -253,17 +253,17 @@ MyGTKFunction (struct FFT_Frame * frame_data)
    }
 
    pthread_mutex_lock(&p_mutex);
-   temp_frame_data->pink_muted=frame_data->pink_muted;
+   temp_frame_data->pink_muted = frame_data->pink_muted;
    temp_frame_data->volume_pink = frame_data->volume_pink;
    temp_frame_data->find_delay = frame_data->find_delay;
    temp_frame_data->find_impulse = frame_data->find_impulse;
    temp_frame_data->delay_size = frame_data->delay_size;
-//   memcpy(temp_frame_data->delay_size, frame_data->delay, N*sizeof(short));
-   memcpy(temp_frame_data->fft_returned_1, frame_data->fft_returned_1, N*sizeof(double));
-   memcpy(temp_frame_data->fft_returned_2, frame_data->fft_returned_2, N*sizeof(double));
-   memcpy(temp_frame_data->buffer_data_1, frame_data->buffer_data_1, N*sizeof(short));
-   memcpy(temp_frame_data->buffer_data_2, frame_data->buffer_data_2, N*sizeof(short));
-   memcpy(temp_frame_data->rfft_returned_1, frame_data->rfft_returned_1, N*sizeof(double));
+//   memcpy(temp_frame_data->delay_size, frame_data->delay, N_FFT*sizeof(short));
+   memcpy(temp_frame_data->fft_returned_1, frame_data->fft_returned_1, N_FFT*sizeof(double));
+   memcpy(temp_frame_data->fft_returned_2, frame_data->fft_returned_2, N_FFT*sizeof(double));
+   memcpy(temp_frame_data->buffer_data_1, frame_data->buffer_data_1, N_FFT*sizeof(short));
+   memcpy(temp_frame_data->buffer_data_2, frame_data->buffer_data_2, N_FFT*sizeof(short));
+   memcpy(temp_frame_data->rfft_returned_1, frame_data->rfft_returned_1, N_FFT*sizeof(double));
    pthread_mutex_unlock(&p_mutex);
 
    gui_idle_func(temp_frame_data);
@@ -275,7 +275,7 @@ MyGTKFunction (struct FFT_Frame * frame_data)
    frame_data->find_impulse = temp_frame_data->find_impulse;
    frame_data->delay_size = temp_frame_data->delay_size;
    pthread_mutex_unlock(&p_mutex);
-   
+
    return 900;
 
 }
@@ -286,21 +286,21 @@ struct FFT_Frame *init_fft_frame(void)
    struct FFT_Frame *FFT_Kit = (struct FFT_Frame *) malloc(sizeof(struct FFT_Frame));
    //p_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-   FFT_Kit->fft_returned_1 = (double *) malloc(sizeof(double) * N);
-   FFT_Kit->fft_returned_2 = (double *) malloc(sizeof(double) * N);
-   FFT_Kit->rfft_returned_1 = (double *) malloc(sizeof(double) * N);
-   FFT_Kit->prewin_buffer_data_1 = (short *) malloc(sizeof(short) * N);
-   FFT_Kit->prewin_buffer_data_2 = (short *) malloc(sizeof(short) * N);
-   FFT_Kit->buffer_data_1 = (short *) malloc(sizeof(short) * N);
-   FFT_Kit->buffer_data_2 = (short *) malloc(sizeof(short) * N);
-   FFT_Kit->delay = (short *) malloc(sizeof(short) * N);
+   FFT_Kit->fft_returned_1 = (double *) malloc(sizeof(double) * N_FFT);
+   FFT_Kit->fft_returned_2 = (double *) malloc(sizeof(double) * N_FFT);
+   FFT_Kit->rfft_returned_1 = (double *) malloc(sizeof(double) * N_FFT);
+   FFT_Kit->prewin_buffer_data_1 = (short *) malloc(sizeof(short) * N_FFT);
+   FFT_Kit->prewin_buffer_data_2 = (short *) malloc(sizeof(short) * N_FFT);
+   FFT_Kit->buffer_data_1 = (short *) malloc(sizeof(short) * N_FFT);
+   FFT_Kit->buffer_data_2 = (short *) malloc(sizeof(short) * N_FFT);
+   FFT_Kit->delay = (short *) malloc(sizeof(short) * N_FFT);
 
    FFT_Kit->delay_size = 0;
    FFT_Kit->volume_pink = 0.0;
    FFT_Kit->find_delay = 0;
    FFT_Kit->find_impulse = 0;
 
-   for (k = 0; k < N; k++)
+   for (k = 0; k < N_FFT; k++)
    {
       FFT_Kit->delay[k] = 0;
       //FFT_Kit->audio[k] = 0;
@@ -312,8 +312,8 @@ struct FFT_Frame *init_fft_frame(void)
       FFT_Kit->fft_returned_2[k] = 0;
       FFT_Kit->delay[k] = 0;
    }
-   FFT_Kit->plan = fftw_create_plan(N, FFTW_FORWARD, FFTW_ESTIMATE);
-   FFT_Kit->reverse_plan = fftw_create_plan(N, FFTW_BACKWARD, FFTW_ESTIMATE);
+   FFT_Kit->plan = fftw_create_plan(N_FFT, FFTW_FORWARD, FFTW_ESTIMATE);
+   FFT_Kit->reverse_plan = fftw_create_plan(N_FFT, FFTW_BACKWARD, FFTW_ESTIMATE);
    return FFT_Kit;
 }
 
@@ -461,8 +461,8 @@ main (int argc, char *argv[])
    //        struct FFT_Frame *FFT_Kit = g_new0 (struct FFT_Frame, 1);
 
    pthread_t capt_buff_thread;
-   audio1 = (float *)malloc(sizeof(float) * N);
-   audio2 = (float *)malloc(sizeof(float) * N);
+   audio1 = (float *)malloc(sizeof(float) * N_FFT);
+   audio2 = (float *)malloc(sizeof(float) * N_FFT);
    b0 = 0;
    b1 = 0;
    b2 = 0;
@@ -482,15 +482,15 @@ main (int argc, char *argv[])
    {
       if (create_gui(fill_it))
       {
-        timer_id = gtk_timeout_add(90, MyGTKFunction, (gpointer) fill_it ); // Start the initial delay
-        gtk_main ();
+         timer_id = gtk_timeout_add(90, MyGTKFunction, (gpointer) fill_it ); // Start the initial delay
+         gtk_main ();
 
-        gtk_timeout_remove(timer_id);
-        run = 0;
-      jack_deactivate (client);
+         gtk_timeout_remove(timer_id);
+         run = 0;
+         jack_deactivate (client);
       }
       else
-        fprintf(stderr, "Gui did not start\n");
+         fprintf(stderr, "Gui did not start\n");
    }
    else
       fprintf(stderr, "////////\n////////\n BRP_PACU failed to start because jackd failed to initialize, please check your jackd sound card settings.  qjackctl (JackPilot with a mac) is an easy way to do this\n////////\n////////\n");

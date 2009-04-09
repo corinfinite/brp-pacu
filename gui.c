@@ -111,34 +111,35 @@ static   GdkColor background_color;
 static   GdkColor grid_color;
 static   GdkColor trace_transfer_color;
 static   GdkColor trace_impulse_color;
-static   GdkColor line_color[N_BUFF] = {
-      //unused, red, green, blue
-      {0, 16384 ,16384 ,65535 },
-      {0, 0 ,65535 ,0 },
-      {0, 65535 ,0 ,0 },
-      {0, 65535 ,16384 ,65535 },
-      {0, 65535 ,65535 ,65535 }
-   };
+static   GdkColor line_color[N_BUFF] =
+{
+   //unused, red, green, blue
+   {0, 16384 , 16384 , 65535 },
+   {0, 0 , 65535 , 0 },
+   {0, 65535 , 0 , 0 },
+   {0, 65535 , 16384 , 65535 },
+   {0, 65535 , 65535 , 65535 }
+};
 static GdkColor myColor1 =    { 0, 0x3333, 0x3333, 0x3333 };
 static GdkColor myColor2 =    { 0, 0x3333, 0x3333, 0x3333 };
 
 void message(char * format, char* text, gboolean error)
 {
-      fprintf(stderr, format, text);
-      fprintf(stderr, "\n");
-      GtkWidget* dialog = gtk_message_dialog_new (window,
-                                  GTK_DIALOG_DESTROY_WITH_PARENT,
-                                  error?GTK_MESSAGE_ERROR:GTK_MESSAGE_WARNING,
-                                  GTK_BUTTONS_CLOSE,
-                                  format,
-                                  text);
-      gtk_window_set_position(dialog, GTK_WIN_POS_CENTER);
-      gtk_window_set_decorated (dialog, FALSE);
-      gtk_window_present (dialog);
-      gtk_dialog_run (GTK_DIALOG (dialog));
-      gtk_widget_destroy (dialog);
+   fprintf(stderr, format, text);
+   fprintf(stderr, "\n");
+   GtkWidget* dialog = gtk_message_dialog_new (window,
+                       GTK_DIALOG_DESTROY_WITH_PARENT,
+                       error ? GTK_MESSAGE_ERROR : GTK_MESSAGE_WARNING,
+                       GTK_BUTTONS_CLOSE,
+                       format,
+                       text);
+   gtk_window_set_position(dialog, GTK_WIN_POS_CENTER);
+   gtk_window_set_decorated (dialog, FALSE);
+   gtk_window_present (dialog);
+   gtk_dialog_run (GTK_DIALOG (dialog));
+   gtk_widget_destroy (dialog);
 }
-                                    
+
 gboolean
 gui_idle_func (struct FFT_Frame *data)
 {
@@ -172,7 +173,7 @@ gui_idle_func (struct FFT_Frame *data)
    if (data->find_impulse == 2)
    {
 
-      for (i = 0; i < N; i++)
+      for (i = 0; i < N_FFT; i++)
       {
          index = i;
          temp = (gfloat)data->rfft_returned_1[index] ;
@@ -188,12 +189,11 @@ gui_idle_func (struct FFT_Frame *data)
    {
       for (i = 0; i < PLOT_PTS; i++)
       {
-         index = i;
          if (tf)
-            avgY[i][avg_index] = (0.0 + 20.0 * log10((gfloat)data->fft_returned_1[index] / \
-                                  (gfloat)data->fft_returned_2[index]));
+            avgY[i][avg_index] = (0.0 + 20.0 * log10((gfloat)data->fft_returned_1[i] / \
+                                  (gfloat)data->fft_returned_2[i]));
          else
-            avgY[i][avg_index] = (0.0 + 20.0 * log10((gfloat)data->fft_returned_1[index]));
+            avgY[i][avg_index] = (0.0 + 20.0 * log10((gfloat)data->fft_returned_1[i]));
          //      avgY[i][avg_index] = (20*log10((gfloat)data->fft_returned_1[index]+1));
 
          tmp[i] = 0;
@@ -207,9 +207,13 @@ gui_idle_func (struct FFT_Frame *data)
       }
    }
 
-   for (i = 0; i < PLOT_PTS; i++)
+   smoothing=(int)pow(10.0, (((float)0) / (((float)N_FFT / 3.0)) + 1.0))-9;
+   for (i = smoothing; i < PLOT_PTS-smoothing; i+=smoothing)
    {
-      smoothing = (int)pow(10, (((float)i) / ((float)(N / 4)) + 1.0));  // Apply smoothing more at higher frequencies than lower frequencies
+      smoothing = (int)pow(10.0, (((float)i) / (((float)N_FFT / 3.0)) + 1.0))-9;  // Apply smoothing more at higher frequencies than lower frequencies
+      if (i==4095)
+         printf("Its: %d\n",smoothing );
+      //smoothing=1;
       smoothing = smoothing > 0 ? smoothing : 0;
       //smoothing=0;
       //smoothing=0;
@@ -219,7 +223,15 @@ gui_idle_func (struct FFT_Frame *data)
          guiY[i] += tmp[(i-j)>=0?(i-j):0];
          guiY[i] += tmp[(i+j)<PLOT_PTS?(i+j):(PLOT_PTS-1)];
       }
+
       guiY[i] /= (smoothing * 2.0 + 1.0);
+
+      for (j = 1; j <= smoothing; j++)
+      {
+         guiY[i-j]=guiY[i]*(smoothing-j)/smoothing+guiY[i-smoothing]*(j)/smoothing;
+         guiY[i+j]=guiY[i]*(smoothing-j)/smoothing+guiY[i+smoothing]*(j)/smoothing;
+      }
+
    }
    guiY[0] = tmp[3];
    guiY[1] = tmp[3];
@@ -230,7 +242,7 @@ gui_idle_func (struct FFT_Frame *data)
    if (data->find_impulse == 2)
    {
       min_x = 0.0;
-      max_x = ((gfloat) N) / NYQUIST;
+      max_x = ((gfloat) N_FFT) / NYQUIST;
       gtk_databox_set_total_limits (GTK_DATABOX (impulse_box), min_x, max_x, max_y, \
                                     min_y);
       gtk_widget_queue_draw(GTK_WIDGET (impulse_box));
@@ -264,7 +276,7 @@ gui_idle_func (struct FFT_Frame *data)
    ///////////////////////////////////////////////////////////////////////////////////////////////////
    //LED Color Choosing & rendering
    max = 0;
-   for (k = N - 2000; k < N; k++)
+   for (k = N_FFT - 2000; k < N_FFT; k++)
    {
       if (max < data->buffer_data_1[k])
          max = data->buffer_data_1[k];
@@ -306,7 +318,7 @@ gui_idle_func (struct FFT_Frame *data)
    gdk_draw_drawable (measured_draw->window, measured_draw->style->fg_gc[GTK_WIDGET_STATE (measured_draw)], measured_pixmap, 5, 5, 5, 5, 20, 20);
 
    max = 0;
-   for (k = N - 2000; k < N; k++)
+   for (k = N_FFT - 2000; k < N_FFT; k++)
    {
       if (max < data->buffer_data_2[k])
          max = data->buffer_data_2[k];
@@ -363,9 +375,9 @@ delay_custom_cb(GtkWidget *widget)// , gtkwidget *widget)
 static void
 pinknoise_mute(GtkWidget *widget, char * data)// , gtkwidget *widget)
 {
-   if (strcmp(data,"menu")==0) // what button was pressed
+   if (strcmp(data, "menu") == 0) // what button was pressed
    {
-      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button))!=  gtk_check_menu_item_get_active(GTK_MENU_ITEM (pinknoise_menu_item)) )  // is this the first call
+      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button)) !=  gtk_check_menu_item_get_active(GTK_MENU_ITEM (pinknoise_menu_item)) ) // is this the first call
       {
          gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pinknoise_button), !gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button)) );
          pinknoise_muted ^= 1;
@@ -410,7 +422,7 @@ transfer_function_toggled_cb(GtkWidget *widget)
    {
       if (tf == 0) //Don't do anything if initiated by transfer_fxn_cb()
       {
-         tf = 1;  
+         tf = 1;
          gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(transfer_function_menu), TRUE);
       }
    }
@@ -430,8 +442,8 @@ transfer_fxn_cb(GtkWidget *widget)
    if (gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (transfer_function_menu)))
    {
       if (tf != 1) //Don't do anything if initiated by transfer_function_toggled_cb()
-      {   
-         tf = 1;  
+      {
+         tf = 1;
          gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(transfer_function_toggle), TRUE);
       }
    }
@@ -456,7 +468,7 @@ capture_cb(GtkWidget *widget, GtkWidget *box)// , gtkwidget *widget)
 
    if (buffer[buffer_last_clicked] == 1) // Is it on the screen?
    {
-      if (buffer_last_clicked == N_BUFF- 1) // Is it the average buffer?
+      if (buffer_last_clicked == N_BUFF - 1) // Is it the average buffer?
       {
          for (k = 0; k < PLOT_PTS; k++)
          {
@@ -604,30 +616,30 @@ open_file(char *fn)
    int k;
    FILE *file_handle;
    gint read_plot_pts[1];
-      printf("%s is being opened\n", fn );
-      file_handle = fopen( fn, "rb");
-      if (file_handle != NULL)
+   printf("%s is being opened\n", fn );
+   file_handle = fopen( fn, "rb");
+   if (file_handle != NULL)
+   {
+      fread (read_plot_pts, sizeof(gint), 1, file_handle );
+      if (read_plot_pts[0] == PLOT_PTS)
       {
-         fread (read_plot_pts, sizeof(gint), 1, file_handle );
-         if (read_plot_pts[0] == PLOT_PTS)
-         {
-            for (k = 0; k < N_BUFF; k++)
-               fread (guiYBuf[k], sizeof(gfloat), PLOT_PTS, file_handle );
-            if (save_name_str)
-                g_string_assign(save_name_str, fn);
-            else
-                save_name_str = g_string_new(fn);
-         }
+         for (k = 0; k < N_BUFF; k++)
+            fread (guiYBuf[k], sizeof(gfloat), PLOT_PTS, file_handle );
+         if (save_name_str)
+            g_string_assign(save_name_str, fn);
          else
-         {
-            message("Wrong file format", NULL, TRUE);
-            fprintf (stderr, "PLOT_PTS is different from PLOT_PTS last captured size."); 
-            fprintf (stderr, "N has been changed from N=%d * 2 since your last capture.\n", read_plot_pts  );
-         }
+            save_name_str = g_string_new(fn);
       }
       else
-         message("Couldn't open file %s for reading\n", fn, TRUE);
-      fclose(file_handle);
+      {
+         message("Wrong file format", NULL, TRUE);
+         fprintf (stderr, "PLOT_PTS is different from PLOT_PTS last captured size.");
+         fprintf (stderr, "N_FFT has been changed from N_FFT=%d * 2 since your last capture.\n", read_plot_pts  );
+      }
+   }
+   else
+      message("Couldn't open file %s for reading\n", fn, TRUE);
+   fclose(file_handle);
 }
 
 static void
@@ -637,10 +649,10 @@ save_file(char* fn)
    gint tmp_array[1];
    FILE *file_handle;
    printf("%s is being saved\n", fn);
-/*      for (k = 0; k < PLOT_PTS; k++)
-      {
-          printf("%g*",guiYBufAvg[k]);
-      } */
+   /*      for (k = 0; k < PLOT_PTS; k++)
+         {
+             printf("%g*",guiYBufAvg[k]);
+         } */
    file_handle = fopen(fn, "wb");
    if (file_handle != NULL)
    {
@@ -660,10 +672,10 @@ save_file(char* fn)
 
 #ifdef __APPLE__
 
-static UInt8 strBuffer[PATH_MAX]; 
+static UInt8 strBuffer[PATH_MAX];
 
 // To open a file, pass docList containing one record with the file to open
-//     and set basename to NULL.  
+//     and set basename to NULL.
 // To save a flle, pass basename with the file name
 //     and docList containing one record with the encloseing folder
 // doclist must contain exactly one entry.
@@ -683,18 +695,18 @@ static OSStatus DoOpenSave(AEDescList docList, CFStringRef basename)
       if (count == 1)
       {
          if (osError == noErr)
-         osError = AEGetNthPtr(&docList, index, typeFSRef,
-                        NULL, NULL, &theFSRef,
-                        sizeof(FSRef), NULL);
+            osError = AEGetNthPtr(&docList, index, typeFSRef,
+                                  NULL, NULL, &theFSRef,
+                                  sizeof(FSRef), NULL);
          if (osError == noErr)
             osError = FSRefMakePath(&theFSRef, strBuffer, PATH_MAX);
          if (osError == noErr)
          {
             if (basename)
             {
-               if (CFStringGetCString(basename,bn,256,kCFStringEncodingUTF8))
+               if (CFStringGetCString(basename, bn, 256, kCFStringEncodingUTF8))
                {
-                  strcat(strBuffer,"/");
+                  strcat(strBuffer, "/");
                   strcat(strBuffer, bn);
                }
                save_file(strBuffer);
@@ -705,85 +717,85 @@ static OSStatus DoOpenSave(AEDescList docList, CFStringRef basename)
          }
       }
       else
-          message("Cannot open more than one file at a time.", NULL, TRUE);
+         message("Cannot open more than one file at a time.", NULL, TRUE);
       return(0);
    }
    fprintf(stderr, "OS X error %d\n", (int)osError);
-   return(0);   
+   return(0);
 }
 
 // Handler function for opening files from the OS X finder
 // such as double-click on a data file
 OSErr
-openAndPrintDocsEventHandler(theAppleEvent ,reply, handlerRefcon)
+openAndPrintDocsEventHandler(theAppleEvent , reply, handlerRefcon)
 {
    AEDescList  docList;
    FSRef       theFSRef;
    long        index = 1;
    long        count = 0;
    OSErr       osError;
- 
+
    osError = AEGetParamDesc(theAppleEvent, keyDirectObject,
-                         typeAEList, &docList);
-   
+                            typeAEList, &docList);
+
    if (osError == noErr)
-       osError = DoOpenSave(docList, NULL);
+      osError = DoOpenSave(docList, NULL);
    fprintf(stderr, "OS X error %d\n", (int)osError);
-   return(0);   
+   return(0);
 }
 
 static void
 open_cb(GtkWidget *widget, char *data)
 {
-	OSStatus status;
-    NavDialogCreationOptions navOptions;
-    CFStringRef              uti;
-    CFMutableArrayRef		 identifiers;
-	NavDialogRef             theDialog = NULL;
-    
-	status = NavGetDefaultDialogCreationOptions(&navOptions);
-	require_noerr(status, NavGetDefaultDialogCreationOptions);
-	
-	navOptions.preferenceKey = 1;
-    navOptions.optionFlags &= ~kNavAllowMultipleFiles;
-	
-    gtk_widget_set_sensitive(open_menuitem, 0);
-    gtk_widget_set_sensitive(save_as, 0);
-    gtk_widget_set_sensitive(save_now, 0);
-    
-	status = NavCreateGetFileDialog(&navOptions, NULL, NULL, NULL, NULL, NULL, &theDialog);
-	require_noerr(status, NavCreateChooseFileDialog);
-	
-	// BRP-PACU can open files with the ".brp" extension
-	identifiers = CFArrayCreateMutable( kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks );
-	require_action( identifiers != NULL, CantCreateChooseFileFilterIdentifiers, status = coreFoundationUnknownErr );
-	
-	// create the image browser UTI conforming to "public.data" because it's a data file rather than a bundle 
-	uti = UTTypeCreatePreferredIdentifierForTag( kUTTagClassFilenameExtension, CFSTR("brp"),
-																kUTTypeData );
-	require_action( uti != NULL, CantCreateImageBrowserUTI, status = coreFoundationUnknownErr );
-	
-	CFArrayAppendValue( identifiers, uti );
-	
-	// filter by image browser UTI
-	status = NavDialogSetFilterTypeIdentifiers( theDialog, identifiers );
-	require_noerr( status, CantSetChooseFileFilterIdentifiers );
-	
-    status = NavDialogRun(theDialog);
-	require_noerr(status, NavDialogRun);
-	
-	NavReplyRecord aNavReplyRecord;
-	status = NavDialogGetReply(theDialog, &aNavReplyRecord);
-	require((status == noErr) || (status == userCanceledErr), NavDialogGetReply);
-	
-	if (aNavReplyRecord.validRecord)
-		status = DoOpenSave(aNavReplyRecord.selection, NULL);
-	else
-		status = userCanceledErr;
-	
+   OSStatus status;
+   NavDialogCreationOptions navOptions;
+   CFStringRef              uti;
+   CFMutableArrayRef		 identifiers;
+   NavDialogRef             theDialog = NULL;
+
+   status = NavGetDefaultDialogCreationOptions(&navOptions);
+   require_noerr(status, NavGetDefaultDialogCreationOptions);
+
+   navOptions.preferenceKey = 1;
+   navOptions.optionFlags &= ~kNavAllowMultipleFiles;
+
+   gtk_widget_set_sensitive(open_menuitem, 0);
+   gtk_widget_set_sensitive(save_as, 0);
+   gtk_widget_set_sensitive(save_now, 0);
+
+   status = NavCreateGetFileDialog(&navOptions, NULL, NULL, NULL, NULL, NULL, &theDialog);
+   require_noerr(status, NavCreateChooseFileDialog);
+
+   // BRP-PACU can open files with the ".brp" extension
+   identifiers = CFArrayCreateMutable( kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks );
+   require_action( identifiers != NULL, CantCreateChooseFileFilterIdentifiers, status = coreFoundationUnknownErr );
+
+   // create the image browser UTI conforming to "public.data" because it's a data file rather than a bundle
+   uti = UTTypeCreatePreferredIdentifierForTag( kUTTagClassFilenameExtension, CFSTR("brp"),
+         kUTTypeData );
+   require_action( uti != NULL, CantCreateImageBrowserUTI, status = coreFoundationUnknownErr );
+
+   CFArrayAppendValue( identifiers, uti );
+
+   // filter by image browser UTI
+   status = NavDialogSetFilterTypeIdentifiers( theDialog, identifiers );
+   require_noerr( status, CantSetChooseFileFilterIdentifiers );
+
+   status = NavDialogRun(theDialog);
+   require_noerr(status, NavDialogRun);
+
+   NavReplyRecord aNavReplyRecord;
+   status = NavDialogGetReply(theDialog, &aNavReplyRecord);
+   require((status == noErr) || (status == userCanceledErr), NavDialogGetReply);
+
+   if (aNavReplyRecord.validRecord)
+      status = DoOpenSave(aNavReplyRecord.selection, NULL);
+   else
+      status = userCanceledErr;
+
 NavDialogGetReply:
-	
-	NavDisposeReply(&aNavReplyRecord);
+
+   NavDisposeReply(&aNavReplyRecord);
 
 CantCreateChooseFileFilterIdentifiers:
 CantCreateImageBrowserUTI:
@@ -793,98 +805,98 @@ NavDialogRun:
 NavCreateChooseFileDialog:
 NavGetDefaultDialogCreationOptions:
 
-    if (status && status != userCanceledErr)
-        fprintf(stderr, "OS X error %d\n", (int) status);
-	if (theDialog != NULL)
-		NavDialogDispose(theDialog);
-		
-    gtk_widget_set_sensitive(save_as, 1);
-    gtk_widget_set_sensitive(save_now, 1);
-    gtk_widget_set_sensitive(open_menuitem, 1);
-	return status;
+   if (status && status != userCanceledErr)
+      fprintf(stderr, "OS X error %d\n", (int) status);
+   if (theDialog != NULL)
+      NavDialogDispose(theDialog);
+
+   gtk_widget_set_sensitive(save_as, 1);
+   gtk_widget_set_sensitive(save_now, 1);
+   gtk_widget_set_sensitive(open_menuitem, 1);
+   return status;
 }
 
 // static OSStatus Do_SaveAs(WindowRef inWindow)
 static void
-save_as_cb(GtkWidget *widget, char *data)   
+save_as_cb(GtkWidget *widget, char *data)
 {
-	OSStatus status = noErr;
-    CFStringRef theFileName;
-	
-	NavDialogCreationOptions navOptions;
-	status = NavGetDefaultDialogCreationOptions(&navOptions);
-	require_noerr(status, NavGetDefaultDialogCreationOptions);
-	
-    theFileName = CFStringCreateWithCString
-                     (NULL, save_name_str?strrchr(save_name_str->str,'/')+1:"Untitled.brp",
-                     kCFStringEncodingUTF8);
-    CFMutableStringRef newFileName = CFStringCreateMutableCopy(NULL, 0, theFileName);
-    CFRelease(theFileName);
-    
-    CFIndex len = CFStringGetLength(newFileName);
-    if (len > 255)
-        len = 255;
-    
-    UniChar buffer[255];
-    CFStringGetCharacters(newFileName, CFRangeMake(0, len), buffer);
-    
-    UniCharCount extIndex;
-    status = LSGetExtensionInfo(len, buffer, &extIndex);
-    require_noerr(status, LSGetExtensionInfo);
-    
-    if (extIndex != kLSInvalidExtensionIndex)
-        CFStringReplace(newFileName, CFRangeMake(extIndex, len-extIndex), CFSTR("brp"));
-    else
-        CFStringAppend(newFileName, CFSTR(".brp"));
-    
-    navOptions.preferenceKey = 2;
-    navOptions.optionFlags |= kNavPreserveSaveFileExtension;
-    navOptions.saveFileName = newFileName;
-	
-	NavDialogRef theDialog = NULL;
-    gtk_widget_set_sensitive(open_menuitem, 0);
-    gtk_widget_set_sensitive(save_as, 0);
-    gtk_widget_set_sensitive(save_now, 0);
+   OSStatus status = noErr;
+   CFStringRef theFileName;
 
-	status = NavCreatePutFileDialog(&navOptions, NULL, "BRPP", NULL, NULL, &theDialog);
-	CFRelease(newFileName);
-	require_noerr(status, NavCreatePutFileDialog);
-	
-	status = NavDialogRun(theDialog);
-	require_noerr(status, NavDialogRun);
-    
-	NavReplyRecord aNavReplyRecord;
-	status = NavDialogGetReply(theDialog, &aNavReplyRecord);
-	require((status == noErr) || (status == userCanceledErr), NavDialogGetReply);
+   NavDialogCreationOptions navOptions;
+   status = NavGetDefaultDialogCreationOptions(&navOptions);
+   require_noerr(status, NavGetDefaultDialogCreationOptions);
 
-	if (aNavReplyRecord.validRecord)
-       status = DoOpenSave(aNavReplyRecord.selection, aNavReplyRecord.saveFileName);
-    else
-        status = userCanceledErr;
-	
+   theFileName = CFStringCreateWithCString
+                 (NULL, save_name_str ? strrchr(save_name_str->str, '/') + 1 : "Untitled.brp",
+                  kCFStringEncodingUTF8);
+   CFMutableStringRef newFileName = CFStringCreateMutableCopy(NULL, 0, theFileName);
+   CFRelease(theFileName);
+
+   CFIndex len = CFStringGetLength(newFileName);
+   if (len > 255)
+      len = 255;
+
+   UniChar buffer[255];
+   CFStringGetCharacters(newFileName, CFRangeMake(0, len), buffer);
+
+   UniCharCount extIndex;
+   status = LSGetExtensionInfo(len, buffer, &extIndex);
+   require_noerr(status, LSGetExtensionInfo);
+
+   if (extIndex != kLSInvalidExtensionIndex)
+      CFStringReplace(newFileName, CFRangeMake(extIndex, len - extIndex), CFSTR("brp"));
+   else
+      CFStringAppend(newFileName, CFSTR(".brp"));
+
+   navOptions.preferenceKey = 2;
+   navOptions.optionFlags |= kNavPreserveSaveFileExtension;
+   navOptions.saveFileName = newFileName;
+
+   NavDialogRef theDialog = NULL;
+   gtk_widget_set_sensitive(open_menuitem, 0);
+   gtk_widget_set_sensitive(save_as, 0);
+   gtk_widget_set_sensitive(save_now, 0);
+
+   status = NavCreatePutFileDialog(&navOptions, NULL, "BRPP", NULL, NULL, &theDialog);
+   CFRelease(newFileName);
+   require_noerr(status, NavCreatePutFileDialog);
+
+   status = NavDialogRun(theDialog);
+   require_noerr(status, NavDialogRun);
+
+   NavReplyRecord aNavReplyRecord;
+   status = NavDialogGetReply(theDialog, &aNavReplyRecord);
+   require((status == noErr) || (status == userCanceledErr), NavDialogGetReply);
+
+   if (aNavReplyRecord.validRecord)
+      status = DoOpenSave(aNavReplyRecord.selection, aNavReplyRecord.saveFileName);
+   else
+      status = userCanceledErr;
+
 NavDialogRun:
 NavCreatePutFileDialog:
 LSGetExtensionInfo:
 NavGetDefaultDialogCreationOptions:
 NavDialogGetReply:
 
-    if (status && status != userCanceledErr)
-        fprintf(stderr, "OS X error %d\n", (int) status);
-	if (theDialog != NULL) 
-		NavDialogDispose(theDialog);
+   if (status && status != userCanceledErr)
+      fprintf(stderr, "OS X error %d\n", (int) status);
+   if (theDialog != NULL)
+      NavDialogDispose(theDialog);
 
-    gtk_widget_set_sensitive(save_as, 1);
-    gtk_widget_set_sensitive(save_now, 1);
-    gtk_widget_set_sensitive(open_menuitem, 1);
-	return status;
+   gtk_widget_set_sensitive(save_as, 1);
+   gtk_widget_set_sensitive(save_now, 1);
+   gtk_widget_set_sensitive(open_menuitem, 1);
+   return status;
 }   // Do_SaveAs
 
-#else  
+#else
 static void
 open_cb(GtkWidget *widget, char *data)
 {
 
-   GtkFileFilter *file_filter= NULL;
+   GtkFileFilter *file_filter = NULL;
    gint result;
 
    if (open_dialog != NULL)
@@ -927,9 +939,9 @@ save_as_cb(GtkWidget *widget, char *data)
 
    int k;
    gint result;
-   GtkFileFilter *file_filter= NULL;
+   GtkFileFilter *file_filter = NULL;
    char* file_name, * extension;
-   
+
    if (save_as_dialog != NULL)
    {
       gtk_window_present (save_as_dialog);
@@ -937,9 +949,9 @@ save_as_cb(GtkWidget *widget, char *data)
    }
 
    save_as_dialog = gtk_file_chooser_dialog_new ("Save Capture Buffers As (*.brp recommended)", GTK_WINDOW(bkg_dialog), GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE_AS, GTK_RESPONSE_ACCEPT, NULL);
-   if(save_name_str)
-      gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(save_as_dialog),save_name_str->str);
-         
+   if (save_name_str)
+      gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(save_as_dialog), save_name_str->str);
+
    file_filter = gtk_file_filter_new   ();
    gtk_file_filter_add_pattern (file_filter, "*.brp");
    gtk_file_filter_set_name(file_filter, "BRP-PACU files");
@@ -952,18 +964,18 @@ save_as_cb(GtkWidget *widget, char *data)
    if (save_name_str) g_string_assign(file_name_str, save_name_str->str);
    while (TRUE)
    {
-   file_name = strrchr(file_name_str->str,'/');
-   file_name = file_name?file_name +1:file_name_str->str;
-      gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(save_as_dialog),file_name);
+      file_name = strrchr(file_name_str->str, '/');
+      file_name = file_name ? file_name + 1 : file_name_str->str;
+      gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(save_as_dialog), file_name);
       result = gtk_dialog_run (GTK_DIALOG (save_as_dialog));
       file_name = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER(save_as_dialog));
       g_string_assign(file_name_str, file_name);
       file_name = file_name_str->str;
-      extension = strrchr(file_name,'.');    
+      extension = strrchr(file_name, '.');
       if (extension && !strcmp(extension, ".brp")) break;
-      g_string_append(file_name_str, ".brp");     
+      g_string_append(file_name_str, ".brp");
    }
-  switch (result)
+   switch (result)
    {
    case GTK_RESPONSE_ACCEPT:
       save_file(file_name);
@@ -1160,12 +1172,12 @@ create_gui (struct FFT_Frame * data)
       UInt8* buffer;
       buffer = malloc(PATH_MAX);
       if (CFURLGetFileSystemRepresentation(xmlUrl, true, buffer, PATH_MAX))
-        xml = glade_xml_new (buffer, NULL, NULL);
+         xml = glade_xml_new (buffer, NULL, NULL);
       free(buffer);
    }
    else
 #endif
-   xml = glade_xml_new ("gui.glade", NULL, NULL);
+      xml = glade_xml_new ("gui.glade", NULL, NULL);
    if (!xml)
    {
       xml = glade_xml_new (DATADIR"/BRP_PACU/gui.glade", NULL, NULL);
@@ -1288,10 +1300,10 @@ create_gui (struct FFT_Frame * data)
 
    guiX = g_new0 (gfloat, PLOT_PTS);
    guiY = g_new0 (gfloat, PLOT_PTS);
-   gui_impulse_Y = g_new0 (gfloat, N);
-   gui_impulse_X = g_new0 (gfloat, N);
+   gui_impulse_Y = g_new0 (gfloat, N_FFT);
+   gui_impulse_X = g_new0 (gfloat, N_FFT);
 
-   for (i = 0; i < PLOT_PTS; i++)
+   for (i = 0; i < N_FFT/2; i++)
    {
       gui_impulse_Y[i] = .01;
       gui_impulse_X[i] = ((gfloat)i) / ((gfloat)FSAMP);
@@ -1316,7 +1328,7 @@ create_gui (struct FFT_Frame * data)
    gtk_databox_graph_add (GTK_DATABOX (box), graph[0]);
    for (i = 0; i < N_BUFF; i++)
       graph[i+1] = gtk_databox_lines_new (PLOT_PTS, guiX, guiYBuf[i],
-                                     &line_color[i], 1);
+                                          &line_color[i], 1);
    grid_color.red = 65535;
    grid_color.green = 65535;
    grid_color.blue = 16384;
@@ -1397,9 +1409,9 @@ create_gui (struct FFT_Frame * data)
                      window);
    ige_mac_menu_connect_window_key_handler     (window);
 // Enable file open from Mac OS
-   osError = AEInstallEventHandler(kCoreEventClass,kAEOpenDocuments,
-        NewAEEventHandlerUPP((AEEventHandlerProcPtr) openAndPrintDocsEventHandler),
-        0,false);
+   osError = AEInstallEventHandler(kCoreEventClass, kAEOpenDocuments,
+                                   NewAEEventHandlerUPP((AEEventHandlerProcPtr) openAndPrintDocsEventHandler),
+                                   0, false);
    if (osError != noErr)
       fprintf(stderr, "OS X error %d\n", (int)osError);
 //                  RunApplicationEventLoop();
@@ -1426,8 +1438,8 @@ create_gui (struct FFT_Frame * data)
       }
       else
       {
-      message("The BRP_PACU initialization file has the wrong format. An initialization file will be created for you on your next capture.", NULL, FALSE);
-         fprintf (stderr, "PLOT_PTS is different from PLOT_PTS saved size, this is because you have changed N since your last capture.  Please change it back to %d * 2. Otherwise making a new capture should overwrite the old file\n", read_plot_pts  );
+         message("The BRP_PACU initialization file has the wrong format. An initialization file will be created for you on your next capture.", NULL, FALSE);
+         fprintf (stderr, "PLOT_PTS is different from PLOT_PTS saved size, this is because you have changed N_FFT since your last capture.  Please change it back to %d * 2. Otherwise making a new capture should overwrite the old file\n", read_plot_pts  );
       }
       fclose(file_handle);
    }
