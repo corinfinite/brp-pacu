@@ -1,5 +1,10 @@
 Version 2.0.8 04/06/2009
    Added Pink Noise Menu Item and CTRL-P accel
+   
+   Changed N to N_FFT to avoid symbol collisions
+   
+   Major Performance improvement, more than halved needed CPU cycles in gui
+      *Changed smoothing algorithm in gui.c to not calculate millions of points redundantly
 Version 2.0.7 04/01/2009
    Buffer Management
       *Added capability to automatically save the capture buffers and load them
