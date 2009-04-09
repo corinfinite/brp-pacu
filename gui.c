@@ -210,13 +210,6 @@ gui_idle_func (struct FFT_Frame *data)
    smoothing=(int)pow(10.0, (((float)0) / (((float)N_FFT / 3.0)) + 1.0))-9;
    for (i = smoothing; i < PLOT_PTS-smoothing; i+=smoothing)
    {
-      smoothing = (int)pow(10.0, (((float)i) / (((float)N_FFT / 3.0)) + 1.0))-9;  // Apply smoothing more at higher frequencies than lower frequencies
-      if (i==4095)
-         printf("Its: %d\n",smoothing );
-      //smoothing=1;
-      smoothing = smoothing > 0 ? smoothing : 0;
-      //smoothing=0;
-      //smoothing=0;
       guiY[i] = tmp[i];
       for (j = 1; j <= smoothing; j++)
       {
@@ -231,6 +224,8 @@ gui_idle_func (struct FFT_Frame *data)
          guiY[i-j]=guiY[i]*(smoothing-j)/smoothing+guiY[i-smoothing]*(j)/smoothing;
          guiY[i+j]=guiY[i]*(smoothing-j)/smoothing+guiY[i+smoothing]*(j)/smoothing;
       }
+      smoothing = (int)pow(10.0, (((float)i) / (((float)N_FFT / 3.0)) + 1.0))-9;  // Apply smoothing more at higher frequencies than lower frequencies
+      smoothing = smoothing > 0 ? smoothing : 0;
 
    }
    guiY[0] = tmp[3];

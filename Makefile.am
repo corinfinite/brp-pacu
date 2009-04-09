@@ -20,8 +20,8 @@ BRP_PACU_SOURCES = testfft.c gui.c BRP_PACU.c
 include_HEADERS = testfft.h gui.h main.h ige-mac-menu.h ige-mac-private.h ige-mac-dock.h ige-mac-image-utils.h
 EXTRA_DIST = ige-mac-menu.c ige-mac-dock.c gui.glade sinc.png info.plist \
  sinc.icns sinc.xcf brpData.icns README-Mac.txt INSTALL-Mac.txt
-AM_CFLAGS =  -O2 -Wall -g  `pkg-config --cflags libglade-2.0`  `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gdk`   `pkg-config --cflags gdk-2.0`  `pkg-config --cflags  gtkdatabox` -DDATADIR=\"$(datadir)\"
-LIBS =   -lm -lpthread  -lfftw  `pkg-config --libs  libglade-2.0`  `pkg-config --libs  gtk+-2.0` `pkg-config --libs  gdk`  `pkg-config --libs gtkdatabox` `pkg-config --libs jack`
+AM_CFLAGS =  -O2 -Wall -g  `pkg-config --cflags libglade-2.0`  `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gdk-2.0` `pkg-config --cflags glib-2.0`  `pkg-config --cflags  gtkdatabox` -DDATADIR=\"$(datadir)\"
+LIBS =   -lm  -lfftw  `pkg-config --libs  libglade-2.0`  `pkg-config --libs  gtk+-2.0` `pkg-config --libs  gdk-2.0`  `pkg-config --libs gtkdatabox` `pkg-config --libs jack` -lgthread-2.0
 pkgdata_DATA = gui.glade sinc.png ige-mac-menu.c
 #########  Macintosh implementation #########
 if APPLE
@@ -35,7 +35,7 @@ INFOPLIST=$(MACAPPLICATION)/Contents/info.plist
 MACDISK=BRP-PACU-mac-$(VERSION)
 AM_CFLAGS+=-xobjective-c -framework Carbon -lobjc
 AM_LDFLAGS=-framework Carbon -lobjc
-LINK = $(CCLD) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+#LINK = $(CCLD) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 $(INFOPLIST): gui.glade AUTHORS COPYING COPYING.LESSER NEWS ChangeLog README-Mac.txt sinc.icns brpData.icns info.plist
 	mkdir -p $(MACDISTRESOURCES)/en.lproj $(MACAPPLICATION)/Contents/MacOS
 	cp -fp gui.glade sinc.icns brpData.icns sinc.png $(MACDISTRESOURCES)

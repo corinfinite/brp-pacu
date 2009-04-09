@@ -6,6 +6,10 @@ Change delay buffer to not be dependent on N-FFT so that the maximum system dela
 
 Achieve Compilation on mingw
 
+There should be a warning, and not buff_store.brp ceated.
+
+"Resize" lets the line go out of the window
+
 #Change const N to another name like N_FFT because it may cause symbol collisions
 
 #Change gui to not use N datapoints because this drastically increases processor usage to draw points that aren't visible or useful

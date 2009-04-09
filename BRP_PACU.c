@@ -23,6 +23,8 @@
 *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 #include <gdk/gdk.h>
+#include <glib/gthread.h>
+#include <glib.h>
 #include <gtk/gtkadjustment.h>
 #include <gtk/gtkwidget.h>
 #include <gtk/gtkmain.h>
@@ -32,13 +34,12 @@
 #include "testfft.h"
 #include "gui.h"
 #include <jack/jack.h>
-#include <pthread.h>
 
 volatile struct FFT_Frame *fill_it;
 volatile struct FFT_Frame * temp_frame_data;  // tmp copy so mutexes don't need to wait
-static float * audio1;
-static float * audio2;
-static float pink_noise[1024];
+static float  audio1[8192];
+static float  audio2[8192];
+static float pink_noise[8192];
 volatile char run = 1;
 static guint timer_id = 0;
 static guint BUF_SIZE = BUFSIZE;
@@ -46,7 +47,7 @@ float b0, b1, b2, b3, b4, b5, b6, white;
 float tmp_time = 0.0;
 float scale_it = 0.98;
 float volume = 0.5;
-pthread_mutex_t p_mutex;
+GMutex *thread_mutex;
 
 jack_port_t *input_port1;
 jack_port_t *input_port2;
@@ -77,7 +78,7 @@ Fill_Buffer(jack_nframes_t nframes, void *arg)
    int err, k, j, flag,  avail, period_size;
    jack_default_audio_sample_t *in_buffer1, *in_buffer2, *out_buffer;
 
-   pthread_mutex_lock(&p_mutex);
+   g_mutex_lock (thread_mutex);
    // if (pthread_mutex_trylock(&p_mutex))
    {
       jack_transport_state_t ts = jack_transport_query(client, NULL);
@@ -185,7 +186,7 @@ Fill_Buffer(jack_nframes_t nframes, void *arg)
       //
       //}
    }
-   pthread_mutex_unlock(&p_mutex);
+   g_mutex_unlock (thread_mutex);
    return 0;
 }
 
@@ -196,17 +197,17 @@ MyGTKFunction (struct FFT_Frame * frame_data)
    float avg[2000], min;
    double max, tmp;
 
-   pthread_mutex_lock(&p_mutex);
+   g_mutex_lock (thread_mutex);
    memcpy(temp_frame_data->buffer_data_1, frame_data->buffer_data_1, N_FFT*sizeof(short));
    memcpy(temp_frame_data->buffer_data_2, frame_data->buffer_data_2, N_FFT*sizeof(short));
    memcpy(temp_frame_data->plan, frame_data->plan, sizeof(frame_data->plan));
-   pthread_mutex_unlock(&p_mutex);
+   g_mutex_unlock (thread_mutex);
    fft_capture(temp_frame_data);  // This fxn does the FFT, frame_data->buffer_data_n is used to get frame_data->fft_returned_n
 
-   pthread_mutex_lock(&p_mutex);
+   g_mutex_lock (thread_mutex);
    memcpy(frame_data->fft_returned_1, temp_frame_data->fft_returned_1, N_FFT*sizeof(double));
    memcpy(frame_data->fft_returned_2, temp_frame_data->fft_returned_2, N_FFT*sizeof(double));
-   pthread_mutex_unlock(&p_mutex);
+   g_mutex_unlock (thread_mutex);
 
    if (frame_data->find_delay == 1) // Delay button pressed, set delay to new value
    {
@@ -222,9 +223,9 @@ MyGTKFunction (struct FFT_Frame * frame_data)
    {
       gtk_timeout_remove(timer_id);
 
-      pthread_mutex_lock(&p_mutex);
+      g_mutex_lock (thread_mutex);
       impulse_capture(frame_data);
-      pthread_mutex_unlock(&p_mutex);
+      g_mutex_unlock (thread_mutex);
       max = 0.0;
       for (j = 0; j < N_FFT; j++)
       {
@@ -252,7 +253,7 @@ MyGTKFunction (struct FFT_Frame * frame_data)
 
    }
 
-   pthread_mutex_lock(&p_mutex);
+   g_mutex_lock (thread_mutex);
    temp_frame_data->pink_muted = frame_data->pink_muted;
    temp_frame_data->volume_pink = frame_data->volume_pink;
    temp_frame_data->find_delay = frame_data->find_delay;
@@ -264,17 +265,17 @@ MyGTKFunction (struct FFT_Frame * frame_data)
    memcpy(temp_frame_data->buffer_data_1, frame_data->buffer_data_1, N_FFT*sizeof(short));
    memcpy(temp_frame_data->buffer_data_2, frame_data->buffer_data_2, N_FFT*sizeof(short));
    memcpy(temp_frame_data->rfft_returned_1, frame_data->rfft_returned_1, N_FFT*sizeof(double));
-   pthread_mutex_unlock(&p_mutex);
+   g_mutex_unlock (thread_mutex);
 
    gui_idle_func(temp_frame_data);
 
-   pthread_mutex_lock(&p_mutex);
+   g_mutex_lock (thread_mutex);
    frame_data->pink_muted = temp_frame_data->pink_muted;
    frame_data->volume_pink = temp_frame_data->volume_pink;
    frame_data->find_delay = temp_frame_data->find_delay;
    frame_data->find_impulse = temp_frame_data->find_impulse;
    frame_data->delay_size = temp_frame_data->delay_size;
-   pthread_mutex_unlock(&p_mutex);
+   g_mutex_unlock (thread_mutex);
 
    return 900;
 
@@ -372,7 +373,7 @@ jack_init()
    /* display the current sample rate.
     */
 
-   printf ("engine sample rate: %" PRIu32 "\n",
+   printf ("engine sample rate: d%\n",
            jack_get_sample_rate (client));
 
    /* create two ports */
@@ -460,9 +461,6 @@ main (int argc, char *argv[])
    int k = 0;
    //        struct FFT_Frame *FFT_Kit = g_new0 (struct FFT_Frame, 1);
 
-   pthread_t capt_buff_thread;
-   audio1 = (float *)malloc(sizeof(float) * N_FFT);
-   audio2 = (float *)malloc(sizeof(float) * N_FFT);
    b0 = 0;
    b1 = 0;
    b2 = 0;
@@ -471,8 +469,9 @@ main (int argc, char *argv[])
    b4 = 0;
    b5 = 0;
    b6 = 0;
-   int cbthread_return;
    gtk_init (&argc, &argv);
+   //g_thread_init(NULL);
+    thread_mutex = g_mutex_new ();
 
    fill_it = init_fft_frame();
    temp_frame_data = init_fft_frame();
@@ -496,7 +495,6 @@ main (int argc, char *argv[])
       fprintf(stderr, "////////\n////////\n BRP_PACU failed to start because jackd failed to initialize, please check your jackd sound card settings.  qjackctl (JackPilot with a mac) is an easy way to do this\n////////\n////////\n");
 
    // Wait until thread execution has ended
-   usleep(200000);
    printf("Main Cleaning up.......\n");
    fftw_destroy_plan(fill_it->plan);
    fftw_destroy_plan(fill_it->reverse_plan);
