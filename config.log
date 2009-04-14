@@ -43,127 +43,125 @@ PATH: /usr/local/bin/
 ## Core tests. ##
 ## ----------- ##
 
-configure:1793: checking for a BSD-compatible install
-configure:1849: result: /usr/bin/install -c
-configure:1860: checking whether build environment is sane
-configure:1903: result: yes
-configure:1931: checking for a thread-safe mkdir -p
-configure:1970: result: /bin/mkdir -p
-configure:1983: checking for gawk
-configure:1999: found /usr/bin/gawk
-configure:2010: result: gawk
-configure:2021: checking whether make sets $(MAKE)
-configure:2042: result: yes
-configure:2278: checking for gcc
-configure:2294: found /usr/bin/gcc
-configure:2305: result: gcc
-configure:2543: checking for C compiler version
-configure:2550: gcc --version >&5
+configure:1785: checking for a BSD-compatible install
+configure:1841: result: /usr/bin/install -c
+configure:1852: checking whether build environment is sane
+configure:1895: result: yes
+configure:1923: checking for a thread-safe mkdir -p
+configure:1962: result: /bin/mkdir -p
+configure:1975: checking for gawk
+configure:1991: found /usr/bin/gawk
+configure:2002: result: gawk
+configure:2013: checking whether make sets $(MAKE)
+configure:2034: result: yes
+configure:2270: checking for gcc
+configure:2286: found /usr/bin/gcc
+configure:2297: result: gcc
+configure:2535: checking for C compiler version
+configure:2542: gcc --version >&5
 gcc (Ubuntu 4.3.2-1ubuntu12) 4.3.2
 Copyright (C) 2008 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-configure:2553: $? = 0
-configure:2560: gcc -v >&5
+configure:2545: $? = 0
+configure:2552: gcc -v >&5
 Using built-in specs.
 Target: x86_64-linux-gnu
 Configured with: ../src/configure -v --with-pkgversion='Ubuntu 4.3.2-1ubuntu12' --with-bugurl=file:///usr/share/doc/gcc-4.3/README.Bugs --enable-languages=c,c++,fortran,objc,obj-c++ --prefix=/usr --enable-shared --with-system-zlib --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --enable-nls --with-gxx-include-dir=/usr/include/c++/4.3 --program-suffix=-4.3 --enable-clocale=gnu --enable-libstdcxx-debug --enable-objc-gc --enable-mpfr --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu
 Thread model: posix
 gcc version 4.3.2 (Ubuntu 4.3.2-1ubuntu12) 
-configure:2563: $? = 0
-configure:2570: gcc -V >&5
+configure:2555: $? = 0
+configure:2562: gcc -V >&5
 gcc: '-V' option must have argument
-configure:2573: $? = 1
-configure:2596: checking for C compiler default output file name
-configure:2623: gcc    conftest.c  >&5
-configure:2626: $? = 0
-configure:2664: result: a.out
-configure:2681: checking whether the C compiler works
-configure:2691: ./a.out
-configure:2694: $? = 0
-configure:2711: result: yes
-configure:2718: checking whether we are cross compiling
-configure:2720: result: no
-configure:2723: checking for suffix of executables
-configure:2730: gcc -o conftest    conftest.c  >&5
-configure:2733: $? = 0
-configure:2757: result: 
-configure:2763: checking for suffix of object files
-configure:2789: gcc -c   conftest.c >&5
-configure:2792: $? = 0
-configure:2815: result: o
-configure:2819: checking whether we are using the GNU C compiler
-configure:2848: gcc -c   conftest.c >&5
-configure:2854: $? = 0
-configure:2871: result: yes
-configure:2876: checking whether gcc accepts -g
-configure:2906: gcc -c -g  conftest.c >&5
-configure:2912: $? = 0
-configure:3011: result: yes
-configure:3028: checking for gcc option to accept ISO C89
-configure:3102: gcc  -c -g -O2  conftest.c >&5
-configure:3108: $? = 0
-configure:3131: result: none needed
-configure:3160: checking for style of include used by make
-configure:3188: result: GNU
-configure:3213: checking dependency style of gcc
-configure:3304: result: gcc3
-configure:3332: checking for a BSD-compatible install
-configure:3388: result: /usr/bin/install -c
-configure:3522: creating ./config.status
-configure:4733: checking for cos in -lm
-configure:4768: gcc -o conftest -g -O2   conftest.c -lm   >&5
+configure:2565: $? = 1
+configure:2588: checking for C compiler default output file name
+configure:2615: gcc    conftest.c  >&5
+configure:2618: $? = 0
+configure:2656: result: a.out
+configure:2673: checking whether the C compiler works
+configure:2683: ./a.out
+configure:2686: $? = 0
+configure:2703: result: yes
+configure:2710: checking whether we are cross compiling
+configure:2712: result: no
+configure:2715: checking for suffix of executables
+configure:2722: gcc -o conftest    conftest.c  >&5
+configure:2725: $? = 0
+configure:2749: result: 
+configure:2755: checking for suffix of object files
+configure:2781: gcc -c   conftest.c >&5
+configure:2784: $? = 0
+configure:2807: result: o
+configure:2811: checking whether we are using the GNU C compiler
+configure:2840: gcc -c   conftest.c >&5
+configure:2846: $? = 0
+configure:2863: result: yes
+configure:2868: checking whether gcc accepts -g
+configure:2898: gcc -c -g  conftest.c >&5
+configure:2904: $? = 0
+configure:3003: result: yes
+configure:3020: checking for gcc option to accept ISO C89
+configure:3094: gcc  -c -g -O2  conftest.c >&5
+configure:3100: $? = 0
+configure:3123: result: none needed
+configure:3152: checking for style of include used by make
+configure:3180: result: GNU
+configure:3205: checking dependency style of gcc
+configure:3296: result: gcc3
+configure:3324: checking for a BSD-compatible install
+configure:3380: result: /usr/bin/install -c
+configure:3514: creating ./config.status
+configure:4725: checking for cos in -lm
+configure:4760: gcc -o conftest -g -O2   conftest.c -lm   >&5
 conftest.c:17: warning: conflicting types for built-in function 'cos'
-configure:4774: $? = 0
-configure:4792: result: yes
-configure:4808: checking for fftw_create_plan in -lfftw
-configure:4843: gcc -o conftest -g -O2   conftest.c -lfftw  -lm  >&5
-configure:4849: $? = 0
-configure:4867: result: yes
-configure:4931: checking for pkg-config
-configure:4949: found /usr/bin/pkg-config
-configure:4961: result: /usr/bin/pkg-config
-configure:4990: checking pkg-config is at least version 0.9.0
-configure:4993: result: yes
-configure:5004: checking for GTK
-configure:5012: $PKG_CONFIG --exists --print-errors "gtk+-2.0"
-configure:5015: $? = 0
-configure:5030: $PKG_CONFIG --exists --print-errors "gtk+-2.0"
-configure:5033: $? = 0
-configure:5069: result: yes
-configure:5075: checking for PANGO
-configure:5083: $PKG_CONFIG --exists --print-errors "pango"
-configure:5086: $? = 0
-configure:5101: $PKG_CONFIG --exists --print-errors "pango"
-configure:5104: $? = 0
-configure:5140: result: yes
-configure:5146: checking for CAIRO
-configure:5154: $PKG_CONFIG --exists --print-errors "cairo"
-configure:5157: $? = 0
-configure:5172: $PKG_CONFIG --exists --print-errors "cairo"
-configure:5175: $? = 0
-configure:5211: result: yes
-configure:5217: checking for LIBGLADE
-configure:5225: $PKG_CONFIG --exists --print-errors "libglade-2.0"
-configure:5228: $? = 0
-configure:5243: $PKG_CONFIG --exists --print-errors "libglade-2.0"
-configure:5246: $? = 0
-configure:5282: result: yes
-configure:5288: checking for GDK-2.0
-configure:5353: result: yes
-configure:5359: checking for GTKDATABOX
-configure:5367: $PKG_CONFIG --exists --print-errors "gtkdatabox"
-configure:5370: $? = 0
-configure:5385: $PKG_CONFIG --exists --print-errors "gtkdatabox"
-configure:5388: $? = 0
-configure:5428: result: yes
-configure:5434: checking for JACK
-configure:5442: $PKG_CONFIG --exists --print-errors "jack"
-configure:5445: $? = 0
-configure:5460: $PKG_CONFIG --exists --print-errors "jack"
-configure:5463: $? = 0
-configure:5503: result: yes
+configure:4766: $? = 0
+configure:4784: result: yes
+configure:4800: checking for fftw_create_plan in -lfftw
+configure:4835: gcc -o conftest -g -O2   conftest.c -lfftw  -lm  >&5
+configure:4841: $? = 0
+configure:4859: result: yes
+configure:4923: checking for pkg-config
+configure:4941: found /usr/bin/pkg-config
+configure:4953: result: /usr/bin/pkg-config
+configure:4982: checking pkg-config is at least version 0.9.0
+configure:4985: result: yes
+configure:4996: checking for GTK
+configure:5004: $PKG_CONFIG --exists --print-errors "gtk+-2.0"
+configure:5007: $? = 0
+configure:5022: $PKG_CONFIG --exists --print-errors "gtk+-2.0"
+configure:5025: $? = 0
+configure:5061: result: yes
+configure:5067: checking for PANGO
+configure:5075: $PKG_CONFIG --exists --print-errors "pango"
+configure:5078: $? = 0
+configure:5093: $PKG_CONFIG --exists --print-errors "pango"
+configure:5096: $? = 0
+configure:5132: result: yes
+configure:5138: checking for CAIRO
+configure:5146: $PKG_CONFIG --exists --print-errors "cairo"
+configure:5149: $? = 0
+configure:5164: $PKG_CONFIG --exists --print-errors "cairo"
+configure:5167: $? = 0
+configure:5203: result: yes
+configure:5209: checking for LIBGLADE
+configure:5217: $PKG_CONFIG --exists --print-errors "libglade-2.0"
+configure:5220: $? = 0
+configure:5235: $PKG_CONFIG --exists --print-errors "libglade-2.0"
+configure:5238: $? = 0
+configure:5274: result: yes
+configure:5281: checking for GTKDATABOX
+configure:5289: $PKG_CONFIG --exists --print-errors "gtkdatabox"
+configure:5292: $? = 0
+configure:5307: $PKG_CONFIG --exists --print-errors "gtkdatabox"
+configure:5310: $? = 0
+configure:5350: result: yes
+configure:5356: checking for JACK
+configure:5364: $PKG_CONFIG --exists --print-errors "jack"
+configure:5367: $? = 0
+configure:5382: $PKG_CONFIG --exists --print-errors "jack"
+configure:5385: $? = 0
+configure:5425: result: yes
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -265,8 +263,6 @@ ECHO_C=''
 ECHO_N='-n'
 ECHO_T=''
 EXEEXT=''
-GDK-2.0_CFLAGS='-2.0_CFLAGS'
-GDK-2.0_LIBS='-2.0_LIBS'
 GTKDATABOX_CFLAGS='-I/usr/local/include -I/usr/include/gtk-2.0 -I/usr/include/pango-1.0 -I/usr/include/cairo -I/usr/lib/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12  '
 GTKDATABOX_LIBS='-L/usr/local/lib -lgtkdatabox -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -lpangoft2-1.0 -lgdk_pixbuf-2.0 -lm -lpangocairo-1.0 -lgio-2.0 -lcairo -lpango-1.0 -lfreetype -lz -lfontconfig -lgobject-2.0 -lgmodule-2.0 -lglib-2.0  '
 GTK_CFLAGS='-I/usr/include/gtk-2.0 -I/usr/lib/gtk-2.0/include -I/usr/include/atk-1.0 -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/pixman-1 -I/usr/include/freetype2 -I/usr/include/libpng12  '

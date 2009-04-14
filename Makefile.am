@@ -35,7 +35,7 @@ INFOPLIST=$(MACAPPLICATION)/Contents/info.plist
 MACDISK=BRP-PACU-mac-$(VERSION)
 AM_CFLAGS+=-xobjective-c -framework Carbon -lobjc
 AM_LDFLAGS=-framework Carbon -lobjc
-LINK = $(CCLD) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+#LINK = $(CCLD) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 $(INFOPLIST): gui.glade AUTHORS COPYING COPYING.LESSER NEWS ChangeLog README-Mac.txt sinc.icns brpData.icns info.plist
 	mkdir -p $(MACDISTRESOURCES)/en.lproj $(MACAPPLICATION)/Contents/MacOS
 	cp -fp gui.glade sinc.icns brpData.icns sinc.png $(MACDISTRESOURCES)

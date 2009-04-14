@@ -24,13 +24,13 @@
 #include "main.h"
 #define N_FFT 8192
 #define RATIO 2
-#define AVG_NUM 32
+#define MAX_AVG_NUM 32
 #define BUFF_NUM 32
 #define FSAMP 44100
 #define SCALEF 32765
 #define NYQUIST FSAMP/2
 #define PLOT_PTS (N_FFT)/RATIO
-#define FBIN (float) ((float) FSAMP)/( ((float)PLOT_PTS)/1.0)
+#define FBIN (float) ((float) NYQUIST)/( ((float)PLOT_PTS)/1.0)
 #define BUFSIZE 256
 #define B_N N_FFT/BUFSIZE
 

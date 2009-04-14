@@ -665,8 +665,6 @@ CAIRO_CFLAGS
 CAIRO_LIBS
 LIBGLADE_CFLAGS
 LIBGLADE_LIBS
-GDK-2.0_CFLAGS
-GDK-2.0_LIBS
 GTKDATABOX_CFLAGS
 GTKDATABOX_LIBS
 JACK_CFLAGS
@@ -689,8 +687,6 @@ CAIRO_CFLAGS
 CAIRO_LIBS
 LIBGLADE_CFLAGS
 LIBGLADE_LIBS
-GDK-2.0_CFLAGS
-GDK-2.0_LIBS
 GTKDATABOX_CFLAGS
 GTKDATABOX_LIBS
 JACK_CFLAGS
@@ -1292,10 +1288,6 @@ Some influential environment variables:
               C compiler flags for LIBGLADE, overriding pkg-config
   LIBGLADE_LIBS
               linker flags for LIBGLADE, overriding pkg-config
-  GDK-2.0_CFLAGS
-              C compiler flags for GDK-2.0, overriding pkg-config
-  GDK-2.0_LIBS
-              linker flags for GDK-2.0, overriding pkg-config
   GTKDATABOX_CFLAGS
               C compiler flags for GTKDATABOX, overriding pkg-config
   GTKDATABOX_LIBS
@@ -5283,77 +5275,7 @@ else
 echo "${ECHO_T}yes" >&6; }
 	:
 fi
-
-pkg_failed=no
-{ echo "$as_me:$LINENO: checking for GDK-2.0" >&5
-echo $ECHO_N "checking for GDK-2.0... $ECHO_C" >&6; }
-
-if test -n "$PKG_CONFIG"; then
-    if test -n "$GDK-2.0_CFLAGS"; then
-        pkg_cv_GDK-2.0_CFLAGS="$GDK-2.0_CFLAGS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gdk-2.0\"") >&5
-  ($PKG_CONFIG --exists --print-errors "gdk-2.0") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_GDK-2.0_CFLAGS=`$PKG_CONFIG --cflags "gdk-2.0" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-if test -n "$PKG_CONFIG"; then
-    if test -n "$GDK-2.0_LIBS"; then
-        pkg_cv_GDK-2.0_LIBS="$GDK-2.0_LIBS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gdk-2.0\"") >&5
-  ($PKG_CONFIG --exists --print-errors "gdk-2.0") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_GDK-2.0_LIBS=`$PKG_CONFIG --libs "gdk-2.0" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        GDK-2.0_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "gdk-2.0"`
-        else
-	        GDK-2.0_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "gdk-2.0"`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$GDK-2.0_PKG_ERRORS" >&5
-
-	{ echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-                exit
-elif test $pkg_failed = untried; then
-	exit
-else
-	GDK-2.0_CFLAGS=$pkg_cv_GDK-2.0_CFLAGS
-	GDK-2.0_LIBS=$pkg_cv_GDK-2.0_LIBS
-        { echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; }
-	:
-fi
+#PKG_CHECK_MODULES(GDK-2.0, gdk-2.0,,exit)
 
 pkg_failed=no
 { echo "$as_me:$LINENO: checking for GTKDATABOX" >&5

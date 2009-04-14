@@ -83,6 +83,8 @@ static char pinknoise_muted = 0;
 static char find_delay = 0;
 static char update_delay = 0;
 static char buffer[N_BUFF] = {2, 2, 2, 2, 2};
+static gfloat grid_x[] = {32.0, 64.0, 128.0, 256.0, 512.0, 1024.0, 2048.0, 4096.0, 8192.0, 16384.0};
+static guint avg_num;
 static gfloat avg_gain = 0;
 static int  buffer_last_clicked;
 static GtkWidget *bkg_dialog;
@@ -94,7 +96,7 @@ static GtkWidget *open_menuitem;
 
 static gint avg_index = 0;
 static gchar tf = 1;
-static gfloat avgY[PLOT_PTS][AVG_NUM];
+static gfloat avgY[PLOT_PTS][MAX_AVG_NUM];
 
 static gint gui_idle = 0;
 static gfloat gui_frequency = 3. * G_PI / 2.;
@@ -106,6 +108,8 @@ static GtkWidget *gui_sb = NULL;
 static GtkWidget *open_dialog = NULL;
 static GtkWidget *save_as_dialog = NULL;
 static guint gui_counter = 0;
+static guint smooth_factor;
+static guint smooth_constant;
 
 static   GdkColor background_color;
 static   GdkColor grid_color;
@@ -166,7 +170,7 @@ gui_idle_func (struct FFT_Frame *data)
 
    data->volume_pink = volume_pink_value;
    avg_index++;
-   if (avg_index == AVG_NUM) avg_index = 0;
+   if (avg_index == avg_num) avg_index = 0;
    min_y = 0.0;
    max_y = 0.0;
 
@@ -197,18 +201,18 @@ gui_idle_func (struct FFT_Frame *data)
          //      avgY[i][avg_index] = (20*log10((gfloat)data->fft_returned_1[index]+1));
 
          tmp[i] = 0;
-         for (k = 0; k < AVG_NUM; k++)
+         for (k = 0; k < avg_num; k++)
          {
             tmp[i] += avgY[i][k];
          }
-         tmp[i] /= AVG_NUM;
+         tmp[i] /= avg_num;
          //guiY[i] = avgY[i][0];
 
       }
    }
 
-   smoothing=(int)pow(10.0, (((float)0) / (((float)N_FFT / 3.0)) + 1.0))-9;
-   for (i = smoothing; i < PLOT_PTS-smoothing; i+=smoothing)
+   smoothing=1;
+   for (i = 0; i < PLOT_PTS; i += smoothing)
    {
       guiY[i] = tmp[i];
       for (j = 1; j <= smoothing; j++)
@@ -217,22 +221,16 @@ gui_idle_func (struct FFT_Frame *data)
          guiY[i] += tmp[(i+j)<PLOT_PTS?(i+j):(PLOT_PTS-1)];
       }
 
-      guiY[i] /= (smoothing * 2.0 + 1.0);
+      guiY[i] /= (smoothing * 2.0+1);
 
       for (j = 1; j <= smoothing; j++)
       {
-         guiY[i-j]=guiY[i]*(smoothing-j)/smoothing+guiY[i-smoothing]*(j)/smoothing;
-         guiY[i+j]=guiY[i]*(smoothing-j)/smoothing+guiY[i+smoothing]*(j)/smoothing;
+         guiY[(i-j)>=0?(i-j):0] = guiY[i] * (smoothing - j) / smoothing + guiY[(i-smoothing)>=0?(i-smoothing):0] * (j) / smoothing;
+         guiY[(i+j)<PLOT_PTS?(i+j):(PLOT_PTS-1)] = guiY[i] * (smoothing - j) / smoothing + guiY[(i+smoothing)<(PLOT_PTS)?(i+smoothing):(PLOT_PTS-1)] * (j) / smoothing;
       }
-      smoothing = (int)pow(10.0, (((float)i) / (((float)N_FFT / 3.0)) + 1.0))-9;  // Apply smoothing more at higher frequencies than lower frequencies
-      smoothing = smoothing > 0 ? smoothing : 0;
+      smoothing = (int)pow(2.0, (((float)i) / (((float)N_FFT / 2.0))  +smooth_factor))-smooth_constant ;  // Apply smoothing more at higher frequencies than lower frequencies
 
    }
-   guiY[0] = tmp[3];
-   guiY[1] = tmp[3];
-   guiY[2] = tmp[4];
-   guiY[PLOT_PTS-1] = tmp[PLOT_PTS-1];
-   guiY[PLOT_PTS-2] = tmp[PLOT_PTS-2];
 
    if (data->find_impulse == 2)
    {
@@ -1019,7 +1017,7 @@ static void
 resize_default_cb(GtkWidget *widget, GtkWidget *box )// , GtkWidget *widget)
 {
    gfloat min_x, min_y, max_x, max_y;
-   min_x = 30.0;
+   min_x = 20.0;
    max_x = (gfloat) NYQUIST;
    min_y = -100.0;
    max_y = 100.0;
@@ -1034,18 +1032,18 @@ resize_cb(GtkWidget *widget, GtkWidget *box )// , GtkWidget *widget)
 {
    gint k;
    gfloat min_x, min_y, max_x, max_y, tempY;
-   min_x = 30.0;
+   min_x = 20.0;
    max_x = (gfloat) NYQUIST;
    max_y = -100.0;
    min_y = 100.0;
-   for (k = min_x * (gfloat)FBIN + 10; k < PLOT_PTS - 10; k++)
+   for (k = (int) (min_x * (gfloat)FBIN + 10.0); k < PLOT_PTS - 10; k++)
    {
       tempY = guiY[k];
       max_y = (max_y > tempY) ? max_y : tempY;
       min_y = (min_y < tempY) ? min_y : tempY;
    }
-   gtk_databox_set_total_limits (GTK_DATABOX (box), min_x, max_x, max_y + 10, \
-                                 min_y - 10);
+   gtk_databox_set_visible_limits (GTK_DATABOX (box), min_x, max_x, max_y + 20.0, \
+                                   min_y - 10.0);
    gtk_widget_queue_draw(GTK_WIDGET (box));
 
 }
@@ -1142,6 +1140,9 @@ create_gui (struct FFT_Frame * data)
 ////   GtkRuler * hruler;
    GtkDataboxGrid *my_grid;
    GladeXML *xml = NULL;
+   avg_num=16;
+   smooth_factor=5;
+   smooth_constant=pow(2,smooth_factor)-1;
 
    FILE * file_handle;
    gint read_plot_pts[1];
@@ -1154,7 +1155,7 @@ create_gui (struct FFT_Frame * data)
    gint i;
    gfloat  min_x,  max_x,  min_y,   max_y;
    /* set the extrema */
-   min_x = 30.0;
+   min_x = 20.0;
    max_x = (gfloat) NYQUIST;
    min_y = -100.0;
    max_y = 100.0;
@@ -1275,7 +1276,8 @@ create_gui (struct FFT_Frame * data)
                                  min_y);
 
    //hruler = gtk_databox_get_hruler (GTK_DATABOX(box));
-   gtk_databox_set_scale_type_x (GTK_DATABOX (box), GTK_DATABOX_SCALE_LOG);
+   //gtk_databox_set_scale_type_x (GTK_DATABOX (box), GTK_DATABOX_SCALE_LOG);
+   gtk_databox_set_scale_type_x (GTK_DATABOX (box), GTK_DATABOX_SCALE_LOG2);
    gtk_databox_set_scale_type_y (GTK_DATABOX (box), GTK_DATABOX_SCALE_LINEAR);
    /*for(index=0; index<10; index++)
       hruler->metric->ruler_scale[index] = lscale[index];
@@ -1298,7 +1300,7 @@ create_gui (struct FFT_Frame * data)
    gui_impulse_Y = g_new0 (gfloat, N_FFT);
    gui_impulse_X = g_new0 (gfloat, N_FFT);
 
-   for (i = 0; i < N_FFT/2; i++)
+   for (i = 0; i < N_FFT / 2; i++)
    {
       gui_impulse_Y[i] = .01;
       gui_impulse_X[i] = ((gfloat)i) / ((gfloat)FSAMP);
@@ -1306,7 +1308,7 @@ create_gui (struct FFT_Frame * data)
    for (i = 0; i < PLOT_PTS; i++)
    {
       guiX[i] = ((gfloat)i) * (gfloat)FBIN;
-      for (k = 0; k < AVG_NUM; k++)
+      for (k = 0; k < avg_num; k++)
          avgY[i][k] = .01;
       guiY[i] = .01;
       for (k = 0; k < N_BUFF; k++)
@@ -1327,7 +1329,8 @@ create_gui (struct FFT_Frame * data)
    grid_color.red = 65535;
    grid_color.green = 65535;
    grid_color.blue = 16384;
-   my_grid = gtk_databox_grid_new (19, 21.5, &grid_color, 1);
+   my_grid = gtk_databox_grid_array_new (19, 10, NULL, grid_x, &grid_color, 1);
+   //my_grid = gtk_databox_grid_new (19, 21.5, &grid_color, 1);
    gtk_databox_graph_add (GTK_DATABOX (box), my_grid);
 
    trace_impulse_color.red = 16384;

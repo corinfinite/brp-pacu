@@ -373,7 +373,7 @@ jack_init()
    /* display the current sample rate.
     */
 
-   printf ("engine sample rate: d%\n",
+   printf ("engine sample rate: %d\n",
            jack_get_sample_rate (client));
 
    /* create two ports */
@@ -471,7 +471,7 @@ main (int argc, char *argv[])
    b6 = 0;
    gtk_init (&argc, &argv);
    //g_thread_init(NULL);
-    thread_mutex = g_mutex_new ();
+   thread_mutex = g_mutex_new ();
 
    fill_it = init_fft_frame();
    temp_frame_data = init_fft_frame();
