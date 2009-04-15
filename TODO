@@ -4,11 +4,17 @@ The program should not quit when Jack does not start but stay on hold until jack
 
 Change delay buffer to not be dependent on N-FFT so that the maximum system delay is not dependednt on N_FFT and Sample Rates
 
-Achieve Compilation on mingw
+#Achieve Compilation on mingw
 
 There should be a warning, and not buff_store.brp ceated.
 
 "Resize" lets the line go out of the window
+
+Sample Rate should be displayed somewhere
+
+Window size, smoothing, and avg_num should be changeable in the UI
+
+Make guiY less points, so drawing requires less CPU.
 
 #Change const N to another name like N_FFT because it may cause symbol collisions
 

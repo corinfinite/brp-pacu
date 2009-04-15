@@ -68,6 +68,10 @@ static GtkWidget *transfer_function_toggle = NULL;
 static GtkWidget *transfer_function_menu = NULL;
 static GtkWidget *buffer_button[N_BUFF] = { NULL, NULL, NULL, NULL, NULL };
 static GtkWidget *buffer_menu[N_BUFF] = { NULL, NULL, NULL, NULL, NULL };
+static GtkWidget *smoothing_dialog = NULL;
+static GtkWidget *averaging_dialog = NULL;
+static GtkWidget *smoothing_spin_button=NULL;
+static GtkWidget *averaging_spin_button=NULL;
 static gfloat volume_pink_value = 0;
 static gfloat *guiX = NULL;
 static gfloat *guiY = NULL;
@@ -1036,14 +1040,14 @@ resize_cb(GtkWidget *widget, GtkWidget *box )// , GtkWidget *widget)
    max_x = (gfloat) NYQUIST;
    max_y = -100.0;
    min_y = 100.0;
-   for (k = (int) (min_x * (gfloat)FBIN + 10.0); k < PLOT_PTS - 10; k++)
+   for (k = (int) (min_x / (gfloat)FBIN); k < PLOT_PTS - 10; k++)
    {
       tempY = guiY[k];
       max_y = (max_y > tempY) ? max_y : tempY;
       min_y = (min_y < tempY) ? min_y : tempY;
    }
-   gtk_databox_set_visible_limits (GTK_DATABOX (box), min_x, max_x, max_y + 20.0, \
-                                   min_y - 10.0);
+   gtk_databox_set_visible_limits (GTK_DATABOX (box), min_x, max_x, max_y + 5.0, \
+                                   min_y - 5.0);
    gtk_widget_queue_draw(GTK_WIDGET (box));
 
 }
@@ -1128,6 +1132,49 @@ static gboolean configure_event_reference( GtkWidget         *widget,
    return TRUE;
 }
 
+static void
+smoothing_dialog_cb(GtkWidget *widget)// , gtkwidget *widget)
+{
+   gtk_window_set_transient_for(smoothing_dialog, window);
+   gtk_window_set_decorated (smoothing_dialog, FALSE);
+   gtk_widget_show_all(GTK_DIALOG(smoothing_dialog));
+   gtk_window_present (smoothing_dialog);
+}
+
+static void
+averaging_dialog_cb(GtkWidget *widget)// , gtkwidget *widget)
+{
+   gtk_window_set_transient_for(averaging_dialog, window);
+   gtk_window_set_decorated (averaging_dialog, FALSE);
+   gtk_widget_show_all(GTK_DIALOG(averaging_dialog));
+   gtk_window_present (averaging_dialog);
+}
+
+static void
+close_smoothing_cb(GtkWidget *widget)// , gtkwidget *widget)
+{
+   gtk_widget_hide_all (smoothing_dialog);
+}
+
+static void
+close_averaging_cb(GtkWidget *widget)// , gtkwidget *widget)
+{
+   gtk_widget_hide_all (averaging_dialog);
+}
+
+static void apply_smoothing_cb( GtkWidget *widget)
+{
+   smooth_factor = gtk_spin_button_get_value_as_int (smoothing_spin_button);
+   smooth_constant=pow(2,smooth_factor)-1;
+         
+}
+
+static void apply_averaging_cb( GtkWidget *widget)
+{
+   avg_num = gtk_spin_button_get_value_as_int (averaging_spin_button);
+         
+}
+
 gboolean
 create_gui (struct FFT_Frame * data)
 {
@@ -1140,7 +1187,7 @@ create_gui (struct FFT_Frame * data)
 ////   GtkRuler * hruler;
    GtkDataboxGrid *my_grid;
    GladeXML *xml = NULL;
-   avg_num=16;
+   avg_num=32;
    smooth_factor=5;
    smooth_constant=pow(2,smooth_factor)-1;
 
@@ -1207,6 +1254,21 @@ create_gui (struct FFT_Frame * data)
    pinknoise_menu_item = glade_xml_get_widget (xml, "pink_noise");
    transfer_function_toggle = glade_xml_get_widget (xml, "TransferFxn");
    transfer_function_menu = glade_xml_get_widget (xml, "transfer_fxn");
+   averaging_dialog = glade_xml_get_widget (xml, "averaging_dialog");
+   smoothing_dialog = glade_xml_get_widget (xml, "smoothing_dialog");
+   smoothing_spin_button = glade_xml_get_widget (xml, "spinbutton_smoothing");
+   averaging_spin_button = glade_xml_get_widget (xml, "spinbutton_averaging");
+   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "plot_smoothing")), "activate", G_CALLBACK (smoothing_dialog_cb), NULL);
+   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "plot_averaging")), "activate", G_CALLBACK (averaging_dialog_cb), NULL);
+   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "close_smoothing")), "clicked", G_CALLBACK (close_smoothing_cb), NULL);
+   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "close_averaging")), "clicked", G_CALLBACK (close_averaging_cb), NULL);
+   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "apply_smoothing")), "clicked", G_CALLBACK (apply_smoothing_cb), NULL);
+   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "apply_averaging")), "clicked", G_CALLBACK (apply_averaging_cb), NULL);
+   g_signal_connect (GTK_OBJECT (smoothing_dialog), "delete_event", G_CALLBACK (delay_hide), NULL);
+   g_signal_connect (GTK_OBJECT (averaging_dialog), "delete_event", G_CALLBACK (delay_hide), NULL);
+   gtk_window_set_decorated (smoothing_dialog, FALSE);
+   gtk_window_set_decorated (averaging_dialog, FALSE);
+
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "pinknoise_button")), "clicked", G_CALLBACK (pinknoise_mute), "button");
    //g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "volumebutton1")), "popdown", G_CALLBACK (volume_popdown_gui), NULL);
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "volumebutton1")), "value-changed", G_CALLBACK (volume_gui), NULL);
