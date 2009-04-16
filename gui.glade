@@ -1,106 +1,104 @@
 <?xml version="1.0"?>
 <glade-interface>
   <requires-version lib="gtk+" version="2.12"/>
-  <widget class="GtkDialog" id="averaging_dialog">
-    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-    <property name="tooltip_text">Increasing this value slows down the response of the graph.</property>
-    <property name="border_width">5</property>
-    <property name="title" translatable="yes">Graph Averaging</property>
-    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
-    <property name="destroy_with_parent">True</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
-    <property name="urgency_hint">True</property>
-    <property name="gravity">GDK_GRAVITY_CENTER</property>
-    <property name="transient_for">window1</property>
-    <property name="has_separator">False</property>
-    <child internal-child="vbox">
-      <widget class="GtkVBox" id="dialog-vbox6">
+  <widget class="GtkWindow" id="about_me_window">
+    <property name="title" translatable="yes">About BRP-PACU</property>
+    <child>
+      <widget class="GtkVBox" id="vbox3">
         <property name="visible">True</property>
-        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-        <property name="spacing">2</property>
         <child>
-          <widget class="GtkVBox" id="vbox5">
+          <widget class="GtkTextView" id="textview1">
             <property name="visible">True</property>
-            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="can_focus">True</property>
+            <property name="editable">False</property>
+            <property name="justification">GTK_JUSTIFY_FILL</property>
+            <property name="text" translatable="yes">Brian's Reasonably Priced Professional Audio Configuration Utility
+
+* Copyright (C) 2007-2008 Brian Phelps(lm317t@gmail.com)
+* Macintosh application Copyright (C) 2009 Andreas Schwab
+* Macintosh synchronization Copyright (C) 2007 Pioneer Research Center USA, Inc.
+* Macintosh integration Copyright (C) 2007, 2008 Imendio AB
+* This program is based on the following libraries 
+* FFTW: Copyright (c) 1997-1999, 2003 Massachusetts Institute of Technology
+* libglade: Copyright (C) 1998-2002  James Henstridge
+* gtkdatabox: Copyright (C) 1998 - 2008  Dr. Roland Bock
+* 
+*  This program is free software; you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation; either version 2 of the License, or
+*  (at your option) any later version.
+*
+*  This program is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU Library General Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License
+*  along with this program; if not, write to the Free Software
+*  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
+*
+
+Written by Brian R. Phelps aka Electronjunkie
+http://electronjunkie.wordpress.com
+
+Questions or comments? 
+Interested in contributing?
+
+Please email me at lm317t@gmail.com
+
+I need someone to help me package it for Debian/Ubuntu! 
+Also a Redhat/Fedora rpm or any other packaging help would be much appreciated.</property>
+          </widget>
+        </child>
+        <child>
+          <widget class="GtkHBox" id="hbox7">
+            <property name="visible">True</property>
             <child>
-              <widget class="GtkLabel" id="label_averaging">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">Averaging Value:</property>
-              </widget>
+              <placeholder/>
             </child>
             <child>
-              <widget class="GtkHSeparator" id="hseparator3">
+              <widget class="GtkButton" id="about_ok">
                 <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="label" translatable="yes">OK</property>
+                <property name="response_id">0</property>
               </widget>
               <packing>
-                <property name="expand">False</property>
-                <property name="padding">9</property>
                 <property name="position">1</property>
               </packing>
             </child>
             <child>
               <placeholder/>
             </child>
-            <child>
-              <widget class="GtkSpinButton" id="spinbutton_averaging">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_text">Increasing this value smooths the graph more.</property>
-                <property name="adjustment">32 1 40 1 2 2</property>
-                <property name="digits">3</property>
-              </widget>
-              <packing>
-                <property name="position">3</property>
-              </packing>
-            </child>
           </widget>
           <packing>
             <property name="position">1</property>
-          </packing>
-        </child>
-        <child internal-child="action_area">
-          <widget class="GtkHButtonBox" id="dialog-action_area6">
-            <property name="visible">True</property>
-            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="layout_style">GTK_BUTTONBOX_END</property>
-            <child>
-              <widget class="GtkButton" id="apply_averaging">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="label" translatable="yes">gtk-apply</property>
-                <property name="use_stock">True</property>
-                <property name="response_id">0</property>
-              </widget>
-            </child>
-            <child>
-              <widget class="GtkButton" id="close_averaging">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="label" translatable="yes">gtk-close</property>
-                <property name="use_stock">True</property>
-                <property name="response_id">0</property>
-              </widget>
-              <packing>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </widget>
-          <packing>
-            <property name="expand">False</property>
-            <property name="pack_type">GTK_PACK_END</property>
           </packing>
         </child>
       </widget>
     </child>
   </widget>
-  <widget class="GtkDialog" id="smoothing_dialog">
+  <widget class="GtkMenu" id="menu4">
+    <property name="visible">True</property>
+    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+  </widget>
+  <widget class="GtkWindow" id="impulse_window">
+    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+    <child>
+      <widget class="GtkVBox" id="vbox_impulse">
+        <property name="visible">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <child>
+          <placeholder/>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="GtkDialog" id="delay1">
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="border_width">5</property>
-    <property name="title" translatable="yes">Graph Smoothing</property>
+    <property name="title" translatable="yes">Delay</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
@@ -109,22 +107,22 @@
     <property name="transient_for">window1</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
-      <widget class="GtkVBox" id="dialog-vbox3">
+      <widget class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="spacing">2</property>
         <child>
-          <widget class="GtkVBox" id="vbox4">
+          <widget class="GtkVBox" id="vbox2">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <child>
-              <widget class="GtkLabel" id="label_smoothing">
+              <widget class="GtkLabel" id="label2">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Smoothing value:</property>
+                <property name="label" translatable="yes">Insert custom delay or found delay?</property>
               </widget>
             </child>
             <child>
-              <widget class="GtkHSeparator" id="hseparator2">
+              <widget class="GtkHSeparator" id="hseparator1">
                 <property name="visible">True</property>
               </widget>
               <packing>
@@ -134,16 +132,23 @@
               </packing>
             </child>
             <child>
-              <placeholder/>
+              <widget class="GtkLabel" id="delay_label">
+                <property name="visible">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">&lt;b&gt; Found:  0.000 secs&lt;/b&gt;</property>
+                <property name="use_markup">True</property>
+              </widget>
+              <packing>
+                <property name="padding">3</property>
+                <property name="position">2</property>
+              </packing>
             </child>
             <child>
-              <widget class="GtkSpinButton" id="spinbutton_smoothing">
+              <widget class="GtkSpinButton" id="spinbutton1">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_text">Increasing this value smooths the graph more.</property>
-                <property name="adjustment">3 1 10 1 2 2</property>
+                <property name="adjustment">0 0 100 1 10 10</property>
                 <property name="digits">3</property>
               </widget>
               <packing>
@@ -156,27 +161,27 @@
           </packing>
         </child>
         <child internal-child="action_area">
-          <widget class="GtkHButtonBox" id="dialog-action_area3">
+          <widget class="GtkHButtonBox" id="dialog-action_area1">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <property name="layout_style">GTK_BUTTONBOX_END</property>
             <child>
-              <widget class="GtkButton" id="apply_smoothing">
+              <widget class="GtkButton" id="delay_custom_button">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="label" translatable="yes">gtk-apply</property>
-                <property name="use_stock">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">Custom</property>
                 <property name="response_id">0</property>
               </widget>
             </child>
             <child>
-              <widget class="GtkButton" id="close_smoothing">
+              <widget class="GtkButton" id="delay_keep_button">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="label" translatable="yes">gtk-close</property>
-                <property name="use_stock">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">Found</property>
                 <property name="response_id">0</property>
               </widget>
               <packing>
@@ -320,8 +325,8 @@
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="label" translatable="yes">Resize Window</property>
                         <property name="use_underline">True</property>
-                        <accelerator key="r" signal="activate" modifiers="GDK_MOD1_MASK"/>
                         <accelerator key="R" signal="activate" modifiers="GDK_MOD1_MASK"/>
+                        <accelerator key="r" signal="activate" modifiers="GDK_MOD1_MASK"/>
                       </widget>
                     </child>
                     <child>
@@ -368,8 +373,8 @@
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="label" translatable="yes">Record Impulse Response h(n)</property>
                         <property name="use_underline">True</property>
-                        <accelerator key="I" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <accelerator key="i" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                        <accelerator key="I" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </widget>
                     </child>
                     <child>
@@ -378,8 +383,8 @@
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="label" translatable="yes">Find Delay</property>
                         <property name="use_underline">True</property>
-                        <accelerator key="D" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <accelerator key="d" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                        <accelerator key="D" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </widget>
                     </child>
                     <child>
@@ -388,8 +393,8 @@
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="label" translatable="yes">Capture Trace</property>
                         <property name="use_underline">True</property>
-                        <accelerator key="c" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <accelerator key="C" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                        <accelerator key="c" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </widget>
                     </child>
                     <child>
@@ -453,8 +458,9 @@
                 <property name="justify">GTK_JUSTIFY_CENTER</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="padding">4</property>
+                <property name="padding">2</property>
               </packing>
             </child>
             <child>
@@ -464,7 +470,7 @@
               </widget>
               <packing>
                 <property name="expand">False</property>
-                <property name="padding">10</property>
+                <property name="padding">2</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -479,7 +485,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="padding">4</property>
+                <property name="padding">2</property>
                 <property name="position">2</property>
               </packing>
             </child>
@@ -489,14 +495,14 @@
               </widget>
               <packing>
                 <property name="expand">False</property>
-                <property name="padding">10</property>
+                <property name="padding">2</property>
                 <property name="position">3</property>
               </packing>
             </child>
             <child>
               <widget class="GtkLabel" id="delay_status_label">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Current Delay 0.0ms</property>
+                <property name="label" translatable="yes">Delay 0.0ms</property>
                 <property name="use_markup">True</property>
               </widget>
               <packing>
@@ -519,7 +525,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="padding">20</property>
+                <property name="padding">10</property>
                 <property name="position">5</property>
               </packing>
             </child>
@@ -531,7 +537,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="padding">3</property>
+                <property name="padding">2</property>
                 <property name="position">6</property>
               </packing>
             </child>
@@ -550,6 +556,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
+                <property name="padding">1</property>
                 <property name="position">7</property>
               </packing>
             </child>
@@ -559,7 +566,7 @@
               </widget>
               <packing>
                 <property name="expand">False</property>
-                <property name="padding">8</property>
+                <property name="padding">4</property>
                 <property name="position">8</property>
               </packing>
             </child>
@@ -592,7 +599,16 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
+                <property name="padding">1</property>
                 <property name="position">10</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkVSeparator" id="vseparator4">
+                <property name="visible">True</property>
+              </widget>
+              <packing>
+                <property name="position">11</property>
               </packing>
             </child>
             <child>
@@ -604,8 +620,8 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="padding">9</property>
-                <property name="position">11</property>
+                <property name="padding">5</property>
+                <property name="position">12</property>
               </packing>
             </child>
             <child>
@@ -619,7 +635,7 @@
                 <property name="expand">False</property>
                 <property name="fill">False</property>
                 <property name="padding">3</property>
-                <property name="position">12</property>
+                <property name="position">13</property>
               </packing>
             </child>
             <child>
@@ -631,8 +647,8 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="padding">9</property>
-                <property name="position">13</property>
+                <property name="padding">3</property>
+                <property name="position">14</property>
               </packing>
             </child>
             <child>
@@ -646,7 +662,7 @@
                 <property name="expand">False</property>
                 <property name="fill">False</property>
                 <property name="padding">3</property>
-                <property name="position">14</property>
+                <property name="position">15</property>
               </packing>
             </child>
           </widget>
@@ -852,10 +868,10 @@
       </widget>
     </child>
   </widget>
-  <widget class="GtkDialog" id="delay1">
+  <widget class="GtkDialog" id="smoothing_dialog">
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="border_width">5</property>
-    <property name="title" translatable="yes">Delay</property>
+    <property name="title" translatable="yes">Graph Smoothing</property>
     <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
@@ -864,22 +880,22 @@
     <property name="transient_for">window1</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
-      <widget class="GtkVBox" id="dialog-vbox1">
+      <widget class="GtkVBox" id="dialog-vbox3">
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="spacing">2</property>
         <child>
-          <widget class="GtkVBox" id="vbox2">
+          <widget class="GtkVBox" id="vbox4">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <child>
-              <widget class="GtkLabel" id="label2">
+              <widget class="GtkLabel" id="label_smoothing">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Insert custom delay or found delay?</property>
+                <property name="label" translatable="yes">Smoothing value:</property>
               </widget>
             </child>
             <child>
-              <widget class="GtkHSeparator" id="hseparator1">
+              <widget class="GtkHSeparator" id="hseparator2">
                 <property name="visible">True</property>
               </widget>
               <packing>
@@ -889,23 +905,16 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkLabel" id="delay_label">
-                <property name="visible">True</property>
-                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">&lt;b&gt; Found:  0.000 secs&lt;/b&gt;</property>
-                <property name="use_markup">True</property>
-              </widget>
-              <packing>
-                <property name="padding">3</property>
-                <property name="position">2</property>
-              </packing>
+              <placeholder/>
             </child>
             <child>
-              <widget class="GtkSpinButton" id="spinbutton1">
+              <widget class="GtkSpinButton" id="spinbutton_smoothing">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="adjustment">0 0 100 1 10 10</property>
+                <property name="has_tooltip">True</property>
+                <property name="tooltip_text">Increasing this value smooths the graph more.</property>
+                <property name="adjustment">3 1 10 1 2 2</property>
                 <property name="digits">3</property>
               </widget>
               <packing>
@@ -918,27 +927,27 @@
           </packing>
         </child>
         <child internal-child="action_area">
-          <widget class="GtkHButtonBox" id="dialog-action_area1">
+          <widget class="GtkHButtonBox" id="dialog-action_area3">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <property name="layout_style">GTK_BUTTONBOX_END</property>
             <child>
-              <widget class="GtkButton" id="delay_custom_button">
+              <widget class="GtkButton" id="apply_smoothing">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">Custom</property>
+                <property name="label" translatable="yes">gtk-apply</property>
+                <property name="use_stock">True</property>
                 <property name="response_id">0</property>
               </widget>
             </child>
             <child>
-              <widget class="GtkButton" id="delay_keep_button">
+              <widget class="GtkButton" id="close_smoothing">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="yes">Found</property>
+                <property name="label" translatable="yes">gtk-close</property>
+                <property name="use_stock">True</property>
                 <property name="response_id">0</property>
               </widget>
               <packing>
@@ -954,95 +963,97 @@
       </widget>
     </child>
   </widget>
-  <widget class="GtkWindow" id="impulse_window">
+  <widget class="GtkDialog" id="averaging_dialog">
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-    <child>
-      <widget class="GtkVBox" id="vbox_impulse">
+    <property name="tooltip_text">Increasing this value slows down the response of the graph.</property>
+    <property name="border_width">5</property>
+    <property name="title" translatable="yes">Graph Averaging</property>
+    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
+    <property name="urgency_hint">True</property>
+    <property name="gravity">GDK_GRAVITY_CENTER</property>
+    <property name="transient_for">window1</property>
+    <property name="has_separator">False</property>
+    <child internal-child="vbox">
+      <widget class="GtkVBox" id="dialog-vbox6">
         <property name="visible">True</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="spacing">2</property>
         <child>
-          <placeholder/>
-        </child>
-      </widget>
-    </child>
-  </widget>
-  <widget class="GtkMenu" id="menu4">
-    <property name="visible">True</property>
-    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-  </widget>
-  <widget class="GtkWindow" id="about_me_window">
-    <property name="title" translatable="yes">About BRP-PACU</property>
-    <child>
-      <widget class="GtkVBox" id="vbox3">
-        <property name="visible">True</property>
-        <child>
-          <widget class="GtkTextView" id="textview1">
+          <widget class="GtkVBox" id="vbox5">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="editable">False</property>
-            <property name="justification">GTK_JUSTIFY_FILL</property>
-            <property name="text" translatable="yes">Brian's Reasonably Priced Professional Audio Configuration Utility
-
-* Copyright (C) 2007-2008 Brian Phelps(lm317t@gmail.com)
-* Macintosh application Copyright (C) 2009 Andreas Schwab
-* Macintosh synchronization Copyright (C) 2007 Pioneer Research Center USA, Inc.
-* Macintosh integration Copyright (C) 2007, 2008 Imendio AB
-* This program is based on the following libraries 
-* FFTW: Copyright (c) 1997-1999, 2003 Massachusetts Institute of Technology
-* libglade: Copyright (C) 1998-2002  James Henstridge
-* gtkdatabox: Copyright (C) 1998 - 2008  Dr. Roland Bock
-* 
-*  This program is free software; you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 2 of the License, or
-*  (at your option) any later version.
-*
-*  This program is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU Library General Public License for more details.
-*
-*  You should have received a copy of the GNU General Public License
-*  along with this program; if not, write to the Free Software
-*  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
-*
-
-Written by Brian R. Phelps aka Electronjunkie
-http://electronjunkie.wordpress.com
-
-Questions or comments? 
-Interested in contributing?
-
-Please email me at lm317t@gmail.com
-
-I need someone to help me package it for Debian/Ubuntu! 
-Also a Redhat/Fedora rpm or any other packaging help would be much appreciated.</property>
-          </widget>
-        </child>
-        <child>
-          <widget class="GtkHBox" id="hbox7">
-            <property name="visible">True</property>
+            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <child>
-              <placeholder/>
+              <widget class="GtkLabel" id="label_averaging">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">Averaging Value:</property>
+              </widget>
             </child>
             <child>
-              <widget class="GtkButton" id="about_ok">
+              <widget class="GtkHSeparator" id="hseparator3">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="label" translatable="yes">OK</property>
-                <property name="response_id">0</property>
               </widget>
               <packing>
+                <property name="expand">False</property>
+                <property name="padding">9</property>
                 <property name="position">1</property>
               </packing>
             </child>
             <child>
               <placeholder/>
             </child>
+            <child>
+              <widget class="GtkSpinButton" id="spinbutton_averaging">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="has_tooltip">True</property>
+                <property name="tooltip_text">Increasing this value smooths the graph more.</property>
+                <property name="adjustment">32 1 40 1 2 2</property>
+                <property name="digits">3</property>
+              </widget>
+              <packing>
+                <property name="position">3</property>
+              </packing>
+            </child>
           </widget>
           <packing>
             <property name="position">1</property>
+          </packing>
+        </child>
+        <child internal-child="action_area">
+          <widget class="GtkHButtonBox" id="dialog-action_area6">
+            <property name="visible">True</property>
+            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <child>
+              <widget class="GtkButton" id="apply_averaging">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="label" translatable="yes">gtk-apply</property>
+                <property name="use_stock">True</property>
+                <property name="response_id">0</property>
+              </widget>
+            </child>
+            <child>
+              <widget class="GtkButton" id="close_averaging">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="label" translatable="yes">gtk-close</property>
+                <property name="use_stock">True</property>
+                <property name="response_id">0</property>
+              </widget>
+              <packing>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="pack_type">GTK_PACK_END</property>
           </packing>
         </child>
       </widget>

@@ -22,7 +22,8 @@
 #include <fftw.h>
 #include <math.h>
 #include "main.h"
-#define N_FFT 8192
+#define DELAY_BUFFER_SIZE 44100
+#define N_FFT 16384
 #define RATIO 2
 #define MAX_AVG_NUM 32
 #define BUFF_NUM 32

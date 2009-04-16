@@ -133,15 +133,19 @@ Fill_Buffer(jack_nframes_t nframes, void *arg)
       //fprintf(stderr, "The period size is %d\n",period_size);
       //
       // Fill delay with old data
-      for ( k = 0; k < (N_FFT - period_size); k++)
+      for ( k = 0; k < (DELAY_BUFFER_SIZE - period_size); k++)
       {
          // Rotate dellay data to the left to make room for new samples
          fill_it->delay[k] = fill_it->delay[k + period_size];
       }
-      for ( k = N_FFT - period_size; k < N_FFT; k++)
+
+      j=N_FFT - period_size;
+      for ( k = DELAY_BUFFER_SIZE - period_size; k < DELAY_BUFFER_SIZE; k++)
       {
-         // Copy old delay data to end of delayed buffer 2
-         fill_it->delay[k] = fill_it->prewin_buffer_data_2[k - N_FFT + period_size ];
+         //// Copy old delay data to end of delayed buffer 2
+         // Copy old buffer data to end of delay buffer
+         fill_it->delay[k] = fill_it->prewin_buffer_data_2[j - N_FFT + period_size ];
+         j++;
       }
 
       // Rotate data to the left to make room for new samples
@@ -170,7 +174,7 @@ Fill_Buffer(jack_nframes_t nframes, void *arg)
          if (k - fill_it->delay_size >= 0)
             fill_it->buffer_data_2[k] = fill_it->prewin_buffer_data_2[k - fill_it->delay_size]; // copy end of normal buffer to working buffer
          else
-            fill_it->buffer_data_2[k] = fill_it->delay[k + N_FFT - fill_it->delay_size];  // copy most recent samples of the delay buffer to beginning (oldest) buffer_data_2
+            fill_it->buffer_data_2[k] = fill_it->delay[k + DELAY_BUFFER_SIZE - fill_it->delay_size];  // copy most recent samples of the delay buffer to beginning (oldest) buffer_data_2
       }
       //for (k = 0; k < N_FFT; k++)
       //{
@@ -294,7 +298,7 @@ struct FFT_Frame *init_fft_frame(void)
    FFT_Kit->prewin_buffer_data_2 = (short *) malloc(sizeof(short) * N_FFT);
    FFT_Kit->buffer_data_1 = (short *) malloc(sizeof(short) * N_FFT);
    FFT_Kit->buffer_data_2 = (short *) malloc(sizeof(short) * N_FFT);
-   FFT_Kit->delay = (short *) malloc(sizeof(short) * N_FFT);
+   FFT_Kit->delay = (short *) malloc(sizeof(short) * DELAY_BUFFER_SIZE);
 
    FFT_Kit->delay_size = 0;
    FFT_Kit->volume_pink = 0.0;

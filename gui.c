@@ -174,7 +174,7 @@ gui_idle_func (struct FFT_Frame *data)
 
    data->volume_pink = volume_pink_value;
    avg_index++;
-   if (avg_index == avg_num) avg_index = 0;
+   if (avg_index >= avg_num) avg_index = 0;
    min_y = 0.0;
    max_y = 0.0;
 
@@ -266,7 +266,7 @@ gui_idle_func (struct FFT_Frame *data)
       update_delay = 0;
       gtk_widget_hide_all (delay_window);
    }
-   label = g_strdup_printf ( "Current Delay %g msecs", (float) data->delay_size * (1.0 / (float)FSAMP) * 1000.0 );
+   label = g_strdup_printf ( "Delay %3.2f msecs", (float) data->delay_size * (1.0 / (float)FSAMP) * 1000.0 );
    gtk_label_set_text  (GTK_LABEL (gui_status_delay_label), label);
    g_free((gpointer)label);
 
@@ -1065,10 +1065,10 @@ show_motion_notify_cb(GtkWidget *widget, GdkEventMotion *event)// , GtkWidget *w
    gchar *label;
 
    //y= (gfloat)y;
-   label = g_strdup_printf ( "%g Hz", x);
+   label = g_strdup_printf ( "%5.1f Hz", x);
    gtk_label_set_text (GTK_LABEL (gui_label), label);
    g_free((gpointer)label);
-   label = g_strdup_printf ( "%g dB",  (y)   );
+   label = g_strdup_printf ( "%3.2f dB",  (y)   );
    gtk_label_set_text (GTK_LABEL (gui_db_label), label);
    g_free((gpointer)label);
    return FALSE;
@@ -1370,7 +1370,7 @@ create_gui (struct FFT_Frame * data)
    for (i = 0; i < PLOT_PTS; i++)
    {
       guiX[i] = ((gfloat)i) * (gfloat)FBIN;
-      for (k = 0; k < avg_num; k++)
+      for (k = 0; k < MAX_AVG_NUM; k++)
          avgY[i][k] = .01;
       guiY[i] = .01;
       for (k = 0; k < N_BUFF; k++)

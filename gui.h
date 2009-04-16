@@ -26,8 +26,8 @@
 #ifndef GUI_H
 #define GUI_H
 
-#define WINDOW_H 650
-#define WINDOW_W 1200
+#define WINDOW_H 600
+#define WINDOW_W 950
 
 #define IMPULSE_WINDOW_H 500
 #define IMPULSE_WINDOW_W 900
