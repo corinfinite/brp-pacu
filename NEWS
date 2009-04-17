@@ -1,4 +1,19 @@
-Version 2.0.8 04/06/2009
+Version 2.1.0 04/17/2009
+   Changed libraries for thread mutexes for compilation on windows
+
+   Smaller screen sizes now supported
+
+   Octave based (log2) frequency grids instead of log10
+
+   Auto-resize (ctrl-r) works much more predictably and smoothly
+
+   Delay size has been increased to 1000millisecs
+
+   Averaging (graph response time) and smoothing now adjustable via GUI
+
+   Other minor glitches fixed
+
+Version 2.0.8(unreleased) 04/06/2009
    Added Pink Noise Menu Item and CTRL-P accel
    
    Changed N to N_FFT to avoid symbol collisions
