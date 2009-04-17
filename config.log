@@ -295,7 +295,7 @@ PKG_CONFIG_PATH=''
 SET_MAKE=''
 SHELL='/bin/bash'
 STRIP=''
-VERSION='2.0.8'
+VERSION='2.1.0'
 ac_ct_CC='gcc'
 am__fastdepCC_FALSE='#'
 am__fastdepCC_TRUE=''
@@ -343,7 +343,7 @@ target_alias=''
 #define PACKAGE_STRING ""
 #define PACKAGE_BUGREPORT ""
 #define PACKAGE "BRP_PACU"
-#define VERSION "2.0.8"
+#define VERSION "2.1.0"
 #define HAVE_LIBM 1
 #define HAVE_LIBFFTW 1
 
