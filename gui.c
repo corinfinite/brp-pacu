@@ -68,8 +68,7 @@ static GtkWidget *transfer_function_toggle = NULL;
 static GtkWidget *transfer_function_menu = NULL;
 static GtkWidget *buffer_button[N_BUFF] = { NULL, NULL, NULL, NULL, NULL };
 static GtkWidget *buffer_menu[N_BUFF] = { NULL, NULL, NULL, NULL, NULL };
-static GtkWidget *smoothing_dialog = NULL;
-static GtkWidget *averaging_dialog = NULL;
+static GtkWidget *preferences_dialog = NULL;
 static GtkWidget *smoothing_spin_button=NULL;
 static GtkWidget *averaging_spin_button=NULL;
 static gfloat volume_pink_value = 0;
@@ -123,7 +122,7 @@ static   GdkColor line_color[N_BUFF] =
 {
    //unused, red, green, blue
    {0, 16384 , 16384 , 65535 },
-   {0, 0 , 65535 , 0 },
+   {0, 0 , 62000 , 0 },
    {0, 65535 , 0 , 0 },
    {0, 65535 , 16384 , 65535 },
    {0, 65535 , 65535 , 65535 }
@@ -489,27 +488,27 @@ capture_cb(GtkWidget *widget, GtkWidget *box)// , gtkwidget *widget)
       else  // it is a regular buffer
          for (k = 0; k < PLOT_PTS; k++)
             guiYBuf[buffer_last_clicked][k] = guiY[k];
-   }
-   write_output = mkdir(file_path1, 0770);
-   if (  ((write_output == -1) && (errno == EEXIST)) || (write_output == 0)   )
-      write_output = 1;
-   if ( write_output == 1) // The directory exists or was created
-   {
-      file_handle = fopen(file_path2, "wb");
-      if (file_handle == NULL)
+      write_output = mkdir(file_path1, 0770);
+      if (  ((write_output == -1) && (errno == EEXIST)) || (write_output == 0)   )
+         write_output = 1;
+      if ( write_output == 1) // The directory exists or was created
       {
-         write_output = 0;
-         message("Could not open file %s, permissions issue?", file_path2, TRUE);
+         file_handle = fopen(file_path2, "wb");
+         if (file_handle == NULL)
+         {
+            write_output = 0;
+            message("Could not open file %s, permissions issue?", file_path2, TRUE);
+         }
       }
-   }
-   if (write_output == 1)
-   {
-      tmp_array[0] = PLOT_PTS;
-      printf("Writing %d elements per buffer to %s\n",  tmp_array[0], file_path2);
-      fwrite (tmp_array, sizeof(gint), 1, file_handle );
-      for (i = 0; i < N_BUFF; i++)
-         fwrite (guiYBuf[i], sizeof(gfloat), PLOT_PTS, file_handle );
-      fclose(file_handle);
+      if (write_output == 1)
+      {
+         tmp_array[0] = PLOT_PTS;
+         printf("Writing %d elements per buffer to %s\n",  tmp_array[0], file_path2);
+         fwrite (tmp_array, sizeof(gint), 1, file_handle );
+         for (i = 0; i < N_BUFF; i++)
+            fwrite (guiYBuf[i], sizeof(gfloat), PLOT_PTS, file_handle );
+         fclose(file_handle);
+      }
    }
 }
 
@@ -1133,47 +1132,35 @@ static gboolean configure_event_reference( GtkWidget         *widget,
 }
 
 static void
-smoothing_dialog_cb(GtkWidget *widget)// , gtkwidget *widget)
+preferences_dialog_cb(GtkWidget *widget)// , gtkwidget *widget)
 {
-   gtk_window_set_transient_for(smoothing_dialog, window);
-   gtk_window_set_decorated (smoothing_dialog, FALSE);
-   gtk_widget_show_all(GTK_DIALOG(smoothing_dialog));
-   gtk_window_present (smoothing_dialog);
+   gtk_window_set_transient_for(preferences_dialog, window);
+   gtk_window_set_decorated (preferences_dialog, FALSE);
+
+   gtk_spin_button_set_value (smoothing_spin_button, (gdouble) smooth_factor);
+   gtk_spin_button_set_value (averaging_spin_button, (gdouble) avg_num);
+
+
+   gtk_widget_show_all(GTK_DIALOG(preferences_dialog));
+   gtk_window_present (preferences_dialog);
 }
+
 
 static void
-averaging_dialog_cb(GtkWidget *widget)// , gtkwidget *widget)
+close_preferences_cb(GtkWidget *widget)// , gtkwidget *widget)
 {
-   gtk_window_set_transient_for(averaging_dialog, window);
-   gtk_window_set_decorated (averaging_dialog, FALSE);
-   gtk_widget_show_all(GTK_DIALOG(averaging_dialog));
-   gtk_window_present (averaging_dialog);
+   gtk_widget_hide_all (preferences_dialog);
 }
 
-static void
-close_smoothing_cb(GtkWidget *widget)// , gtkwidget *widget)
-{
-   gtk_widget_hide_all (smoothing_dialog);
-}
 
-static void
-close_averaging_cb(GtkWidget *widget)// , gtkwidget *widget)
-{
-   gtk_widget_hide_all (averaging_dialog);
-}
-
-static void apply_smoothing_cb( GtkWidget *widget)
+static void apply_preferences_cb( GtkWidget *widget)
 {
    smooth_factor = gtk_spin_button_get_value_as_int (smoothing_spin_button);
    smooth_constant=pow(2,smooth_factor)-1;
-         
-}
-
-static void apply_averaging_cb( GtkWidget *widget)
-{
    avg_num = gtk_spin_button_get_value_as_int (averaging_spin_button);
          
 }
+
 
 gboolean
 create_gui (struct FFT_Frame * data)
@@ -1254,20 +1241,14 @@ create_gui (struct FFT_Frame * data)
    pinknoise_menu_item = glade_xml_get_widget (xml, "pink_noise");
    transfer_function_toggle = glade_xml_get_widget (xml, "TransferFxn");
    transfer_function_menu = glade_xml_get_widget (xml, "transfer_fxn");
-   averaging_dialog = glade_xml_get_widget (xml, "averaging_dialog");
-   smoothing_dialog = glade_xml_get_widget (xml, "smoothing_dialog");
+   preferences_dialog = glade_xml_get_widget (xml, "preferences_dialog");
    smoothing_spin_button = glade_xml_get_widget (xml, "spinbutton_smoothing");
    averaging_spin_button = glade_xml_get_widget (xml, "spinbutton_averaging");
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "plot_smoothing")), "activate", G_CALLBACK (smoothing_dialog_cb), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "plot_averaging")), "activate", G_CALLBACK (averaging_dialog_cb), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "close_smoothing")), "clicked", G_CALLBACK (close_smoothing_cb), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "close_averaging")), "clicked", G_CALLBACK (close_averaging_cb), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "apply_smoothing")), "clicked", G_CALLBACK (apply_smoothing_cb), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "apply_averaging")), "clicked", G_CALLBACK (apply_averaging_cb), NULL);
-   g_signal_connect (GTK_OBJECT (smoothing_dialog), "delete_event", G_CALLBACK (delay_hide), NULL);
-   g_signal_connect (GTK_OBJECT (averaging_dialog), "delete_event", G_CALLBACK (delay_hide), NULL);
-   gtk_window_set_decorated (smoothing_dialog, FALSE);
-   gtk_window_set_decorated (averaging_dialog, FALSE);
+   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "plot_preferences")), "activate", G_CALLBACK (preferences_dialog_cb), NULL);
+   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "close_preferences")), "clicked", G_CALLBACK (close_preferences_cb), NULL);
+   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "apply_preferences")), "clicked", G_CALLBACK (apply_preferences_cb), NULL);
+   g_signal_connect (GTK_OBJECT (preferences_dialog), "delete_event", G_CALLBACK (delay_hide), NULL);
+   gtk_window_set_decorated (preferences_dialog, FALSE);
 
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "pinknoise_button")), "clicked", G_CALLBACK (pinknoise_mute), "button");
    //g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "volumebutton1")), "popdown", G_CALLBACK (volume_popdown_gui), NULL);
@@ -1287,7 +1268,7 @@ create_gui (struct FFT_Frame * data)
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "find_delay_m")), "activate", G_CALLBACK (delay_cb), data);
    g_signal_connect (GTK_OBJECT (window), "destroy", G_CALLBACK (cleanup_gui), NULL);
    g_signal_connect (GTK_OBJECT (window), "delete_event", G_CALLBACK (cleanup_gui), NULL);
-   g_signal_connect (GTK_OBJECT (delay_window), "delete_event", G_CALLBACK (delay_hide), NULL);
+   g_signal_connect (GTK_OBJECT (delay_window), "delete_event", G_CALLBACK (close_preferences_cb), NULL);
    g_signal_connect (G_OBJECT (glade_xml_get_widget(xml, "delay_keep_button")), "clicked", G_CALLBACK (delay_keep_cb), NULL);
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "impulse_response")), "activate", G_CALLBACK (impulse_cb), data);
    g_signal_connect (GTK_OBJECT (impulse_window), "delete_event", G_CALLBACK (impulse_hide), NULL);
@@ -1351,9 +1332,9 @@ create_gui (struct FFT_Frame * data)
    gtk_box_pack_start (GTK_BOX (box_container), table, TRUE, TRUE, 0);
    gtk_box_pack_start (GTK_BOX (box_container_impulse), table_impulse, TRUE, TRUE, 0);
 
-   background_color.red = 8192;
-   background_color.green = 8192;
-   background_color.blue = 8192;
+   background_color.red = 2048;
+   background_color.green = 2048;
+   background_color.blue = 2048;
 
    gtk_widget_modify_bg (box, GTK_STATE_NORMAL, &background_color);
 
@@ -1380,7 +1361,7 @@ create_gui (struct FFT_Frame * data)
    }
    trace_transfer_color.red = 16384;
    trace_transfer_color.green = 65535;
-   trace_transfer_color.blue = 16384;
+   trace_transfer_color.blue = 45000;
 
    graph[0] = gtk_databox_lines_new (PLOT_PTS, guiX, guiY,
                                      &trace_transfer_color, 1);
@@ -1390,7 +1371,7 @@ create_gui (struct FFT_Frame * data)
                                           &line_color[i], 1);
    grid_color.red = 65535;
    grid_color.green = 65535;
-   grid_color.blue = 16384;
+   grid_color.blue = 32767;
    my_grid = gtk_databox_grid_array_new (19, 10, NULL, grid_x, &grid_color, 1);
    //my_grid = gtk_databox_grid_new (19, 21.5, &grid_color, 1);
    gtk_databox_graph_add (GTK_DATABOX (box), my_grid);
