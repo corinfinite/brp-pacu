@@ -473,8 +473,8 @@ main (int argc, char *argv[])
    b4 = 0;
    b5 = 0;
    b6 = 0;
+   g_thread_init(NULL);
    gtk_init (&argc, &argv);
-   //g_thread_init(NULL);
    thread_mutex = g_mutex_new ();
 
    fill_it = init_fft_frame();
