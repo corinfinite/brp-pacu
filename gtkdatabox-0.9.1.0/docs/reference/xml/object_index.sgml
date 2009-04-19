@@ -1,0 +1,30 @@
+<informaltable pgwide="1" frame="none">
+<tgroup cols="3">
+<colspec colwidth="1*"/>
+<colspec colwidth="1*"/>
+<colspec colwidth="1*"/>
+<tbody>
+<row>
+<entry><link linkend="GInitiallyUnowned">GInitiallyUnowned</link></entry>
+<entry><link linkend="GObject">GObject</link></entry>
+<entry><link linkend="GtkDatabox">GtkDatabox</link></entry>
+</row>
+<row>
+<entry><link linkend="GtkDataboxBars">GtkDataboxBars</link></entry>
+<entry><link linkend="GtkDataboxCrossSimple">GtkDataboxCrossSimple</link></entry>
+<entry><link linkend="GtkDataboxGraph">GtkDataboxGraph</link></entry>
+</row>
+<row>
+<entry><link linkend="GtkDataboxGrid">GtkDataboxGrid</link></entry>
+<entry><link linkend="GtkDataboxLines">GtkDataboxLines</link></entry>
+<entry><link linkend="GtkDataboxMarkers">GtkDataboxMarkers</link></entry>
+</row>
+<row>
+<entry><link linkend="GtkDataboxPoints">GtkDataboxPoints</link></entry>
+<entry><link linkend="GtkDataboxRuler">GtkDataboxRuler</link></entry>
+<entry><link linkend="GtkDataboxXYCGraph">GtkDataboxXYCGraph</link></entry>
+</row>
+<row>
+<entry><link linkend="GtkObject">GtkObject</link></entry>
+<entry><link linkend="GtkWidget">GtkWidget</link></entry>
+</tbody></tgroup></informaltable>

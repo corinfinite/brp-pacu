@@ -1,0 +1,13 @@
+    <xi:include href="xml/gtkdatabox.xml"/>
+    <xi:include href="xml/gtkdatabox_graph.xml"/>
+    <xi:include href="xml/gtkdatabox_xyc_graph.xml"/>
+    <xi:include href="xml/gtkdatabox_points.xml"/>
+    <xi:include href="xml/gtkdatabox_lines.xml"/>
+    <xi:include href="xml/gtkdatabox_bars.xml"/>
+    <xi:include href="xml/gtkdatabox_grid.xml"/>
+    <xi:include href="xml/gtkdatabox_cross_simple.xml"/>
+    <xi:include href="xml/gtkdatabox_ruler.xml"/>
+    <xi:include href="xml/gtkdatabox_markers.xml"/>
+    <xi:include href="xml/gtkdatabox_marshal.xml"/>
+    <xi:include href="xml/gtkdatabox_scale.xml"/>
+    <xi:include href="xml/gtkdatabox_typedefs.xml"/>

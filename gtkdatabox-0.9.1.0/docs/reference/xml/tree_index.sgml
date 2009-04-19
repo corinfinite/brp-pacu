@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE screen PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<screen>
+    <link linkend="GObject">GObject</link>
+        <link linkend="GInitiallyUnowned">GInitiallyUnowned</link>
+            <link linkend="GtkObject">GtkObject</link>
+                <link linkend="GtkWidget">GtkWidget</link>
+                    <link linkend="GtkDatabox">GtkDatabox</link>
+                    <link linkend="GtkDataboxRuler">GtkDataboxRuler</link>
+        <link linkend="GtkDataboxGraph">GtkDataboxGraph</link>
+            <link linkend="GtkDataboxXYCGraph">GtkDataboxXYCGraph</link>
+                <link linkend="GtkDataboxPoints">GtkDataboxPoints</link>
+                <link linkend="GtkDataboxLines">GtkDataboxLines</link>
+                <link linkend="GtkDataboxBars">GtkDataboxBars</link>
+                <link linkend="GtkDataboxMarkers">GtkDataboxMarkers</link>
+                    <link linkend="GtkDataboxCrossSimple">GtkDataboxCrossSimple</link>
+            <link linkend="GtkDataboxGrid">GtkDataboxGrid</link>
+</screen>

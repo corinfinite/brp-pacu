@@ -1,0 +1,17 @@
+95% symbol docs coverage.
+145 symbols documented.
+1 symbols incomplete.
+8 not documented.
+
+
+GtkDataboxScaleType (GTK_DATABOX_SCALE_LOG2)
+gtk_databox_marshal_VOID__POINTER
+gtk_databox_marshal_VOID__VOID
+gtk_databox_scale_type_get_type
+
+
+gtkdatabox_marshal:Long_Description
+gtkdatabox_marshal:Short_Description
+gtkdatabox_scale:Long_Description
+gtkdatabox_scale:Short_Description
+gtkdatabox_typedefs:Short_Description
