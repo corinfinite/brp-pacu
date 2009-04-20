@@ -1,4 +1,6 @@
 2009-04-15 (0.9.0.2alpha)
+	 - This project now has a new maintainer, Brian R Phelps.  He can be
+	   reached at lm317t at gmail dot com
 	 - Added log base 2 support to the scale/ruler libraries
 	    - In gtkdatabox.c I Copied log10 code and pasted, it 
 	      after the linear code replacing log10 calls with log2

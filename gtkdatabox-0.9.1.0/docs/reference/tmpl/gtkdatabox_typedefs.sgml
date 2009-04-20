@@ -28,38 +28,38 @@ gtkdatabox_typedefs
 
 </para>
 
-@databox: the object which received the signal.
+@: 
 
 <!-- ##### SIGNAL GtkDatabox::selection-changed ##### -->
 <para>
 
 </para>
 
-@databox: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### SIGNAL GtkDatabox::selection-finalized ##### -->
 <para>
 
 </para>
 
-@databox: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### SIGNAL GtkDatabox::selection-started ##### -->
 <para>
 
 </para>
 
-@databox: the object which received the signal.
-@arg1: 
+@: 
+@: 
 
 <!-- ##### SIGNAL GtkDatabox::zoomed ##### -->
 <para>
 
 </para>
 
-@databox: the object which received the signal.
+@: 
 
 <!-- ##### ARG GtkDatabox:adjustment-x ##### -->
 <para>
