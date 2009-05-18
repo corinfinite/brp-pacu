@@ -35,3 +35,11 @@ git push origin master
 # git add <files_listed_in_status>
 # git commit
 # git push
+
+
+### To get fancy colors
+git config --global color.branch auto
+git config --global color.diff auto
+git config --global color.interactive auto
+git config --global color.status auto
+

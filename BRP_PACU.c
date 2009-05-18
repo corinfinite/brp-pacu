@@ -496,7 +496,15 @@ main (int argc, char *argv[])
          fprintf(stderr, "Gui did not start\n");
    }
    else
+   {
       fprintf(stderr, "////////\n////////\n BRP_PACU failed to start because jackd failed to initialize, please check your jackd sound card settings.  qjackctl (JackPilot with a mac) is an easy way to do this\n////////\n////////\n");
+#ifdef __APPLE__
+      GtkWidget*  jack_error_dialog =  gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "Jack initialization Error. BRP_PACU failed to start because jackd failed to initialize.  Please check how jackd uses your sound card settings.  JackPilot is an easy way to do this.  For more information please read the README-Mac.txt.  BRP_PACU depends on the jack subsystem.");
+#else
+      GtkWidget*  jack_error_dialog =  gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "Jack initialization Error. BRP_PACU failed to start because jackd failed to initialize.  This is usually due to an issue with the sound card settings in qjackctl.  BRP_PACU depends on the jack subsystem.");
+#endif
+       gtk_dialog_run (GTK_DIALOG (jack_error_dialog));
+   }
 
    // Wait until thread execution has ended
    printf("Main Cleaning up.......\n");
