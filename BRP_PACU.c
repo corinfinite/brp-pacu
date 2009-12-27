@@ -42,7 +42,7 @@ static float  audio2[8192];
 static float pink_noise[8192];
 volatile char run = 1;
 static guint timer_id = 0;
-static guint BUF_SIZE = BUFSIZE;
+// static guint BUF_SIZE = BUFSIZE;
 float b0, b1, b2, b3, b4, b5, b6, white;
 float tmp_time = 0.0;
 float scale_it = 0.98;
@@ -63,19 +63,19 @@ volatile enum
    Exit
 } client_state = Init;
 
-static void
-on_quit (GtkObject *object)
+/*static void
+ on_quit (GtkObject *object)
 {
    gtk_object_destroy (object);
    gtk_main_quit ();
-}
+}*/
 
 
 int
 Fill_Buffer(jack_nframes_t nframes, void *arg)
 {
    //fill_it = (struct FFT_Frame *) malloc(sizeof(struct FFT_Frame ));
-   int err, k, j, flag,  avail, period_size;
+   int k, j, period_size;
    jack_default_audio_sample_t *in_buffer1, *in_buffer2, *out_buffer;
 
    g_mutex_lock (thread_mutex);
@@ -194,11 +194,11 @@ Fill_Buffer(jack_nframes_t nframes, void *arg)
    return 0;
 }
 
-static gint
+static gboolean
 MyGTKFunction (struct FFT_Frame * frame_data)
 {
-   int k, j, max_index;
-   float avg[2000], min;
+   int j, max_index = 0;
+//   float avg[2000], min;
    double max, tmp;
 
    g_mutex_lock (thread_mutex);
@@ -215,17 +215,17 @@ MyGTKFunction (struct FFT_Frame * frame_data)
 
    if (frame_data->find_delay == 1) // Delay button pressed, set delay to new value
    {
-      gtk_timeout_remove(timer_id);
+      g_source_remove(timer_id);
       gui_idle_func(frame_data);
       frame_data->delay_size = 0;
       frame_data->find_delay = 3;   // Signal to gui that we are waiting while the delay sets in
-      timer_id = gtk_timeout_add(1000, MyGTKFunction, (gpointer) frame_data ); // Start the initial delay
+      timer_id = g_timeout_add(1000, (GSourceFunc) MyGTKFunction, (gpointer) frame_data ); // Start the initial delay
       printf("Finding delay....\n");
-      return 90;
+      return TRUE;
    }
    else if (frame_data->find_delay == 3)
    {
-      gtk_timeout_remove(timer_id);
+      g_source_remove(timer_id);
 
       g_mutex_lock (thread_mutex);
       impulse_capture(frame_data);
@@ -248,7 +248,7 @@ MyGTKFunction (struct FFT_Frame * frame_data)
       //frame_data->delay_size=10000;
       if ( max_index < N_FFT) // Protect against delay being larger than malloc'd size of N
          frame_data->delay_size = max_index;
-      timer_id = gtk_timeout_add(90, MyGTKFunction, (gpointer) frame_data ); // Start back to normal
+      timer_id = g_timeout_add(90, (GSourceFunc) MyGTKFunction, (gpointer) frame_data ); // Start back to normal
       frame_data->find_delay = 2;  // Indicate to gui that we are done finding the delay
       if (frame_data->find_impulse == 1)
       {
@@ -281,7 +281,7 @@ MyGTKFunction (struct FFT_Frame * frame_data)
    frame_data->delay_size = temp_frame_data->delay_size;
    g_mutex_unlock (thread_mutex);
 
-   return 900;
+   return TRUE;
 
 }
 
@@ -395,7 +395,7 @@ jack_init()
    if ((input_port1 == NULL) || (input_port2 == NULL) || (output_port == NULL))
    {
       fprintf(stderr, "no more JACK ports available\n");
-      return 1;
+      return 2;
    }
 
    /* Tell the JACK server that we are ready to roll.  Our
@@ -404,7 +404,7 @@ jack_init()
    if (jack_activate (client))
    {
       fprintf (stderr, "cannot activate client");
-      return 1;
+      return 3;
    }
 
    /* Connect the ports.  You can't do this before the client is
@@ -420,21 +420,24 @@ jack_init()
    if (ports == NULL)
    {
       fprintf(stderr, "no physical capture ports\n");
-      return 1;
+      return 4;
    }
 
    if (jack_connect (client, ports[0], jack_port_name (input_port1)))
    {
       fprintf (stderr, "cannot connect input ports\n");
+      return 6;
    }
    if (jack_connect (client, ports[1], jack_port_name (input_port2)))
    {
       fprintf (stderr, "cannot connect input ports\n");
+      return 6;
    }
    // Connect the Pink Noise Output to the reference input.
    if (jack_connect (client, jack_port_name (output_port),  jack_port_name (input_port2)))
    {
       fprintf (stderr, "cannot connect output ports\n");
+      return 7;
    }
 
    free (ports);
@@ -444,13 +447,13 @@ jack_init()
    if (ports == NULL)
    {
       fprintf(stderr, "no physical playback ports\n");
-      return 1;
+      return 5;
    }
    // Pink Noise Output
    if (jack_connect (client, jack_port_name (output_port), ports[1]))
    {
       fprintf (stderr, "cannot connect output ports\n");
-      return 1;
+      return 7;
    }
 
    free (ports);
@@ -462,7 +465,6 @@ jack_init()
 int
 main (int argc, char *argv[])
 {
-   int k = 0;
    //        struct FFT_Frame *FFT_Kit = g_new0 (struct FFT_Frame, 1);
 
    b0 = 0;
@@ -475,39 +477,59 @@ main (int argc, char *argv[])
    b6 = 0;
    g_thread_init(NULL);
    gtk_init (&argc, &argv);
+   int ierr = -1;
    thread_mutex = g_mutex_new ();
+    char * jackErrMessage [8] = {"OK",
+       "Unable to connect to JACK server",
+       "No more JACK ports available",
+       "Cannot activate client",
+       "No physical capture ports",
+       "No physical playback ports",
+       "Cannot connect input ports",
+       "Cannot connect output ports"};
 
    fill_it = init_fft_frame();
    temp_frame_data = init_fft_frame();
-
-
-   if (jack_init() == 0)   // If jack init, is successful, run GUI
+   
+   GtkWidget* jack_error_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_NONE, "Jack initialization Error");
+   gtk_window_set_decorated (GTK_WINDOW(jack_error_dialog), FALSE);
+   gtk_window_set_position(GTK_WINDOW(jack_error_dialog), GTK_WIN_POS_CENTER);
+   gtk_dialog_add_buttons(GTK_DIALOG(jack_error_dialog),"Continue",1,"Quit",2,NULL);
+   while (ierr != 0)
    {
+      ierr = jack_init();
+      if (ierr == 0) break;  // If jack init, is successful, run GUI
+      if (client != NULL) jack_client_close (client);
+      fprintf(stderr, "////////\n BRP_PACU failed to start because jackd failed to initialize\n\n%s\n\nplease check your jackd sound card settings.  QjackCtl (JackPilot with a mac) is an easy way to do this\n////////\n", jackErrMessage[ierr]);
+#ifdef __APPLE__
+      gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(jack_error_dialog), "BRP_PACU failed to start.\n-- %s --\nCheck the settings of Audio MIDI Setup and JackPilot, then click on \"Continue\"", jackErrMessage[ierr]);
+      system("open -b gpl.elementicaotici.JackPilot"); // Launch JackPilot so that the user has not to search around
+#else
+      gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(jack_error_dialog),"BRP_PACU failed to start.\n-- %s --\nCheck the settings of QjackCtl, then click on \"Continue\"",jackErrMessage[ierr]);
+#endif
+       if (gtk_dialog_run (GTK_DIALOG(jack_error_dialog)) == 2) { //user clicked on "Quit"
+          gtk_widget_destroy (GTK_WIDGET(jack_error_dialog));
+          printf("BRP-PACU terminated by user. Thank you for using BRP-PACU\n");
+          return (64 + ierr);  // exit program with non-zero exit status
+       }
+;
+   }
+   gtk_widget_destroy (GTK_WIDGET(jack_error_dialog));
       if (create_gui(fill_it))
       {
-         timer_id = gtk_timeout_add(90, MyGTKFunction, (gpointer) fill_it ); // Start the initial delay
+         timer_id = g_timeout_add(90, (GSourceFunc) MyGTKFunction, (gpointer) fill_it ); // Start the initial delay
          gtk_main ();
 
-         gtk_timeout_remove(timer_id);
+         g_source_remove(timer_id);
          run = 0;
-         jack_deactivate (client);
       }
       else
          fprintf(stderr, "Gui did not start\n");
-   }
-   else
-   {
-      fprintf(stderr, "////////\n////////\n BRP_PACU failed to start because jackd failed to initialize, please check your jackd sound card settings.  qjackctl (JackPilot with a mac) is an easy way to do this\n////////\n////////\n");
-#ifdef __APPLE__
-      GtkWidget*  jack_error_dialog =  gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "Jack initialization Error. BRP_PACU failed to start because jackd failed to initialize.  Please check how jackd uses your sound card settings.  JackPilot is an easy way to do this.  For more information please read the README-Mac.txt.  BRP_PACU depends on the jack subsystem.");
-#else
-      GtkWidget*  jack_error_dialog =  gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "Jack initialization Error. BRP_PACU failed to start because jackd failed to initialize.  This is usually due to an issue with the sound card settings in qjackctl.  BRP_PACU depends on the jack subsystem.");
-#endif
-       gtk_dialog_run (GTK_DIALOG (jack_error_dialog));
-   }
 
    // Wait until thread execution has ended
    printf("Main Cleaning up.......\n");
+   jack_deactivate (client);
+   jack_client_close (client);
    fftw_destroy_plan(fill_it->plan);
    fftw_destroy_plan(fill_it->reverse_plan);
    free(fill_it->delay);
@@ -519,6 +541,6 @@ main (int argc, char *argv[])
    free(fill_it->rfft_returned_1);
    free(fill_it->fft_returned_2);
    free(fill_it);
-   printf("Main has exited, Thank you for using BRP-PACU\n");
+   printf("Main has exited. Thank you for using BRP-PACU\n");
    return 0;
 }

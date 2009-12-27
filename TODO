@@ -16,31 +16,6 @@ Window size, smoothing, and avg_num should be changeable in the UI
 
 Make guiY less points, so drawing requires less CPU.
 
-Suggestions:
-1) You do not need to hit "OK". Just check every second or so and destroy the message when jack_init() returns 0.
-
-2) The message should give a reason: jack_init() should return an error code instead of only 0 or 1. For example:
-0= OK
-1 = Unable to connect to JACK server
-2 = No more JACK ports available
-3 = Cannot activate client
-4 = No physical capture ports
-5 = Cannot connect input ports
-6 = Cannot connect output ports
-
-This can then be passed to the message using a case clause.
-
-3) The message for Mac users could be more informative, such as:
-
-"Jack initialization Error. BRP_PACU failed to start\n \
-Reason: %s.\n \
-Make sure that JackOSX has been installed.\n \
-Open JackPilot. You will find it in in the Jack folder within the Applications folder.\n \
-You should first read the Jack-OSX manual. It will be found under the Help menu of the JackPilot.\n \
-Configure JACK according to the Special Intel Mac instructions on page 12 - 13."
-
-where %s is filled with the messages above.
-
 #Change const N to another name like N_FFT because it may cause symbol collisions
 
 #Change gui to not use N datapoints because this drastically increases processor usage to draw points that aren't visible or useful

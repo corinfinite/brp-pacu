@@ -83,7 +83,6 @@ static GString *save_name_str = NULL;
 static char * home_string, *file_path1, *file_path2;
 
 static char pinknoise_muted = 0;
-static char find_delay = 0;
 static char update_delay = 0;
 static char buffer[N_BUFF] = {2, 2, 2, 2, 2};
 static gfloat grid_x[] = {32.0, 64.0, 128.0, 256.0, 512.0, 1024.0, 2048.0, 4096.0, 8192.0, 16384.0};
@@ -92,7 +91,7 @@ static gfloat avg_gain = 0;
 static int  buffer_last_clicked;
 static GtkWidget *bkg_dialog;
 
-static GtkWidget *cb;
+// static GtkWidget *cb;
 static GtkWidget *save_now;
 static GtkWidget *save_as;
 static GtkWidget *open_menuitem;
@@ -134,15 +133,15 @@ void message(char * format, char* text, gboolean error)
 {
    fprintf(stderr, format, text);
    fprintf(stderr, "\n");
-   GtkWidget* dialog = gtk_message_dialog_new (window,
+   GtkWidget* dialog = gtk_message_dialog_new (GTK_WINDOW(window),
                        GTK_DIALOG_DESTROY_WITH_PARENT,
                        error ? GTK_MESSAGE_ERROR : GTK_MESSAGE_WARNING,
                        GTK_BUTTONS_CLOSE,
                        format,
                        text);
-   gtk_window_set_position(dialog, GTK_WIN_POS_CENTER);
-   gtk_window_set_decorated (dialog, FALSE);
-   gtk_window_present (dialog);
+   gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+   gtk_window_set_decorated (GTK_WINDOW(dialog), FALSE);
+   gtk_window_present (GTK_WINDOW(dialog));
    gtk_dialog_run (GTK_DIALOG (dialog));
    gtk_widget_destroy (dialog);
 }
@@ -373,7 +372,7 @@ pinknoise_mute(GtkWidget *widget, char * data)// , gtkwidget *widget)
 {
    if (strcmp(data, "menu") == 0) // what button was pressed
    {
-      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button)) !=  gtk_check_menu_item_get_active(GTK_MENU_ITEM (pinknoise_menu_item)) ) // is this the first call
+      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button)) !=  gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM (pinknoise_menu_item)) ) // is this the first call
       {
          gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pinknoise_button), !gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button)) );
          pinknoise_muted ^= 1;
@@ -381,9 +380,9 @@ pinknoise_mute(GtkWidget *widget, char * data)// , gtkwidget *widget)
    }
    else
    {
-      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button)) !=  gtk_check_menu_item_get_active(GTK_MENU_ITEM (pinknoise_menu_item)) ) // is this the first call
+      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button)) !=  gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM (pinknoise_menu_item)) ) // is this the first call
       {
-         gtk_check_menu_item_set_active(GTK_MENU_ITEM (pinknoise_menu_item), !gtk_check_menu_item_get_active(GTK_MENU_ITEM (pinknoise_menu_item)) );
+         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM (pinknoise_menu_item), !gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM (pinknoise_menu_item)) );
          pinknoise_muted ^= 1;
       }
    }
@@ -408,7 +407,7 @@ static void
 about_me_cb(GtkWidget *widget)// , gtkwidget *widget)
 {
    gtk_widget_show_all (about_me_window);
-   gtk_window_present (about_me_window);
+   gtk_window_present (GTK_WINDOW(about_me_window));
 }
 // Trigger the gui to do the transfer function
 static void
@@ -630,7 +629,7 @@ open_file(char *fn)
       {
          message("Wrong file format", NULL, TRUE);
          fprintf (stderr, "PLOT_PTS is different from PLOT_PTS last captured size.");
-         fprintf (stderr, "N_FFT has been changed from N_FFT=%d * 2 since your last capture.\n", read_plot_pts  );
+         fprintf (stderr, "N_FFT has been changed from N_FFT=%d * 2 since your last capture.\n", (int) read_plot_pts  );
       }
    }
    else
@@ -668,7 +667,7 @@ save_file(char* fn)
 
 #ifdef __APPLE__
 
-static UInt8 strBuffer[PATH_MAX];
+static char strBuffer[PATH_MAX];
 
 // To open a file, pass docList containing one record with the file to open
 //     and set basename to NULL.
@@ -695,7 +694,7 @@ static OSStatus DoOpenSave(AEDescList docList, CFStringRef basename)
                                   NULL, NULL, &theFSRef,
                                   sizeof(FSRef), NULL);
          if (osError == noErr)
-            osError = FSRefMakePath(&theFSRef, strBuffer, PATH_MAX);
+            osError = FSRefMakePath(&theFSRef, (UInt8 *) strBuffer, PATH_MAX);
          if (osError == noErr)
          {
             if (basename)
@@ -723,12 +722,10 @@ static OSStatus DoOpenSave(AEDescList docList, CFStringRef basename)
 // Handler function for opening files from the OS X finder
 // such as double-click on a data file
 OSErr
-openAndPrintDocsEventHandler(theAppleEvent , reply, handlerRefcon)
+openAndPrintDocsEventHandler(AppleEvent *theAppleEvent, AppleEvent *reply,
+                                       SInt32 handlerRefcon)
 {
    AEDescList  docList;
-   FSRef       theFSRef;
-   long        index = 1;
-   long        count = 0;
    OSErr       osError;
 
    osError = AEGetParamDesc(theAppleEvent, keyDirectObject,
@@ -795,7 +792,7 @@ NavDialogGetReply:
 
 CantCreateChooseFileFilterIdentifiers:
 CantCreateImageBrowserUTI:
-coreFoundationUnknownErr:
+// coreFoundationUnknownErr:
 CantSetChooseFileFilterIdentifiers:
 NavDialogRun:
 NavCreateChooseFileDialog:
@@ -809,7 +806,7 @@ NavGetDefaultDialogCreationOptions:
    gtk_widget_set_sensitive(save_as, 1);
    gtk_widget_set_sensitive(save_now, 1);
    gtk_widget_set_sensitive(open_menuitem, 1);
-   return status;
+   return;
 }
 
 // static OSStatus Do_SaveAs(WindowRef inWindow)
@@ -854,7 +851,7 @@ save_as_cb(GtkWidget *widget, char *data)
    gtk_widget_set_sensitive(save_as, 0);
    gtk_widget_set_sensitive(save_now, 0);
 
-   status = NavCreatePutFileDialog(&navOptions, NULL, "BRPP", NULL, NULL, &theDialog);
+   status = NavCreatePutFileDialog(&navOptions, (OSType) NULL, (OSType) "BRPP", NULL, NULL, &theDialog);
    CFRelease(newFileName);
    require_noerr(status, NavCreatePutFileDialog);
 
@@ -884,7 +881,7 @@ NavDialogGetReply:
    gtk_widget_set_sensitive(save_as, 1);
    gtk_widget_set_sensitive(save_now, 1);
    gtk_widget_set_sensitive(open_menuitem, 1);
-   return status;
+   return;
 }   // Do_SaveAs
 
 #else
@@ -897,7 +894,7 @@ open_cb(GtkWidget *widget, char *data)
 
    if (open_dialog != NULL)
    {
-      gtk_window_present (open_dialog);
+      gtk_window_present (GTK_FILE_CHOOSER(open_dialog));
       return(0);
    }
 
@@ -910,7 +907,7 @@ open_cb(GtkWidget *widget, char *data)
    gtk_file_filter_add_pattern (file_filter, "*.brp");
    gtk_file_filter_set_name(file_filter, "BRP-PACU files");
    gtk_file_chooser_set_filter (GTK_FILE_CHOOSER(open_dialog), GTK_FILE_FILTER(file_filter));
-   gtk_window_set_transient_for(open_dialog, window);
+   gtk_window_set_transient_for(GTK_WINDOW(open_dialog), GTK_WINDOW(window));
    gtk_widget_set_sensitive(save_as, 0);
    gtk_widget_set_sensitive(save_now, 0);
    result = gtk_dialog_run (GTK_DIALOG (open_dialog));
@@ -926,22 +923,21 @@ open_cb(GtkWidget *widget, char *data)
    gtk_widget_set_sensitive(save_as, 1);
    gtk_widget_set_sensitive(save_now, 1);
    open_dialog = NULL;
-   return(0);
+   return;
 }
 
 static void
 save_as_cb(GtkWidget *widget, char *data)
 {
 
-   int k;
    gint result;
    GtkFileFilter *file_filter = NULL;
    char* file_name, * extension;
 
    if (save_as_dialog != NULL)
    {
-      gtk_window_present (save_as_dialog);
-      return(0);
+      gtk_window_present (GTK_WINDOW(save_as_dialog));
+      return;
    }
 
    save_as_dialog = gtk_file_chooser_dialog_new ("Save Capture Buffers As (*.brp recommended)", GTK_WINDOW(bkg_dialog), GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE_AS, GTK_RESPONSE_ACCEPT, NULL);
@@ -952,7 +948,7 @@ save_as_cb(GtkWidget *widget, char *data)
    gtk_file_filter_add_pattern (file_filter, "*.brp");
    gtk_file_filter_set_name(file_filter, "BRP-PACU files");
    gtk_file_chooser_set_filter (GTK_FILE_CHOOSER(save_as_dialog), GTK_FILE_FILTER(file_filter));
-   gtk_window_set_transient_for(save_as_dialog, window);
+   gtk_window_set_transient_for(GTK_WINDOW(save_as_dialog), GTK_WINDOW(window));
 
    gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (save_as_dialog), TRUE);
 
@@ -982,7 +978,7 @@ save_as_cb(GtkWidget *widget, char *data)
    gtk_widget_destroy (save_as_dialog);
    save_as_dialog = NULL;
    gtk_widget_set_sensitive(open_menuitem, 1);
-   return(0);
+   return;
 }
 #endif
 static void
@@ -998,8 +994,8 @@ save_now_cb(GtkWidget *widget, char *data)
 static void
 impulse_cb(GtkWidget *widget, struct FFT_Frame * data)// , gtkwidget *widget)
 {
-   gtk_widget_show_all(GTK_DIALOG(impulse_window));
-   gtk_window_present(impulse_window);
+   gtk_widget_show_all(impulse_window);
+   gtk_window_present(GTK_WINDOW(impulse_window));
    data->find_impulse = 1;  // signal for Fill_Buffer fxn to find delay
    data->find_delay = 1;  // signal for Fill_Buffer fxn to find delay
 }
@@ -1008,10 +1004,10 @@ impulse_cb(GtkWidget *widget, struct FFT_Frame * data)// , gtkwidget *widget)
 static void
 delay_cb(GtkWidget *widget, struct FFT_Frame * data)// , gtkwidget *widget)
 {
-   gtk_window_set_transient_for(delay_window, window);
-   gtk_window_set_decorated (delay_window, FALSE);
-   gtk_widget_show_all(GTK_DIALOG(delay_window));
-   gtk_window_present (delay_window);
+   gtk_window_set_transient_for(GTK_WINDOW(delay_window), GTK_WINDOW(window));
+   gtk_window_set_decorated (GTK_WINDOW(delay_window), FALSE);
+   gtk_widget_show_all(delay_window);
+   gtk_window_present (GTK_WINDOW(delay_window));
 
    data->find_delay = 1;  // signal for Fill_Buffer fxn to find delay
 }
@@ -1134,15 +1130,15 @@ static gboolean configure_event_reference( GtkWidget         *widget,
 static void
 preferences_dialog_cb(GtkWidget *widget)// , gtkwidget *widget)
 {
-   gtk_window_set_transient_for(preferences_dialog, window);
-   gtk_window_set_decorated (preferences_dialog, FALSE);
+   gtk_window_set_transient_for(GTK_WINDOW(preferences_dialog), GTK_WINDOW(window));
+   gtk_window_set_decorated (GTK_WINDOW(preferences_dialog), FALSE);
 
-   gtk_spin_button_set_value (smoothing_spin_button, (gdouble) smooth_factor);
-   gtk_spin_button_set_value (averaging_spin_button, (gdouble) avg_num);
+   gtk_spin_button_set_value (GTK_SPIN_BUTTON(smoothing_spin_button), (gdouble) smooth_factor);
+   gtk_spin_button_set_value (GTK_SPIN_BUTTON(averaging_spin_button), (gdouble) avg_num);
 
 
-   gtk_widget_show_all(GTK_DIALOG(preferences_dialog));
-   gtk_window_present (preferences_dialog);
+   gtk_widget_show_all(preferences_dialog);
+   gtk_window_present (GTK_WINDOW(preferences_dialog));
 }
 
 
@@ -1155,9 +1151,9 @@ close_preferences_cb(GtkWidget *widget)// , gtkwidget *widget)
 
 static void apply_preferences_cb( GtkWidget *widget)
 {
-   smooth_factor = gtk_spin_button_get_value_as_int (smoothing_spin_button);
+   smooth_factor = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(smoothing_spin_button));
    smooth_constant=pow(2,smooth_factor)-1;
-   avg_num = gtk_spin_button_get_value_as_int (averaging_spin_button);
+   avg_num = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON(averaging_spin_button));
          
 }
 
@@ -1172,7 +1168,7 @@ create_gui (struct FFT_Frame * data)
    GtkWidget *table_impulse;
    GtkWidget *separator;
 ////   GtkRuler * hruler;
-   GtkDataboxGrid *my_grid;
+   GtkDataboxGraph *my_grid;
    GladeXML *xml = NULL;
    avg_num=32;
    smooth_factor=5;
@@ -1199,9 +1195,9 @@ create_gui (struct FFT_Frame * data)
    CFURLRef xmlUrl = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("gui"), CFSTR("glade"), NULL);
    if (xmlUrl != NULL)
    {
-      UInt8* buffer;
+      char * buffer;
       buffer = malloc(PATH_MAX);
-      if (CFURLGetFileSystemRepresentation(xmlUrl, true, buffer, PATH_MAX))
+      if (CFURLGetFileSystemRepresentation(xmlUrl, true, (UInt8*) buffer, PATH_MAX))
          xml = glade_xml_new (buffer, NULL, NULL);
       free(buffer);
    }
@@ -1248,7 +1244,7 @@ create_gui (struct FFT_Frame * data)
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "close_preferences")), "clicked", G_CALLBACK (close_preferences_cb), NULL);
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "apply_preferences")), "clicked", G_CALLBACK (apply_preferences_cb), NULL);
    g_signal_connect (GTK_OBJECT (preferences_dialog), "delete_event", G_CALLBACK (delay_hide), NULL);
-   gtk_window_set_decorated (preferences_dialog, FALSE);
+   gtk_window_set_decorated (GTK_WINDOW(preferences_dialog), FALSE);
 
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "pinknoise_button")), "clicked", G_CALLBACK (pinknoise_mute), "button");
    //g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "volumebutton1")), "popdown", G_CALLBACK (volume_popdown_gui), NULL);
@@ -1277,7 +1273,7 @@ create_gui (struct FFT_Frame * data)
    g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "delay_custom_button")), "clicked", G_CALLBACK (delay_custom_cb), NULL);
 
    gui_frequency = 0;
-   gtk_widget_set_size_request (window, WINDOW_W, WINDOW_H);
+   gtk_widget_set_size_request (GTK_WIDGET(window), WINDOW_W, WINDOW_H);
 
    sprintf(tmp_string, "BRP-PACU v%s", VERSION);
    gtk_window_set_title (GTK_WINDOW (window), tmp_string);
@@ -1441,14 +1437,14 @@ create_gui (struct FFT_Frame * data)
    ige_mac_menu_add_app_menu_item  (group,
                                     GTK_MENU_ITEM (about_item),
                                     NULL);
-   gtk_widget_hide (G_OBJECT (glade_xml_get_widget (xml, "about_me")));
+   gtk_widget_hide (glade_xml_get_widget (xml, "about_me"));
 // Enable quit from dock
    dock = ige_mac_dock_new ();
    g_signal_connect (dock,
                      "quit-activate",
                      G_CALLBACK (cleanup_gui),
                      window);
-   ige_mac_menu_connect_window_key_handler     (window);
+   ige_mac_menu_connect_window_key_handler (GTK_WINDOW(window));
 // Enable file open from Mac OS
    osError = AEInstallEventHandler(kCoreEventClass, kAEOpenDocuments,
                                    NewAEEventHandlerUPP((AEEventHandlerProcPtr) openAndPrintDocsEventHandler),
@@ -1480,7 +1476,7 @@ create_gui (struct FFT_Frame * data)
       else
       {
          message("The BRP_PACU initialization file has the wrong format. An initialization file will be created for you on your next capture.", NULL, FALSE);
-         fprintf (stderr, "PLOT_PTS is different from PLOT_PTS saved size, this is because you have changed N_FFT since your last capture.  Please change it back to %d * 2. Otherwise making a new capture should overwrite the old file\n", read_plot_pts  );
+         fprintf (stderr, "PLOT_PTS is different from PLOT_PTS saved size, this is because you have changed N_FFT since your last capture.  Please change it back to %d * 2. Otherwise making a new capture should overwrite the old file\n", (int) read_plot_pts  );
       }
       fclose(file_handle);
    }

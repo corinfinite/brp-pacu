@@ -1,1 +1,32 @@
-See NEWS
+2009-12-27 Andreas Schwab <andreasjs@users.sourceforge.net>
+
+* gui.c: correct various casting errors
+  removed various unused variables 
+  removed varoius unused return values
+
+* BRP_PACU.c
+  removed various unused variables 
+  removed varoius unused return values
+  (on_quit): not used, removed
+  (MyGTKFunction): made g_boolean
+  gtk_timeout_.. replaced by g_...
+  (jack_init): return error status
+  (main): use error status, 
+  pop message window on unsuccessful jack init
+
+* main.h:
+  removed dat, MyGTKFunction
+
+* gui.glade:
+  removed unused <requires-version lib="gtk+" version="2.12"/>
+  <property name="adjustment">: set page size to (10 times)
+  
+
+* Makefile.am:
+  made -lgthread-2.0 conditional, not used for Macintosh
+  renamed README-Mac.txt to README when copied to Macintosh distribution
+  removed unused -framework Carbon -lobjc from AM_CFLAGS
+
+* README-Mac.txt: added dependencies
+  
+  

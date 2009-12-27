@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <glade-interface>
-  <requires-version lib="gtk+" version="2.12"/>
   <widget class="GtkWindow" id="about_me_window">
     <property name="title" translatable="yes">About BRP-PACU</property>
     <child>
@@ -148,7 +147,7 @@ Also a Redhat/Fedora rpm or any other packaging help would be much appreciated.<
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="adjustment">0 0 100 1 10 10</property>
+                <property name="adjustment">0 0 100 1 10 0</property>
                 <property name="digits">3</property>
               </widget>
               <packing>
@@ -541,7 +540,7 @@ Also a Redhat/Fedora rpm or any other packaging help would be much appreciated.<
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip" translatable="yes">Gain for Averaging Buffer</property>
-                <property name="adjustment">0.25 -100 100 0.25 10 10</property>
+                <property name="adjustment">0.25 -100 100 0.25 10 0</property>
                 <property name="digits">2</property>
                 <accelerator key="g" signal="grab-focus" modifiers="GDK_CONTROL_MASK"/>
               </widget>
@@ -584,7 +583,7 @@ Also a Redhat/Fedora rpm or any other packaging help would be much appreciated.<
                 <property name="can_focus">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK</property>
                 <property name="extension_events">GDK_EXTENSION_EVENTS_ALL</property>
-                <property name="adjustment">5.0499999999999998 -10 15 0.050000000000000003 4 4</property>
+                <property name="adjustment">5.0499999999999998 -10 15 0.050000000000000003 4 0</property>
                 <property name="digits">2</property>
                 <accelerator key="p" signal="grab-focus" modifiers="GDK_CONTROL_MASK"/>
               </widget>
@@ -900,7 +899,7 @@ Also a Redhat/Fedora rpm or any other packaging help would be much appreciated.<
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_text">Increasing this value slows down the response of the graph..</property>
-                <property name="adjustment">32 1 32 1 2 2</property>
+                <property name="adjustment">32 1 32 1 2 0</property>
               </widget>
               <packing>
                 <property name="position">3</property>
@@ -937,7 +936,7 @@ Also a Redhat/Fedora rpm or any other packaging help would be much appreciated.<
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <property name="has_tooltip">True</property>
             <property name="tooltip_text">Increasing this value smooths the graph more.</property>
-            <property name="adjustment">5 1 10 1 2 2</property>
+            <property name="adjustment">5 1 10 1 2 0</property>
           </widget>
           <packing>
             <property name="position">2</property>

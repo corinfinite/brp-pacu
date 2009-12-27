@@ -10,7 +10,7 @@ AM_CONDITIONAL([APPLE], [ test `uname` = 'Darwin'])
 AC_SUBST(PKG_CONFIG_PATH)
 #############################################
 AC_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE(BRP_PACU,2.1.0)
+AM_INIT_AUTOMAKE(BRP_PACU,2.1.1)
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_CONFIG_FILES([Makefile])

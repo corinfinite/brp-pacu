@@ -31,11 +31,6 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-struct dat
-{
-   double k;
-};
-
 struct FFT_Frame
 {
    fftw_plan plan;      // FFT Plan
@@ -55,7 +50,5 @@ struct FFT_Frame
    char find_delay;
    char find_impulse;
 };
-static gint
-MyGTKFunction (struct FFT_Frame * frame_data);
 
 #endif

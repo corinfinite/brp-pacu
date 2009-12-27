@@ -2,7 +2,15 @@ BRP-PACU
 Instruction for Macintosh
 ===  FOR USERS  ===
 
-To run the program, download the binary distribution immage, open it, and double-click on the PRB-PACU icon. You can drag the application anywhere on your system, preferably into the Application directory. 
+Dependencies:
+
+To build the system, you should first download and install:
+
+Jack-OSX from http://www.jackosx.com/
+
+The GTK-OSX Framework from http://www.gtk-osx.org/
+
+To run the program, download the binary distribution image, open it, and double-click on the PRB-PACU icon. You can drag the application anywhere on your system, preferably into the Application directory. 
 
 === FOR DEVELOPERS ===
 

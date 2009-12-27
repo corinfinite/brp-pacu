@@ -1,4 +1,4 @@
-BRP-PACU for Mac OS X (intel architecture only)
+BRP-PACU for Mac OS X (Intel architecture only)
 
 Web site
 _______________________________________

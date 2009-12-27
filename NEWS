@@ -1,3 +1,6 @@
+Version 2.1.1 12/27/2009
+   Open window with error message when Jack does not initialize (instead of quitting silently)
+
 Version 2.1.0 04/17/2009
    Changed libraries for thread mutexes for compilation on windows
 
