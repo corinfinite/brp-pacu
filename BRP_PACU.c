@@ -34,6 +34,7 @@
 #include "testfft.h"
 #include "gui.h"
 #include <jack/jack.h>
+#include <string.h>
 
 volatile struct FFT_Frame *fill_it;
 volatile struct FFT_Frame * temp_frame_data;  // tmp copy so mutexes don't need to wait
@@ -181,11 +182,11 @@ Fill_Buffer(jack_nframes_t nframes, void *arg)
       // Apply Window function
       // Blackman window
       // For some reason this causes errors in the response, maybe someone knows better than me why?
-      //fill_it->buffer_data_1[k] = (short)(\
-      //      ( ((float)fill_it->buffer_data_1[k])*(0.42 - 0.5 * cos(2.0 * pi * ((float)k) / (  ((float)N) - 1.0)) \
+      //fill_it->buffer_data_1[k] = (short)(
+      //      ( ((float)fill_it->buffer_data_1[k])*(0.42 - 0.5 * cos(2.0 * pi * ((float)k) / (  ((float)N) - 1.0)) 
       //        + 0.08 * cos(4.0 * pi * ((float)k) / (((float)N) - 1.0)))  ));
-      //fill_it->buffer_data_2[k] = (short)(\
-      //   ((float)fill_it->buffer_data_2[k])*(0.42 - 0.5 * cos(2.0 * pi * ((float)k) / (  ((float)N) - 1.0))\
+      //fill_it->buffer_data_2[k] = (short)(
+      //   ((float)fill_it->buffer_data_2[k])*(0.42 - 0.5 * cos(2.0 * pi * ((float)k) / (  ((float)N) - 1.0))
       //    + 0.08 * cos(4.0 * pi * ((float)k) / (((float)N) - 1.0))));
       //
       //}
@@ -206,7 +207,7 @@ MyGTKFunction (struct FFT_Frame * frame_data)
    memcpy(temp_frame_data->buffer_data_2, frame_data->buffer_data_2, N_FFT*sizeof(short));
    memcpy(temp_frame_data->plan, frame_data->plan, sizeof(frame_data->plan));
    g_mutex_unlock (thread_mutex);
-   fft_capture(temp_frame_data);  // This fxn does the FFT, frame_data->buffer_data_n is used to get frame_data->fft_returned_n
+   fft_capture((struct FFT_Frame *)temp_frame_data);  // This fxn does the FFT, frame_data->buffer_data_n is used to get frame_data->fft_returned_n
 
    g_mutex_lock (thread_mutex);
    memcpy(frame_data->fft_returned_1, temp_frame_data->fft_returned_1, N_FFT*sizeof(double));
@@ -271,7 +272,7 @@ MyGTKFunction (struct FFT_Frame * frame_data)
    memcpy(temp_frame_data->rfft_returned_1, frame_data->rfft_returned_1, N_FFT*sizeof(double));
    g_mutex_unlock (thread_mutex);
 
-   gui_idle_func(temp_frame_data);
+   gui_idle_func((struct FFT_Frame *)temp_frame_data);
 
    g_mutex_lock (thread_mutex);
    frame_data->pink_muted = temp_frame_data->pink_muted;
@@ -515,7 +516,7 @@ main (int argc, char *argv[])
 ;
    }
    gtk_widget_destroy (GTK_WIDGET(jack_error_dialog));
-      if (create_gui(fill_it))
+      if (create_gui((struct FFT_Frame *)fill_it))
       {
          timer_id = g_timeout_add(90, (GSourceFunc) MyGTKFunction, (gpointer) fill_it ); // Start the initial delay
          gtk_main ();
@@ -540,7 +541,7 @@ main (int argc, char *argv[])
    free(fill_it->fft_returned_1);
    free(fill_it->rfft_returned_1);
    free(fill_it->fft_returned_2);
-   free(fill_it);
+   free((struct FFT_Frame *)fill_it);
    printf("Main has exited. Thank you for using BRP-PACU\n");
    return 0;
 }

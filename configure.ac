@@ -2,7 +2,8 @@ AC_INIT
 ########## Macintosh implementation #########
 if [[ `uname` = 'Darwin' ]]
  then if [[ -n "PKG_CONFIG_PATH" ]]
-   then PKG_CONFIG_PATH='/usr/lib/pkgconfig/:/usr/local/lib/pkgconfig/:/Library/Frameworks/Gtk.framework/Resources/dev/lib/pkgconfig:/Library/Frameworks/GLib.framework/Resources/dev/lib/pkgconfig:/Library/Frameworks/Cairo.framework/Resources/dev/lib/pkgconfig/'
+   # Assume that PGK is installed with jhbuild in the home directory
+   then PKG_CONFIG_PATH='/usr/lib/pkgconfig/:/usr/local/lib/pkgconfig/:'$HOME'/gtk/inst/lib/pkgconfig'
    export PKG_CONFIG_PATH
   fi
 fi
@@ -20,7 +21,6 @@ AC_CHECK_LIB(fftw,fftw_create_plan,,AC_MSG_ERROR([could not link to fftw please 
 PKG_CHECK_MODULES(GTK, gtk+-2.0,,exit)
 PKG_CHECK_MODULES(PANGO, pango,,exit)
 PKG_CHECK_MODULES(CAIRO, cairo,,exit)
-PKG_CHECK_MODULES(LIBGLADE, libglade-2.0,,exit)
 #PKG_CHECK_MODULES(GDK-2.0, gdk-2.0,,exit)
 PKG_CHECK_MODULES(GTKDATABOX, gtkdatabox,,AC_MSG_ERROR([please install gtkdatabox development version.]))
 PKG_CHECK_MODULES(JACK, jack,,AC_MSG_ERROR([please install the jack development version.]))

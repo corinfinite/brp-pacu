@@ -27,9 +27,8 @@
 
 int fft_capture(struct FFT_Frame * session)
 {
-   int i, k, flag;
+   int k;
    double datapt;
-   int tmr;
    ///////////////////////////////////
    double * fft;
    short * buf;
@@ -100,11 +99,9 @@ int fft_capture(struct FFT_Frame * session)
 
 int impulse_capture(struct FFT_Frame * session)
 {
-   int i, k, flag;
-   double datapt;
+   int k;
    int tmr;
    ///////////////////////////////////
-   double * fft;
    short * buf;
    fftw_plan plan = session->plan;
    fftw_plan reverse_plan = session->reverse_plan;

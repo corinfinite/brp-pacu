@@ -17,47 +17,49 @@
 bin_PROGRAMS = BRP_PACU
 pkgconfigdir = $(libdir)/pkgconfig
 BRP_PACU_SOURCES = testfft.c gui.c BRP_PACU.c 
-include_HEADERS = testfft.h gui.h main.h ige-mac-menu.h ige-mac-private.h ige-mac-dock.h ige-mac-image-utils.h
-EXTRA_DIST = ige-mac-menu.c ige-mac-dock.c gui.glade sinc.png info.plist \
- sinc.icns sinc.xcf brpData.icns README-Mac.txt INSTALL-Mac.txt
-AM_CFLAGS =  -O2 -Wall -g  `pkg-config --cflags libglade-2.0`  `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gdk-2.0` `pkg-config --cflags glib-2.0`  `pkg-config --cflags  gtkdatabox` -DDATADIR=\"$(datadir)\"
-LIBS =   -lm  -lfftw  `pkg-config --libs  libglade-2.0`  `pkg-config --libs  gtk+-2.0` `pkg-config --libs  gdk-2.0`  `pkg-config --libs gtkdatabox` `pkg-config --libs jack` 
-pkgdata_DATA = gui.glade sinc.png ige-mac-menu.c
+include_HEADERS = testfft.h gui.h main.h
+EXTRA_DIST = BRP_PACU.ui sinc.png info.plist \
+ sinc.icns sinc.xcf brpData.icns README-Mac.txt INSTALL-Mac.txt movelibraries.sh
+AM_CFLAGS =  -O2 -Wall -g `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gdk-2.0` `pkg-config --cflags glib-2.0` `pkg-config --cflags ige-mac-integration` `pkg-config --cflags  gtkdatabox` `pkg-config --cflags  gdk-quartz-2.0` -DDATADIR=\"$(datadir)\"
+LIBS =   -lm  -lfftw  `pkg-config --libs  gtk+-2.0` `pkg-config --libs  gdk-2.0` `pkg-config --libs glib-2.0` `pkg-config --libs gthread-2.0` `pkg-config --libs ige-mac-integration` `pkg-config --libs gtkdatabox` `pkg-config --libs gdk-quartz-2.0` `pkg-config --libs jack` 
+pkgdata_DATA = BRP_PACU.ui sinc.png
 #########  Macintosh implementation #########
 if APPLE
-BRP_PACU_SOURCES += ige-mac-menu.c ige-mac-dock.c
 PKG_CONFIG_PATH+=@PKG_CONFIG_PATH@
 export PKG_CONFIG_PATH
 MACAPPLICATION=macdistdir/BRP-PACU.app
-MACDISTRESOURCES=$(MACAPPLICATION)/Contents/Resources
-MACEXECUTABLE=$(MACAPPLICATION)/Contents/MacOS/BRP_PACU
-INFOPLIST=$(MACAPPLICATION)/Contents/info.plist
+MACCONTENTS=$(MACAPPLICATION)/Contents
+MACRESOURCES=$(MACCONTENTS)/Resources
+MACFRAMEWORKS=$(MACCONTENTS)/Frameworks
+MACEXECUTABLE=$(MACCONTENTS)/MacOS/BRP_PACU
 MACDISK=BRP-PACU-mac-$(VERSION)
-AM_CFLAGS+=-xobjective-c 
-AM_LDFLAGS=-framework Carbon -lobjc
-LINK = $(CCLD) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-$(INFOPLIST): gui.glade AUTHORS COPYING COPYING.LESSER NEWS ChangeLog README-Mac.txt sinc.icns brpData.icns info.plist
-	mkdir -p $(MACDISTRESOURCES)/en.lproj $(MACAPPLICATION)/Contents/MacOS
-	cp -fp gui.glade sinc.icns brpData.icns sinc.png $(MACDISTRESOURCES)
-	cp -fp AUTHORS COPYING COPYING.LESSER NEWS ChangeLog README-Mac.txt $(MACDISTRESOURCES)/en.lproj
-	sed -e 's/VERSION/$(VERSION)/' < info.plist > $(INFOPLIST)
-	echo APPLBRPP > $(MACAPPLICATION)/Contents/PkgInfo
-macapplication: $(MACEXECUTABLE)
-$(MACEXECUTABLE): $(BRP_PACU_SOURCES:.c=.o) $(INFOPLIST) 
-# Use static libraries for libglade and gtkdatabox in application
-	$(CCLD) -o $(MACEXECUTABLE) $(BRP_PACU_SOURCES:.c=.o) -lm -lpthread -lfftw `pkg-config --variable=libdir gtkdatabox`/libgtkdatabox.a `pkg-config --variable=libdir libglade-2.0`/libglade-2.0.a `pkg-config --libs jack` -framework Gtk -framework GLib -framework Cairo -framework CoreAudio -framework CoreServices -framework AudioUnit -framework Carbon -lxml2 -lpthread -lz -lm -lobjc
+AM_LDFLAGS=-framework Carbon
+$(MACCONTENTS): BRP_PACU.ui AUTHORS COPYING COPYING.LESSER NEWS ChangeLog README-Mac.txt sinc.icns brpData.icns info.plist
+	mkdir -p $(MACRESOURCES)/en.lproj $(MACCONTENTS)/MacOS $(MACFRAMEWORKS)
+	cp -fp BRP_PACU.ui sinc.icns brpData.icns sinc.png $(MACRESOURCES)
+	cp -fp AUTHORS COPYING COPYING.LESSER NEWS ChangeLog README-Mac.txt $(MACRESOURCES)/en.lproj
+	sed -e 's/VERSION/$(VERSION)/' < info.plist > $(MACCONTENTS)/info.plist
+	echo APPLBRPP > $(MACCONTENTS)/PkgInfo
+	cp -fRP `pkg-config --variable=libdir gtkdatabox`/libgtkdatabox*.dylib $(MACFRAMEWORKS)
+macapplication: $(MACAPPLICATION)
+$(MACAPPLICATION): $(bin_PROGRAMS) $(MACCONTENTS) 
+	cp $(bin_PROGRAMS) $(MACEXECUTABLE)
+# Change install names to be relative to the executable in the application
+	movelibraries.sh $(MACAPPLICATION) `pkg-config --variable=libdir gtk+-2.0`
+	install_name_tool \
+          `otool -L $(MACEXECUTABLE) | sed -n  '\:'\`pkg-config --variable=libdir gtkdatabox\`': s/\(.*\/\)\(.*\) (.*/-change \1\2 @executable_path\/..\/Frameworks\/\2 /p'` \
+	  $(MACEXECUTABLE)
 	touch $(MACAPPLICATION)
 # create distribution disk image
 macdist: $(MACDISK).dmg
-$(MACDISK).dmg: $(MACEXECUTABLE)
+$(MACDISK).dmg: $(MACAPPLICATION) AUTHORS COPYING COPYING.LESSER NEWS ChangeLog macdistdir README-Mac.txt
 	test -z $(MACDISK).dmg || rm -f $(MACDISK).dmg
 	cp -fp AUTHORS COPYING COPYING.LESSER NEWS ChangeLog macdistdir
 	cp -fp README-Mac.txt macdistdir/README
 	hdiutil create -srcfolder macdistdir -fs HFS+J -volname $(MACDISK) $(MACDISK).dmg
-CLEANFILES=$(MACAPPLICATION) $(INFOPLIST) $(MACDISK).dmg
 clean-local:
 	-rm -rf macdistdir
+#############################################
 else
 AM_CFLAGS+=-lgthread-2.0
 endif
-#############################################

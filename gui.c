@@ -36,7 +36,6 @@
 //#include <gtkdatabox_ruler.h>
 #include <gtkdatabox_graph.h>
 #include <gtkdatabox_grid.h>
-#include <glade/glade.h>
 #include <math.h>
 #include <errno.h>
 #include <string.h>
@@ -63,11 +62,11 @@ static GtkWidget *delay_window = NULL;
 static GtkWidget *impulse_window = NULL;
 static GtkWidget *volume_pink_gui = NULL;
 static GtkWidget *pinknoise_button = NULL;
-static GtkWidget *pinknoise_menu_item = NULL;
+static GtkToggleAction *pinknoise_menu_item = NULL;
 static GtkWidget *transfer_function_toggle = NULL;
-static GtkWidget *transfer_function_menu = NULL;
+static GtkToggleAction *transfer_function_menu = NULL;
 static GtkWidget *buffer_button[N_BUFF] = { NULL, NULL, NULL, NULL, NULL };
-static GtkWidget *buffer_menu[N_BUFF] = { NULL, NULL, NULL, NULL, NULL };
+static GtkToggleAction *buffer_menu[N_BUFF] = { NULL, NULL, NULL, NULL, NULL };
 static GtkWidget *preferences_dialog = NULL;
 static GtkWidget *smoothing_spin_button=NULL;
 static GtkWidget *averaging_spin_button=NULL;
@@ -92,9 +91,9 @@ static int  buffer_last_clicked;
 static GtkWidget *bkg_dialog;
 
 // static GtkWidget *cb;
-static GtkWidget *save_now;
-static GtkWidget *save_as;
-static GtkWidget *open_menuitem;
+static GtkAction *save_now;
+static GtkAction *save_as;
+static GtkAction *open_menuitem;
 
 static gint avg_index = 0;
 static gchar tf = 1;
@@ -372,7 +371,7 @@ pinknoise_mute(GtkWidget *widget, char * data)// , gtkwidget *widget)
 {
    if (strcmp(data, "menu") == 0) // what button was pressed
    {
-      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button)) !=  gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM (pinknoise_menu_item)) ) // is this the first call
+      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button)) !=  gtk_toggle_action_get_active(pinknoise_menu_item) ) // is this the first call
       {
          gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pinknoise_button), !gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button)) );
          pinknoise_muted ^= 1;
@@ -380,9 +379,9 @@ pinknoise_mute(GtkWidget *widget, char * data)// , gtkwidget *widget)
    }
    else
    {
-      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button)) !=  gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM (pinknoise_menu_item)) ) // is this the first call
+      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pinknoise_button)) !=  gtk_toggle_action_get_active(pinknoise_menu_item) ) // is this the first call
       {
-         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM (pinknoise_menu_item), !gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM (pinknoise_menu_item)) );
+         gtk_toggle_action_set_active(pinknoise_menu_item, !gtk_toggle_action_get_active(pinknoise_menu_item));
          pinknoise_muted ^= 1;
       }
    }
@@ -398,10 +397,11 @@ delay_keep_cb(GtkWidget *widget)// , gtkwidget *widget)
 {
    gtk_widget_hide_all (delay_window);
 }
-static void
+static gboolean
 about_ok_cb(GtkWidget *widget)// , gtkwidget *widget)
 {
    gtk_widget_hide_all (about_me_window);
+   return TRUE;
 }
 static void
 about_me_cb(GtkWidget *widget)// , gtkwidget *widget)
@@ -418,7 +418,7 @@ transfer_function_toggled_cb(GtkWidget *widget)
       if (tf == 0) //Don't do anything if initiated by transfer_fxn_cb()
       {
          tf = 1;
-         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(transfer_function_menu), TRUE);
+         gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(transfer_function_menu), TRUE);
       }
    }
    else
@@ -426,7 +426,7 @@ transfer_function_toggled_cb(GtkWidget *widget)
       if (tf != 0) //Don't do anything if initiated by transfer_fxn_cb()
       {
          tf = 0;
-         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(transfer_function_menu), FALSE);
+         gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(transfer_function_menu), FALSE);
       }
    }
 }
@@ -434,7 +434,7 @@ transfer_function_toggled_cb(GtkWidget *widget)
 static void
 transfer_fxn_cb(GtkWidget *widget)
 {
-   if (gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (transfer_function_menu)))
+   if (gtk_toggle_action_get_active (GTK_TOGGLE_ACTION(transfer_function_menu)))
    {
       if (tf != 1) //Don't do anything if initiated by transfer_function_toggled_cb()
       {
@@ -523,19 +523,15 @@ static void gain_cb( GtkWidget *widget, GtkSpinButton *spin )
 static void
 buffer_button_cb(GtkWidget *widget, gpointer p)
 {
-   GtkWidget *bufferwid;
-   GtkWidget *bufferwid_m;
    gint i;
    i = GPOINTER_TO_INT(p);
-   bufferwid = buffer_button[i];
-   bufferwid_m = buffer_menu[i];
-   if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (bufferwid)))
+   if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (buffer_button[i])))
    {
       if (buffer[i] != 1) //Don't do anything if initiated by buffer_button_cb()
       {
          gtk_databox_graph_add (GTK_DATABOX(box), graph[i+1]);
          buffer[i] = 1;  // Its not on the screen
-         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bufferwid_m), TRUE);
+         gtk_toggle_action_set_active( buffer_menu[i], TRUE);
       }
    }
    else
@@ -544,7 +540,7 @@ buffer_button_cb(GtkWidget *widget, gpointer p)
       {
          gtk_databox_graph_remove (GTK_DATABOX(box), graph[i+1]);
          buffer[i] = 0;  // Its on the screen
-         gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(bufferwid_m), FALSE);
+         gtk_toggle_action_set_active( buffer_menu[i], FALSE);
       }
    }
    buffer_last_clicked = i;
@@ -553,20 +549,16 @@ buffer_button_cb(GtkWidget *widget, gpointer p)
 static void
 buffer_menu_cb(GtkWidget *widget, gpointer p)
 {
-   GtkWidget *bufferwid;
-   GtkWidget *bufferwid_m;
    gint i;
    i = GPOINTER_TO_INT(p);
-   bufferwid = buffer_button[i];
-   bufferwid_m = buffer_menu[i];
 
-   if (gtk_check_menu_item_get_active (GTK_CHECK_MENU_ITEM (bufferwid_m)))
+   if (gtk_toggle_action_get_active ( buffer_menu[i]))
    {
       if (buffer[i] != 1) //Don't do anything if initiated by buffer_button_cb()
       {
          gtk_databox_graph_add (GTK_DATABOX(box), graph[i+1]);
          buffer[i] = 1;  // Its not on the screen
-         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (bufferwid), TRUE);
+         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (buffer_button[i]), TRUE);
       }
    }
    else
@@ -575,26 +567,12 @@ buffer_menu_cb(GtkWidget *widget, gpointer p)
       {
          gtk_databox_graph_remove (GTK_DATABOX(box), graph[i+1]);
          buffer[i] = 0;  // Its on the screen
-         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (bufferwid), FALSE);
+         gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (buffer_button[i]), FALSE);
       }
    }
    buffer_last_clicked = i;
 }
 
-static void
-impulse_hide(GtkWidget *widget, struct FFT_Frame * data)// , gtkwidget *widget)
-{
-
-   printf("Delete event\n");
-   gtk_widget_hide_all (impulse_window);
-}
-// Do nothing
-static void
-delay_hide(GtkWidget *widget, struct FFT_Frame * data)// , gtkwidget *widget)
-{
-   // Keep delay (done by default after finding)
-   gtk_widget_hide_all (delay_window);
-}
 // cleanup and quit
 static void
 cleanup_gui(GtkWidget *widget, struct FFT_Frame * data)
@@ -752,9 +730,9 @@ open_cb(GtkWidget *widget, char *data)
    navOptions.preferenceKey = 1;
    navOptions.optionFlags &= ~kNavAllowMultipleFiles;
 
-   gtk_widget_set_sensitive(open_menuitem, 0);
-   gtk_widget_set_sensitive(save_as, 0);
-   gtk_widget_set_sensitive(save_now, 0);
+   gtk_action_set_sensitive(open_menuitem, 0);
+   gtk_action_set_sensitive(save_as, 0);
+   gtk_action_set_sensitive(save_now, 0);
 
    status = NavCreateGetFileDialog(&navOptions, NULL, NULL, NULL, NULL, NULL, &theDialog);
    require_noerr(status, NavCreateChooseFileDialog);
@@ -803,9 +781,9 @@ NavGetDefaultDialogCreationOptions:
    if (theDialog != NULL)
       NavDialogDispose(theDialog);
 
-   gtk_widget_set_sensitive(save_as, 1);
-   gtk_widget_set_sensitive(save_now, 1);
-   gtk_widget_set_sensitive(open_menuitem, 1);
+   gtk_action_set_sensitive(save_as, 1);
+   gtk_action_set_sensitive(save_now, 1);
+   gtk_action_set_sensitive(open_menuitem, 1);
    return;
 }
 
@@ -847,9 +825,9 @@ save_as_cb(GtkWidget *widget, char *data)
    navOptions.saveFileName = newFileName;
 
    NavDialogRef theDialog = NULL;
-   gtk_widget_set_sensitive(open_menuitem, 0);
-   gtk_widget_set_sensitive(save_as, 0);
-   gtk_widget_set_sensitive(save_now, 0);
+   gtk_action_set_sensitive(open_menuitem, 0);
+   gtk_action_set_sensitive(save_as, 0);
+   gtk_action_set_sensitive(save_now, 0);
 
    status = NavCreatePutFileDialog(&navOptions, (OSType) NULL, (OSType) "BRPP", NULL, NULL, &theDialog);
    CFRelease(newFileName);
@@ -878,9 +856,9 @@ NavDialogGetReply:
    if (theDialog != NULL)
       NavDialogDispose(theDialog);
 
-   gtk_widget_set_sensitive(save_as, 1);
-   gtk_widget_set_sensitive(save_now, 1);
-   gtk_widget_set_sensitive(open_menuitem, 1);
+   gtk_action_set_sensitive(save_as, 1);
+   gtk_action_set_sensitive(save_now, 1);
+   gtk_action_set_sensitive(open_menuitem, 1);
    return;
 }   // Do_SaveAs
 
@@ -908,8 +886,8 @@ open_cb(GtkWidget *widget, char *data)
    gtk_file_filter_set_name(file_filter, "BRP-PACU files");
    gtk_file_chooser_set_filter (GTK_FILE_CHOOSER(open_dialog), GTK_FILE_FILTER(file_filter));
    gtk_window_set_transient_for(GTK_WINDOW(open_dialog), GTK_WINDOW(window));
-   gtk_widget_set_sensitive(save_as, 0);
-   gtk_widget_set_sensitive(save_now, 0);
+   gtk_action_set_sensitive(save_as, 0);
+   gtk_action_set_sensitive(save_now, 0);
    result = gtk_dialog_run (GTK_DIALOG (open_dialog));
    switch (result)
    {
@@ -920,8 +898,8 @@ open_cb(GtkWidget *widget, char *data)
       break;
    }
    gtk_widget_destroy (open_dialog);
-   gtk_widget_set_sensitive(save_as, 1);
-   gtk_widget_set_sensitive(save_now, 1);
+   gtk_action_set_sensitive(save_as, 1);
+   gtk_action_set_sensitive(save_now, 1);
    open_dialog = NULL;
    return;
 }
@@ -952,7 +930,7 @@ save_as_cb(GtkWidget *widget, char *data)
 
    gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (save_as_dialog), TRUE);
 
-   gtk_widget_set_sensitive(open_menuitem, 0);
+   gtk_action_set_sensitive(open_menuitem, 0);
    if (save_name_str) g_string_assign(file_name_str, save_name_str->str);
    while (TRUE)
    {
@@ -977,7 +955,7 @@ save_as_cb(GtkWidget *widget, char *data)
    }
    gtk_widget_destroy (save_as_dialog);
    save_as_dialog = NULL;
-   gtk_widget_set_sensitive(open_menuitem, 1);
+   gtk_action_set_sensitive(open_menuitem, 1);
    return;
 }
 #endif
@@ -1142,10 +1120,11 @@ preferences_dialog_cb(GtkWidget *widget)// , gtkwidget *widget)
 }
 
 
-static void
+static gboolean
 close_preferences_cb(GtkWidget *widget)// , gtkwidget *widget)
 {
    gtk_widget_hide_all (preferences_dialog);
+   return TRUE;
 }
 
 
@@ -1169,7 +1148,7 @@ create_gui (struct FFT_Frame * data)
    GtkWidget *separator;
 ////   GtkRuler * hruler;
    GtkDataboxGraph *my_grid;
-   GladeXML *xml = NULL;
+   GtkBuilder* builder = gtk_builder_new ();
    avg_num=32;
    smooth_factor=5;
    smooth_constant=pow(2,smooth_factor)-1;
@@ -1190,87 +1169,88 @@ create_gui (struct FFT_Frame * data)
    min_y = -100.0;
    max_y = 100.0;
 
+  guint done = 1;
+  GError* error = NULL;
+
 #ifdef __APPLE__
-// Find glade file in application resource directory first
-   CFURLRef xmlUrl = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("gui"), CFSTR("glade"), NULL);
+// Find GtkBuilder file in application resource directory first
+   CFURLRef xmlUrl = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("BRP_PACU"), CFSTR("ui"), NULL);
    if (xmlUrl != NULL)
    {
-      char * buffer;
-      buffer = malloc(PATH_MAX);
+      char buffer[PATH_MAX];
       if (CFURLGetFileSystemRepresentation(xmlUrl, true, (UInt8*) buffer, PATH_MAX))
-         xml = glade_xml_new (buffer, NULL, NULL);
-      free(buffer);
+         done = gtk_builder_add_from_file (builder, buffer, &error);
+      else
+         done = 1;
    }
    else
 #endif
-      xml = glade_xml_new ("gui.glade", NULL, NULL);
-   if (!xml)
+    done = gtk_builder_add_from_file (builder, "BRP_PACU.ui", &error);
+   if (done != 0)
    {
-      xml = glade_xml_new (DATADIR"/BRP_PACU/gui.glade", NULL, NULL);
-      if (!xml)
+      if (gtk_builder_add_from_file (builder, DATADIR"/BRP_PACU.ui", &error) != 0)
       {
-         message("Couldn't find glade file.", NULL, TRUE); // glade_xml_new throws error about the path
+         message("Couldn't load builder file:", NULL, TRUE); // gtk_builder_add_from_file throws error about the path
          return(FALSE);
       }
    }
-
-   window = glade_xml_get_widget (xml, "window1");
-   bkg_dialog = glade_xml_get_widget (xml, "bkg_dialog");
-   about_me_window = glade_xml_get_widget (xml, "about_me_window");
-   about_ok = glade_xml_get_widget (xml, "about_ok");
-   delay_window = glade_xml_get_widget (xml, "delay1");
-   impulse_window = glade_xml_get_widget (xml, "impulse_window");
-   box_container = glade_xml_get_widget (xml, "vbox1");
-   gui_label = glade_xml_get_widget (xml, "label3");
-   gui_sb_label = glade_xml_get_widget (xml, "delay_label");
-   gui_sb = glade_xml_get_widget (xml, "spinbutton1");
-   gui_db_label = glade_xml_get_widget (xml, "label4");
-   save_as = glade_xml_get_widget (xml, "save_as");
-   save_now = glade_xml_get_widget (xml, "save_now");
-   open_menuitem = glade_xml_get_widget (xml, "open");
-   box_container_impulse = glade_xml_get_widget (xml, "vbox_impulse");
-   measured_draw = glade_xml_get_widget(xml, "Measured_Draw");
-   reference_draw = glade_xml_get_widget(xml, "Reference_Draw");
-   gui_status_delay_label = glade_xml_get_widget (xml, "delay_status_label");
-   volume_pink_gui = glade_xml_get_widget (xml, "volumebutton1");
-   pinknoise_button = glade_xml_get_widget (xml, "pinknoise_button");
-   pinknoise_menu_item = glade_xml_get_widget (xml, "pink_noise");
-   transfer_function_toggle = glade_xml_get_widget (xml, "TransferFxn");
-   transfer_function_menu = glade_xml_get_widget (xml, "transfer_fxn");
-   preferences_dialog = glade_xml_get_widget (xml, "preferences_dialog");
-   smoothing_spin_button = glade_xml_get_widget (xml, "spinbutton_smoothing");
-   averaging_spin_button = glade_xml_get_widget (xml, "spinbutton_averaging");
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "plot_preferences")), "activate", G_CALLBACK (preferences_dialog_cb), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "close_preferences")), "clicked", G_CALLBACK (close_preferences_cb), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "apply_preferences")), "clicked", G_CALLBACK (apply_preferences_cb), NULL);
-   g_signal_connect (GTK_OBJECT (preferences_dialog), "delete_event", G_CALLBACK (delay_hide), NULL);
+   window = GTK_WIDGET (gtk_builder_get_object (builder, "window1"));
+   bkg_dialog = GTK_WIDGET (gtk_builder_get_object (builder, "bkg_dialog"));
+   about_me_window = GTK_WIDGET (gtk_builder_get_object (builder, "about_me_window"));
+   about_ok = GTK_WIDGET (gtk_builder_get_object (builder, "about_ok"));
+   delay_window = GTK_WIDGET (gtk_builder_get_object (builder, "delay1"));
+   impulse_window = GTK_WIDGET (gtk_builder_get_object (builder, "impulse_window"));
+   box_container = GTK_WIDGET (gtk_builder_get_object (builder, "vbox1"));
+   gui_label = GTK_WIDGET (gtk_builder_get_object (builder, "label3"));
+   gui_sb_label = GTK_WIDGET (gtk_builder_get_object (builder, "delay_label"));
+   gui_sb = GTK_WIDGET (gtk_builder_get_object (builder, "spinbutton1"));
+   gui_db_label = GTK_WIDGET (gtk_builder_get_object (builder, "label4"));
+   save_as = GTK_ACTION (gtk_builder_get_object (builder, "save_as"));
+   save_now = GTK_ACTION (gtk_builder_get_object (builder, "save_now"));
+   open_menuitem = GTK_ACTION (gtk_builder_get_object (builder, "open"));
+   box_container_impulse = GTK_WIDGET (gtk_builder_get_object (builder, "vbox_impulse"));
+   measured_draw = GTK_WIDGET (gtk_builder_get_object (builder, "Measured_Draw"));
+   reference_draw = GTK_WIDGET (gtk_builder_get_object (builder, "Reference_Draw"));
+   gui_status_delay_label = GTK_WIDGET (gtk_builder_get_object (builder, "delay_status_label"));
+   volume_pink_gui = GTK_WIDGET (gtk_builder_get_object (builder, "volumebutton1"));
+   pinknoise_button = GTK_WIDGET (gtk_builder_get_object (builder, "pinknoise_button"));
+   pinknoise_menu_item = GTK_TOGGLE_ACTION (gtk_builder_get_object (builder, "pink_noise"));
+   transfer_function_toggle = GTK_WIDGET (gtk_builder_get_object (builder, "TransferFxn"));
+   transfer_function_menu = GTK_TOGGLE_ACTION (gtk_builder_get_object (builder, "transfer_fxn"));
+   preferences_dialog = GTK_WIDGET (gtk_builder_get_object (builder, "preferences_dialog"));
+   smoothing_spin_button = GTK_WIDGET (gtk_builder_get_object (builder, "spinbutton_smoothing"));
+   averaging_spin_button = GTK_WIDGET (gtk_builder_get_object (builder, "spinbutton_averaging"));
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "plot_preferences")), "activate", G_CALLBACK (preferences_dialog_cb), NULL);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "close_preferences")), "clicked", G_CALLBACK (close_preferences_cb), NULL);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "apply_preferences")), "clicked", G_CALLBACK (apply_preferences_cb), NULL);
+   g_signal_connect (GTK_OBJECT (preferences_dialog), "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
    gtk_window_set_decorated (GTK_WINDOW(preferences_dialog), FALSE);
 
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "pinknoise_button")), "clicked", G_CALLBACK (pinknoise_mute), "button");
-   //g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "volumebutton1")), "popdown", G_CALLBACK (volume_popdown_gui), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "volumebutton1")), "value-changed", G_CALLBACK (volume_gui), NULL);
-//  g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "volumebutton1")), "clicked", G_CALLBACK (volume_popup_gui), NULL);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "pinknoise_button")), "clicked", G_CALLBACK (pinknoise_mute), "button");
+   //g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "volumebutton1")), "popdown", G_CALLBACK (volume_popdown_gui), NULL);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "volumebutton1")), "value-changed", G_CALLBACK (volume_gui), NULL);
+//  g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "volumebutton1")), "clicked", G_CALLBACK (volume_popup_gui), NULL);
 
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "quit_ap")), "activate", G_CALLBACK (cleanup_gui), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "save_as")), "activate", G_CALLBACK (save_as_cb), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "save_now")), "activate", G_CALLBACK (save_now_cb), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "open")), "activate", G_CALLBACK (open_cb), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "about_me")), "activate", G_CALLBACK (about_me_cb), NULL);
-   g_signal_connect (G_OBJECT (about_me_window), "delete_event", G_CALLBACK (about_ok_cb), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "about_ok")), "clicked", G_CALLBACK (about_ok_cb), NULL);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "quit_ap")), "activate", G_CALLBACK (cleanup_gui), NULL);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "save_as")), "activate", G_CALLBACK (save_as_cb), NULL);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "save_now")), "activate", G_CALLBACK (save_now_cb), NULL);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "open")), "activate", G_CALLBACK (open_cb), NULL);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "about_me")), "activate", G_CALLBACK (about_me_cb), NULL);
+   g_signal_connect (G_OBJECT (about_me_window), "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "about_ok")), "clicked", G_CALLBACK (about_ok_cb), NULL);
    g_signal_connect (G_OBJECT (transfer_function_menu), "activate", G_CALLBACK (transfer_fxn_cb), NULL);
    g_signal_connect (G_OBJECT (transfer_function_toggle), "clicked", G_CALLBACK (transfer_function_toggled_cb), NULL);
-   g_signal_connect (GTK_BUTTON (glade_xml_get_widget (xml, "find_delay")), "clicked", G_CALLBACK (delay_cb), data);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "find_delay_m")), "activate", G_CALLBACK (delay_cb), data);
+   g_signal_connect (GTK_BUTTON (gtk_builder_get_object (builder, "find_delay")), "clicked", G_CALLBACK (delay_cb), data);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "find_delay_m")), "activate", G_CALLBACK (delay_cb), data);
    g_signal_connect (GTK_OBJECT (window), "destroy", G_CALLBACK (cleanup_gui), NULL);
    g_signal_connect (GTK_OBJECT (window), "delete_event", G_CALLBACK (cleanup_gui), NULL);
-   g_signal_connect (GTK_OBJECT (delay_window), "delete_event", G_CALLBACK (close_preferences_cb), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget(xml, "delay_keep_button")), "clicked", G_CALLBACK (delay_keep_cb), NULL);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "impulse_response")), "activate", G_CALLBACK (impulse_cb), data);
-   g_signal_connect (GTK_OBJECT (impulse_window), "delete_event", G_CALLBACK (impulse_hide), NULL);
+   g_signal_connect (GTK_OBJECT (delay_window), "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "delay_keep_button")), "clicked", G_CALLBACK (delay_keep_cb), NULL);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "impulse_response")), "activate", G_CALLBACK (impulse_cb), data);
+   g_signal_connect (GTK_OBJECT (impulse_window), "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
 
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "pink_noise")), "activate", G_CALLBACK (pinknoise_mute), "menu");
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "delay_custom_button")), "clicked", G_CALLBACK (delay_custom_cb), NULL);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "pink_noise")), "activate", G_CALLBACK (pinknoise_mute), "menu");
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "delay_custom_button")), "clicked", G_CALLBACK (delay_custom_cb), NULL);
 
    gui_frequency = 0;
    gtk_widget_set_size_request (GTK_WIDGET(window), WINDOW_W, WINDOW_H);
@@ -1379,29 +1359,29 @@ create_gui (struct FFT_Frame * data)
                                           &trace_impulse_color, 1);
    gtk_databox_graph_add (GTK_DATABOX (impulse_box), graph_impulse);
 
-   buffer_button[0] = glade_xml_get_widget (xml, "buff1");
-   buffer_button[1] = glade_xml_get_widget (xml, "buff2");
-   buffer_button[2] = glade_xml_get_widget (xml, "buff3");
-   buffer_button[3] = glade_xml_get_widget (xml, "buff4");
-   buffer_button[4] = glade_xml_get_widget (xml, "buffAvg");
-   buffer_menu[0] = glade_xml_get_widget (xml, "buffer_1");
-   buffer_menu[1] = glade_xml_get_widget (xml, "buffer_2");
-   buffer_menu[2] = glade_xml_get_widget (xml, "buffer_3");
-   buffer_menu[3] = glade_xml_get_widget (xml, "buffer_4");
-   buffer_menu[4] = glade_xml_get_widget (xml, "bufferAvg");
+   buffer_button[0] = GTK_WIDGET (gtk_builder_get_object (builder, "buff1"));
+   buffer_button[1] = GTK_WIDGET (gtk_builder_get_object (builder, "buff2"));
+   buffer_button[2] = GTK_WIDGET (gtk_builder_get_object (builder, "buff3"));
+   buffer_button[3] = GTK_WIDGET (gtk_builder_get_object (builder, "buff4"));
+   buffer_button[4] = GTK_WIDGET (gtk_builder_get_object (builder, "buffAvg"));
+   buffer_menu[0] =  GTK_TOGGLE_ACTION (gtk_builder_get_object (builder, "buffer_1"));
+   buffer_menu[1] =  GTK_TOGGLE_ACTION (gtk_builder_get_object (builder, "buffer_2"));
+   buffer_menu[2] =  GTK_TOGGLE_ACTION (gtk_builder_get_object (builder, "buffer_3"));
+   buffer_menu[3] =  GTK_TOGGLE_ACTION (gtk_builder_get_object (builder, "buffer_4"));
+   buffer_menu[4] =  GTK_TOGGLE_ACTION (gtk_builder_get_object (builder, "bufferAvg"));
 
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "auto_resize")), "clicked", G_CALLBACK (resize_cb), (gpointer) box);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "resize_default")), "clicked", G_CALLBACK (resize_default_cb), (gpointer) box);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "auto_resize_m")), "activate", G_CALLBACK (resize_cb), (gpointer) box);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "resize_default_m")), "activate", G_CALLBACK (resize_default_cb), (gpointer) box);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "auto_resize")), "clicked", G_CALLBACK (resize_cb), (gpointer) box);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "resize_default")), "clicked", G_CALLBACK (resize_default_cb), (gpointer) box);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "auto_resize_m")), "activate", G_CALLBACK (resize_cb), (gpointer) box);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "resize_default_m")), "activate", G_CALLBACK (resize_default_cb), (gpointer) box);
    for (i = 0; i < N_BUFF; i++)
    {
       g_signal_connect (G_OBJECT (buffer_button[i]), "clicked", G_CALLBACK (buffer_button_cb),  GINT_TO_POINTER((gint) i));
       g_signal_connect (G_OBJECT (buffer_menu[i]), "activate", G_CALLBACK (buffer_menu_cb),  GINT_TO_POINTER((gint) i));
    }
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "capt")), "clicked", G_CALLBACK (capture_cb),  (gpointer) box);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "capt_m")), "activate", G_CALLBACK (capture_cb),  (gpointer) box);
-   g_signal_connect (G_OBJECT (glade_xml_get_widget (xml, "gain1")), "value-changed", G_CALLBACK (gain_cb),  (G_OBJECT (glade_xml_get_widget (xml, "gain1")) ));
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "capt")), "clicked", G_CALLBACK (capture_cb),  (gpointer) box);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "capt_m")), "activate", G_CALLBACK (capture_cb),  (gpointer) box);
+   g_signal_connect (G_OBJECT (gtk_builder_get_object (builder, "gain1")), "value-changed", G_CALLBACK (gain_cb),  (G_OBJECT (gtk_builder_get_object (builder, "gain1")) ));
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //  Pixmap stuff
@@ -1417,15 +1397,15 @@ create_gui (struct FFT_Frame * data)
 
 #ifdef __APPLE__
    GtkWidget *menubar1;
-   GtkWidget *quit_ap;
+   GtkAction *quit_ap;
    GtkWidget *about_item;
    IgeMacMenuGroup *group;
    IgeMacDock      *dock;
    OSErr       osError;
 
-   menubar1 = glade_xml_get_widget (xml, "menubar1");
-   quit_ap = glade_xml_get_widget (xml, "quit_ap");
-   about_item = gtk_menu_item_new_with_label ("About BRP-PACU");
+   menubar1 = GTK_WIDGET (gtk_builder_get_object (builder, "menubar1"));
+   quit_ap =  GTK_ACTION (gtk_builder_get_object (builder, "quit_ap"));
+   about_item = GTK_WIDGET (gtk_menu_item_new_with_label ("About BRP-PACU"));
    gtk_widget_hide (menubar1);
 // Put menu bar to the top of the screen
    ige_mac_menu_set_menu_bar (GTK_MENU_SHELL (menubar1));
@@ -1437,7 +1417,8 @@ create_gui (struct FFT_Frame * data)
    ige_mac_menu_add_app_menu_item  (group,
                                     GTK_MENU_ITEM (about_item),
                                     NULL);
-   gtk_widget_hide (glade_xml_get_widget (xml, "about_me"));
+   gtk_action_set_visible (GTK_ACTION (gtk_builder_get_object (builder, "about_me")),FALSE);
+   gtk_action_set_visible (GTK_ACTION (gtk_builder_get_object (builder, "quit_ap")),FALSE);
 // Enable quit from dock
    dock = ige_mac_dock_new ();
    g_signal_connect (dock,
@@ -1480,7 +1461,9 @@ create_gui (struct FFT_Frame * data)
       }
       fclose(file_handle);
    }
-   g_object_unref (G_OBJECT(xml));
+   g_object_unref (G_OBJECT(builder));
    return(TRUE);
 
 }
+
+

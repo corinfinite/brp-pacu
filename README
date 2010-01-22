@@ -37,9 +37,6 @@ What if I try it and it doesn't work?
 - Email me and I can probably figure it out.  My email is lm317t@gmail.com.  Also try the mailing list, 
    it should be working.
 
-Why does it segfault?
-- Make Sure the gui.glade file is in /usr/local/share/BRP-PACU/ or /usr/share/BRP-PACU/ 
-
 Why is there no documentation?
 - Channel 1 is the output of the system we are observing (measured), channel 2 is the input (reference).  
    You also need a decent calibrated omnidrectional microphone (reasonably flat 20Hz-20kHz) and either a
@@ -51,11 +48,3 @@ How do you handle a delay between measured and referenced signals?
 
 Is there a way to find the impulse response?
 - It is in the menu under action
-
-Why do some menu items do nothing?
-- I have not implemented New, Save, Save As, View, or Open yet.  If you would like to help you
-   can write some of them.  Please email me.  Otherwise please wait.
-
-How do I change the FFT window size?
-- This is still done at compile time in testfft.h as "N" I believe.  This will be a menu item like other
-   options at a later time.  Any help on this is appreciated.

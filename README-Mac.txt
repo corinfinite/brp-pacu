@@ -8,23 +8,19 @@ Dependencies
 _______________________________________
 You should first download and install:
 
-Jack-OSX from
+Jack-OS X from
 http://www.jackosx.com/
-
-The GTK-OSX Framework from:
-http://www.gtk-osx.org/
+You should install the 32-bit version even if you have a 64-bit computer.
+BRP-PACU will not work with the 64/32 bit version of Jack-OS X.
 
 Instructions
 _______________________________________
-Open JackPilot from the Application folder. You will find it at /Applications/Jack/JackPilot.app
+To install BRP-PACU, drag the BRP-PACU icon into the Application folder.
+The double-click on BRP-PACU to start.
 
-You should first read the Jack-OSX manual. It will be found under the Help menu of the JackPilot or at
-/Applications/Jack/JackPilot.app/Contents/Resources/jackdoc.pdf
+If Jack-OS X is not present or not running, a warning will appear, and Jack Pilot will open. CLick on "Start" on the JackPilot window, then on "Continue"" on the warning box.
 
-Configure JACK according to the Special Intel Mac instructions on page 12 - 13. If you don't do this, BRP-PAC will crash with the message "no physical capture ports".
-
-Now you can start the BRP_PACU application by double-clicking on its icon.
-The console output can be seen by opening /Applications/Utilities/Console.app
+If Jack Pilot does not open, this means that Jack-OS X is not installed correctly.
 
 Never before asked questions
 -------------------------------------------
@@ -54,9 +50,6 @@ What if I try it and it doesn't work?
 - Email me and I can probably figure it out.  My email is lm317t@gmail.com.  Also try the mailing list, 
    it should be working.
 
-Why does it segfault?
-- Make Sure the gui.glade file is in /usr/local/share/BRP-PACU/ or /usr/share/BRP-PACU/ 
-
 Why is there no documentation?
 - Channel 1 is the output of the system we are observing (measured), channel 2 is the input (reference).  
    You also need a decent calibrated omnidrectional microphone (reasonably flat 20Hz-20kHz) and either a
@@ -68,11 +61,3 @@ How do you handle a delay between measured and referenced signals?
 
 Is there a way to find the impulse response?
 - It is in the menu under action
-
-Why do some menu items do nothing?
-- I have not implemented New, Save, Save As, View, or Open yet.  If you would like to help you
-   can write some of them.  Please email me.  Otherwise please wait.
-
-How do I change the FFT window size?
-- This is still done at compile time in testfft.h as "N" I believe.  This will be a menu item like other
-   options at a later time.  Any help on this is appreciated.
