@@ -49,7 +49,7 @@ $(MACAPPLICATION): $(bin_PROGRAMS) $(MACCONTENTS)
 # Change install names to be relative to the executable in the application
 	movelibraries.sh $(MACAPPLICATION) `pkg-config --variable=libdir gtk+-2.0`
 	install_name_tool \
-          `otool -L $(MACEXECUTABLE) | sed -n  '\:'\`pkg-config --variable=libdir gtkdatabox\`': s/\(.*\/\)\(.*\) (.*/-change \1\2 @executable_path\/..\/Frameworks\/\2 /p'` \
+          `otool -L $(MACEXECUTABLE) | sed -n  '\:/libgtkdatabox: s/\(.*\/\)\(.*\) (.*/-change \1\2 @executable_path\/..\/Frameworks\/\2 /p'` \
 	  $(MACEXECUTABLE)
 	touch $(MACAPPLICATION)
 # create distribution disk image
