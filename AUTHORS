@@ -5,5 +5,11 @@ Macintosh desktop integration:
   Pioneer Research Center USA, Inc.
 Pink noise filter adapted from:
   Paul Kellet http://www.musicdsp.org/showone.php?id=76
+
+Libraries used (and integrated into the Macintosh binary distribution)
+fftw ("Fastest Fourier Transform in the West")
+  Matteo Frigo and Steven G. Johnson http://www.fftw.org/
 GTK+ graphical user interface
   The GTK Team, http://www.gtk.org
+GtkDatabox
+  Roland Bock, Brian Phelps https://sourceforge.net/projects/gtkdatabox/

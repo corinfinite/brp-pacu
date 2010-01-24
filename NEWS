@@ -1,5 +1,10 @@
-Version 2.1.1 12/27/2009
-   Open window with error message when Jack does not initialize (instead of quitting silently)
+Version 2.1.1 1/20/2010
+   Open a window with error message when Jack does not initialize (instead of quitting silently) and automatically open JackPilot
+
+   The Binary Macintosh distribution is bundled together with the GTK library, so it is not necessary to downloaded GTK separately.
+
+   The graphical user interface is fetched from file BRP_PACU.iu via GTKBuilder (instead of libglade, which is deprecated)
+   
 
 Version 2.1.0 04/17/2009
    Changed libraries for thread mutexes for compilation on windows

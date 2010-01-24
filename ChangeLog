@@ -1,3 +1,8 @@
+2010-01-20 Andreas Schwab <andreasjs@users.sourceforge.net>
+* gui.glade replaced by BRP_PACU.ui to be processed by GTKBuilder
+* gui.c 
+  (impulse_hide, delay_hide, close_preferences_cb): replaced by gtk_widget_hide_on_delete
+
 2009-12-27 Andreas Schwab <andreasjs@users.sourceforge.net>
 
 * gui.c: correct various casting errors
@@ -9,7 +14,7 @@
   removed varoius unused return values
   (on_quit): not used, removed
   (MyGTKFunction): made g_boolean
-  gtk_timeout_.. replaced by g_...
+  (gtk_timeout_).. replaced by (g_...)
   (jack_init): return error status
   (main): use error status, 
   pop message window on unsuccessful jack init
@@ -21,9 +26,7 @@
   removed unused <requires-version lib="gtk+" version="2.12"/>
   <property name="adjustment">: set page size to (10 times)
   
-
 * Makefile.am:
-  made -lgthread-2.0 conditional, not used for Macintosh
   renamed README-Mac.txt to README when copied to Macintosh distribution
   removed unused -framework Carbon -lobjc from AM_CFLAGS
 

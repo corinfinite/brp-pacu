@@ -1,13 +1,18 @@
 BRP-PACU
 
-Please note that to compile and run you need to download gtkdatabox library 0.8.2.2
-or greater:
-http://www.eudoxos.de/gtk/gtkdatabox/download/gtkdatabox-0.8.2.2.tar.gz
+To build the system, you should first download and install:
 
-I have been helping out with that library and this is the only version that has
-full logarithmic scale/grid support.
+Jack-OSX from http://www.jackosx.com/
 
-You will also need the fftw development libraries packaged with your distro.
+GTK+ stable release from http://gtk.org
+including dependencies such as Glib and Pango
+
+Also, you will need the development versions of:
+
+fftw version 2.1.5 from http://www.fftw.org/download.html
+(fttw version 3 does not work yet)
+
+GtkDatabox 0.9.1.1 or later from https://sourceforge.net/projects/gtkdatabox/
 
 Never before asked questions
 -------------------------------------------
