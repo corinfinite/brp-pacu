@@ -10,8 +10,6 @@ You should first download and install:
 
 Jack-OS X from
 http://www.jackosx.com/
-You should install the 32-bit version even if you have a 64-bit computer.
-BRP-PACU will not work with the 64/32 bit version of Jack-OS X.
 
 Instructions
 _______________________________________
