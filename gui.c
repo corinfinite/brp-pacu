@@ -1073,7 +1073,6 @@ static gboolean configure_event_measured( GtkWidget         *widget,
    gdk_gc_set_rgb_fg_color (gc, &myColor);
 
    gdk_draw_rectangle (measured_pixmap, gc, TRUE, 7, 7, 16, 16);
-   printf("config\n");
    g_object_unref(gc);
    return TRUE;
 }
@@ -1100,7 +1099,6 @@ static gboolean configure_event_reference( GtkWidget         *widget,
    gdk_gc_set_rgb_fg_color (gc, &myColor);
 
    gdk_draw_rectangle (reference_pixmap, gc, TRUE, 7, 7, 16, 16);
-   printf("config\n");
    g_object_unref(gc);
    return TRUE;
 }
@@ -1138,7 +1136,7 @@ static void apply_preferences_cb( GtkWidget *widget)
 
 
 gboolean
-create_gui (struct FFT_Frame * data)
+create_gui (struct FFT_Frame * data, char *  datadir)
 {
    GtkWidget *box_container;
    GtkWidget *box_container_impulse;
@@ -1158,6 +1156,7 @@ create_gui (struct FFT_Frame * data)
    file_name_str = g_string_new("Untitled.brp");
 
    char tmp_string[] = "BRP-PACU vxx.xx.xx ";
+   char gtkbuilder_path[400];
    graph = g_new0 (GtkDataboxGraph *, 10);  // allocate memory graph array
    graph_impulse = g_new0 (GtkDataboxGraph, 1); // allocate memory graph array
    gint k;
@@ -1169,7 +1168,7 @@ create_gui (struct FFT_Frame * data)
    min_y = -100.0;
    max_y = 100.0;
 
-  guint done = 1;
+  guint done = 0;
   GError* error = NULL;
 
 #ifdef __APPLE__
@@ -1185,12 +1184,14 @@ create_gui (struct FFT_Frame * data)
    }
    else
 #endif
-    done = gtk_builder_add_from_file (builder, "BRP_PACU.ui", &error);
-   if (done != 0)
+    //done = gtk_builder_add_from_file (builder, "BRP_PACU.ui", &error);
+   sprintf(gtkbuilder_path, "%s/BRP_PACU.ui", datadir);
+   if (done == 0)
    {
-      if (gtk_builder_add_from_file (builder, DATADIR"/BRP_PACU.ui", &error) != 0)
+      if (gtk_builder_add_from_file (builder, gtkbuilder_path, &error) == 0)
       {
-         message("Couldn't load builder file:", NULL, TRUE); // gtk_builder_add_from_file throws error about the path
+         //message("Couldn't load builder file:", NULL, TRUE); // gtk_builder_add_from_file throws error about the path
+         fprintf(1,"\n\n-----------Error--------------\n\n\n");
          return(FALSE);
       }
    }

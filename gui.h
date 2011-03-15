@@ -37,6 +37,6 @@
 
 gboolean gui_idle_func (struct FFT_Frame * data);
 
-gboolean create_gui (struct FFT_Frame * data);
+gboolean create_gui (struct FFT_Frame * data, char* datadir);
 
 #endif

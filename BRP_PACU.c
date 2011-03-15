@@ -516,7 +516,7 @@ main (int argc, char *argv[])
 ;
    }
    gtk_widget_destroy (GTK_WIDGET(jack_error_dialog));
-      if (create_gui((struct FFT_Frame *)fill_it))
+      if (create_gui((struct FFT_Frame *)fill_it, DATADIR))
       {
          timer_id = g_timeout_add(90, (GSourceFunc) MyGTKFunction, (gpointer) fill_it ); // Start the initial delay
          gtk_main ();
