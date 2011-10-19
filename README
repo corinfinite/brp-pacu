@@ -1,18 +1,55 @@
-BRP-PACU
+BRP-PACU - An Audio Configuration utility
 
-To build the system, you should first download and install:
+To compile BRP-PACU on Linux, this must be installed:
+* JACK. Any recent version will work, just take what the distribution provides, the package is probably named "jackd".
+– Tip: If jack is not already installed on your system, try to install the package "qjackctl" which depends on JACK.
 
-Jack-OSX from http://www.jackosx.com/
+* The development files that matches the installed version of JACK.
+– Finding the right development package: Search for packages with libjack in their names. Notice the name of the installed libjack*, and find the most similar named package which name is ending in "-dev", and install that one.
 
-GTK+ stable release from http://gtk.org
-including dependencies such as Glib and Pango
+* GTK databox, library and header files, in version 0.9.1-1 (that will work) or preferable newer.
+        – In Ubuntu 10.10 you can install the package libgtkdatabox-0.9.1-1-dev , but:
+        – It is recommended to use a newer version, because there are a few UI tweaks in the latest gtkdatabox. Get it from the source code released on https://sourceforge.net/projects/gtkdatabox 
 
-Also, you will need the development versions of:
+* FFTW version 2.1.5, the package is probably named “fftw-dev”, or download it from http://www.fftw.org/download.html  (note: v. 3 is not supported) 
 
-fftw version 2.1.5 from http://www.fftw.org/download.html
-(fttw version 3 does not work yet)
+* the GTK+ and Glade stuff (including its dependencies such as Glib and Pango), with these packages (and their dependencies)
+	libglade2-dev
+	libgtk2.0-dev
+	libglib2.0-dev
+	GTK+ stable release from http://gtk.org
+* The building tools in these packages:
+	build-essential
+	autotools-dev
+	autoconf
+	automake
+	pkg-config
+	make
+	gcc
 
-GtkDatabox 0.9.1.1 or later from https://sourceforge.net/projects/gtkdatabox/
+If the source code comes directly from the GIT repository, instead of a release in a tar ball, you must run “aclocal && autoconf && automake” before running “./configure”.
+
+Details about the actual compilation procedure (run ./configure, then make, then sudo make install) are found in the file “INSTALL”
+
+===========================================
+A tip for JACK and PulseAudio co-existense (not unique to BRP-PACU)
+-------------------------------------------
+
+A way to automate the switching betweenf which software that can get direct (and thus exclusive) access to the audio hardware ins and outs.
+
+In ubuntu (at least) the file /etc/pulse/client.conf needs to have the line:
+autospawn = no
+
+and put “pulseaudio -k” in the jackd start script and “pulseaudio --start” in the jackd stop script (can be done from qjackctl under setup->options-> execute script at startup).
+
+Otherwise pulseaudio will grab ownership instantly on any sound card you try and you will never get jackd to start.
+===========================================
+When BRP-PACU is installed, the executable is named “BRP_PACU”. It can be started from the Run dialog (that comes up when pressing ALt-F2), or from a command line which will give extra debugging information.
+===========================================
+Some other info is placed on Wikipedia: en.wikipedia.org/wiki/BRP-PACU 
+===========================================
+A binary pakcage for Debian can be found at http://packages.debian.org/sid/brp-pacu .
+===========================================
 
 Never before asked questions
 -------------------------------------------
