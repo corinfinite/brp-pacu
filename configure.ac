@@ -1,4 +1,4 @@
-AC_INIT
+AC_INIT(BRP-PACU,2.1.2,lm317t@gmail.com)
 ########## Macintosh implementation #########
 if [[ `uname` = 'Darwin' ]]
  then if [[ -n "PKG_CONFIG_PATH" ]]
@@ -11,7 +11,7 @@ AM_CONDITIONAL([APPLE], [ test `uname` = 'Darwin'])
 AC_SUBST(PKG_CONFIG_PATH)
 #############################################
 AC_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE(BRP_PACU,2.1.1)
+AM_INIT_AUTOMAKE
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_CONFIG_FILES([Makefile])

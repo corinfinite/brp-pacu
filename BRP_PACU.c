@@ -23,7 +23,7 @@
 *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 #include <gdk/gdk.h>
-#include <glib/gthread.h>
+//// #include <glib/gthread.h>
 #include <glib.h>
 #include <gtk/gtkadjustment.h>
 #include <gtk/gtkwidget.h>

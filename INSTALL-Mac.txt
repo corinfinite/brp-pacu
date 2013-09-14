@@ -1,3 +1,6 @@
+BRP-PACU for Mac OS X (Intel architecture only)
+Version 2.1.2 and higher require a 64-bit computer. For 32-bit computers, download and use Version 2.1.1.
+
 BRP-PACU Web site
 _______________________________________
 http://sourceforge.net/projects/brp-pacu
@@ -29,6 +32,10 @@ Building instruction for Mac
 
 To build the system, you should first download and install:
 
+autoconf
+automake
+pkg-config
+
 Jack-OSX from http://www.jackosx.com/
 
 GTK+ for OX X
@@ -42,13 +49,6 @@ fftw version 2.1.5 from http://www.fftw.org/download.html
 
 GtkDatabox 0.9.1.1 or later from https://sourceforge.net/projects/gtkdatabox/
 
-Before installing these packages, do the following from the command line:
-
-export PPKG_CONFIG_PATH='/usr/lib/pkgconfig/:\
-/usr/local/lib/pkgconfig/:'$HOME'/gtk/inst/lib/pkgconfig'
-sudo cat > /usr/share/aclocal/dirlist
-echo '/usr/local/share/aclocal' | \
-sudo tee  /usr/share/aclocal/dirlist
 
 then follow the usual installation procedure (see INSTALL)
 

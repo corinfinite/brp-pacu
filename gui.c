@@ -21,11 +21,9 @@
 */
 
 #include <stdio.h>
-#ifdef __APPLE__
+#ifdef MAC_INTEGRATION
 #include <CoreFoundation/CoreFoundation.h>
-#include <Carbon/Carbon.h>
-#include "ige-mac-menu.h"
-#include "ige-mac-dock.h"
+#include <gtkosxapplication.h>
 #endif
 
 #include <gtk/gtk.h>
@@ -130,14 +128,19 @@ static GdkColor myColor2 =    { 0, 0x3333, 0x3333, 0x3333 };
 
 void message(char * format, char* text, gboolean error)
 {
-   fprintf(stderr, format, text);
-   fprintf(stderr, "\n");
    GtkWidget* dialog = gtk_message_dialog_new (GTK_WINDOW(window),
                        GTK_DIALOG_DESTROY_WITH_PARENT,
                        error ? GTK_MESSAGE_ERROR : GTK_MESSAGE_WARNING,
                        GTK_BUTTONS_CLOSE,
                        format,
                        text);
+#ifdef MAC_INTEGRATION
+    GtkosxApplication *theApp = g_object_new(GTKOSX_TYPE_APPLICATION, NULL);
+// Bounce icon in dock
+    gtkosx_application_attention_request(theApp, error ? CRITICAL_REQUEST : INFO_REQUEST);
+#endif
+    fprintf(stderr, error ? "BRP-PACU error: " : "BRP-PACU warning: ");
+    fprintf(stderr, format, text);
    gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
    gtk_window_set_decorated (GTK_WINDOW(dialog), FALSE);
    gtk_window_present (GTK_WINDOW(dialog));
@@ -583,8 +586,8 @@ cleanup_gui(GtkWidget *widget, struct FFT_Frame * data)
    printf("GUI is done with cleanup\n");
 }
 
-void
-open_file(char *fn)
+gboolean
+open_file(gchar *fn)
 {
    int k;
    FILE *file_handle;
@@ -602,16 +605,21 @@ open_file(char *fn)
             g_string_assign(save_name_str, fn);
          else
             save_name_str = g_string_new(fn);
+          return TRUE;
       }
       else
       {
          message("Wrong file format", NULL, TRUE);
          fprintf (stderr, "PLOT_PTS is different from PLOT_PTS last captured size.");
          fprintf (stderr, "N_FFT has been changed from N_FFT=%d * 2 since your last capture.\n", (int) read_plot_pts  );
+          return FALSE;
       }
    }
    else
+   {
       message("Couldn't open file %s for reading\n", fn, TRUE);
+      return FALSE;
+   }
    fclose(file_handle);
 }
 
@@ -643,7 +651,7 @@ save_file(char* fn)
       message("Couldn't open file %s for writing. Usually this is a permissions issue.", fn, TRUE);
 }
 
-#ifdef __APPLE__
+/* #ifdef MAC_INTEGRATION
 
 static char strBuffer[PATH_MAX];
 
@@ -656,45 +664,40 @@ static char strBuffer[PATH_MAX];
 static OSStatus DoOpenSave(AEDescList docList, CFStringRef basename)
 
 {
-   FSRef       theFSRef;
-   long        index = 1;
-   long        count = 0;
-   OSErr       osError;
-   char        bn[256];
+    int i; // Loop counter.
+    
+    // Create the File Open Dialog class.
+    NSOpenPanel* openDlg = [NSOpenPanel openPanel];
+    
+    // Enable the selection of files in the dialog.
+    [openDlg setCanChooseFiles:YES];
+    
+    // Disable the selection of directories in the dialog.
+    [openDlg setCanChooseDirectories:NO];
+    
+    // Disable multiple selections.
+    [openDlg setAllowsMultipleSelection:NO];
 
-   osError = AECountItems(&docList, &count);
-   if (osError == noErr)
-   {
-      if (count == 1)
-      {
-         if (osError == noErr)
-            osError = AEGetNthPtr(&docList, index, typeFSRef,
-                                  NULL, NULL, &theFSRef,
-                                  sizeof(FSRef), NULL);
-         if (osError == noErr)
-            osError = FSRefMakePath(&theFSRef, (UInt8 *) strBuffer, PATH_MAX);
-         if (osError == noErr)
-         {
-            if (basename)
-            {
-               if (CFStringGetCString(basename, bn, 256, kCFStringEncodingUTF8))
-               {
-                  strcat(strBuffer, "/");
-                  strcat(strBuffer, bn);
-               }
-               save_file(strBuffer);
-            }
-            else
-               open_file(strBuffer);
+    // Display the dialog.  If the OK button was pressed,
+    // process the files.
+    if ( [openDlg runModalForDirectory:nil file:nil] == NSOKButton )
+    {
+        // Get an array containing the full filenames of all
+        // files and directories selected.
+        NSArray* files = [openDlg filenames];
+        
+        // Loop through all the files and process them.
+        if ( [files count] == 1)
+        {
+            NSString* fileName = [files objectAtIndex:0];
+            
+            return fileName
+        }
+        else
+            message("Cannot open more than one file at a time.", NULL, TRUE);
             return(0);
-         }
-      }
-      else
-         message("Cannot open more than one file at a time.", NULL, TRUE);
-      return(0);
-   }
-   fprintf(stderr, "OS X error %d\n", (int)osError);
-   return(0);
+        }
+    }
 }
 
 // Handler function for opening files from the OS X finder
@@ -862,9 +865,9 @@ NavDialogGetReply:
    return;
 }   // Do_SaveAs
 
-#else
+     #else */
 static void
-open_cb(GtkWidget *widget, char *data)
+open_cb(GtkWidget *widget, gchar *data)
 {
 
    GtkFileFilter *file_filter = NULL;
@@ -872,8 +875,7 @@ open_cb(GtkWidget *widget, char *data)
 
    if (open_dialog != NULL)
    {
-      gtk_window_present (GTK_FILE_CHOOSER(open_dialog));
-      return(0);
+      gtk_window_present (GTK_WINDOW(open_dialog));
    }
 
    open_dialog = gtk_file_chooser_dialog_new ("Open Capture Buffers From", GTK_WINDOW(bkg_dialog), GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
@@ -958,7 +960,7 @@ save_as_cb(GtkWidget *widget, char *data)
    gtk_action_set_sensitive(open_menuitem, 1);
    return;
 }
-#endif
+///   #endif  ** ****** */
 static void
 save_now_cb(GtkWidget *widget, char *data)
 {
@@ -1134,10 +1136,28 @@ static void apply_preferences_cb( GtkWidget *widget)
          
 }
 
+#ifdef MAC_INTEGRATION
+static gboolean
+deal_with_quit(GtkosxApplication *app, gpointer user_data)
+{
+    if (open_dialog) gtk_widget_destroy (GTK_WIDGET(open_dialog));
+    if (save_as_dialog) gtk_widget_destroy (GTK_WIDGET(save_as_dialog));
+    gtk_main_quit();
+    printf("GUI is done with cleanup\n");
+    return TRUE;
+}
+
+static gboolean
+deal_with_open(GtkosxApplication *app, gchar *path, gpointer user_data)
+{return open_file (path);}
+#endif
 
 gboolean
 create_gui (struct FFT_Frame * data, char *  datadir)
 {
+#ifdef MAC_INTEGRATION
+   GtkosxApplication *theApp = g_object_new(GTKOSX_TYPE_APPLICATION, NULL);
+#endif
    GtkWidget *box_container;
    GtkWidget *box_container_impulse;
 /////   GtkWidget *label;
@@ -1155,7 +1175,7 @@ create_gui (struct FFT_Frame * data, char *  datadir)
    gint read_plot_pts[1];
    file_name_str = g_string_new("Untitled.brp");
 
-   char tmp_string[] = "BRP-PACU vxx.xx.xx ";
+   char tmp_string[] = "BRP-PACU vxx.xx.xxxxxxx ";
    char gtkbuilder_path[400];
    graph = g_new0 (GtkDataboxGraph *, 10);  // allocate memory graph array
    graph_impulse = g_new0 (GtkDataboxGraph, 1); // allocate memory graph array
@@ -1168,33 +1188,20 @@ create_gui (struct FFT_Frame * data, char *  datadir)
    min_y = -100.0;
    max_y = 100.0;
 
-  guint done = 0;
   GError* error = NULL;
 
-#ifdef __APPLE__
-// Find GtkBuilder file in application resource directory first
-   CFURLRef xmlUrl = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("BRP_PACU"), CFSTR("ui"), NULL);
-   if (xmlUrl != NULL)
-   {
-      char buffer[PATH_MAX];
-      if (CFURLGetFileSystemRepresentation(xmlUrl, true, (UInt8*) buffer, PATH_MAX))
-         done = gtk_builder_add_from_file (builder, buffer, &error);
-      else
-         done = 1;
-   }
-   else
+#ifdef MAC_INTEGRATION
+    // Find GtkBuilder file in application resource directory first
+    datadir = gtkosx_application_get_resource_path();
 #endif
-    //done = gtk_builder_add_from_file (builder, "BRP_PACU.ui", &error);
-   sprintf(gtkbuilder_path, "%s/BRP_PACU.ui", datadir);
-   if (done == 0)
-   {
-      if (gtk_builder_add_from_file (builder, gtkbuilder_path, &error) == 0)
+    sprintf(gtkbuilder_path, "%s/BRP_PACU.ui", datadir);
+    if (gtk_builder_add_from_file (builder, gtkbuilder_path, &error) == 0)
       {
-         //message("Couldn't load builder file:", NULL, TRUE); // gtk_builder_add_from_file throws error about the path
-         fprintf(1,"\n\n-----------Error--------------\n\n\n");
+         // gtk_builder_add_from_file throws error about the path
+         message("Couldn't load builder file: %s", gtkbuilder_path, TRUE);
+         ///printf(1,"\n\n-----------Error--------------\n\n\n");
          return(FALSE);
       }
-   }
    window = GTK_WIDGET (gtk_builder_get_object (builder, "window1"));
    bkg_dialog = GTK_WIDGET (gtk_builder_get_object (builder, "bkg_dialog"));
    about_me_window = GTK_WIDGET (gtk_builder_get_object (builder, "about_me_window"));
@@ -1396,50 +1403,37 @@ create_gui (struct FFT_Frame * data, char *  datadir)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef __APPLE__
+#ifdef MAC_INTEGRATION
    GtkWidget *menubar1;
    GtkAction *quit_ap;
    GtkWidget *about_item;
-   IgeMacMenuGroup *group;
-   IgeMacDock      *dock;
-   OSErr       osError;
 
    menubar1 = GTK_WIDGET (gtk_builder_get_object (builder, "menubar1"));
    quit_ap =  GTK_ACTION (gtk_builder_get_object (builder, "quit_ap"));
    about_item = GTK_WIDGET (gtk_menu_item_new_with_label ("About BRP-PACU"));
    gtk_widget_hide (menubar1);
 // Put menu bar to the top of the screen
-   ige_mac_menu_set_menu_bar (GTK_MENU_SHELL (menubar1));
-   ige_mac_menu_set_quit_menu_item (GTK_MENU_ITEM (quit_ap));
+    gtkosx_application_set_menu_bar(theApp, GTK_MENU_SHELL(menubar1));
+
 // move "About BRP-PACU" menu item to application menu
    g_signal_connect (about_item, "activate", G_CALLBACK (about_me_cb), "about_me");
-   group = ige_mac_menu_add_app_menu_group ();
-
-   ige_mac_menu_add_app_menu_item  (group,
-                                    GTK_MENU_ITEM (about_item),
-                                    NULL);
+   gtkosx_application_insert_app_menu_item  (theApp,
+                                             GTK_WIDGET (about_item),0);
+   gtkosx_application_ready(theApp);
    gtk_action_set_visible (GTK_ACTION (gtk_builder_get_object (builder, "about_me")),FALSE);
    gtk_action_set_visible (GTK_ACTION (gtk_builder_get_object (builder, "quit_ap")),FALSE);
-// Enable quit from dock
-   dock = ige_mac_dock_new ();
-   g_signal_connect (dock,
-                     "quit-activate",
-                     G_CALLBACK (cleanup_gui),
-                     window);
-   ige_mac_menu_connect_window_key_handler (GTK_WINDOW(window));
 // Enable file open from Mac OS
-   osError = AEInstallEventHandler(kCoreEventClass, kAEOpenDocuments,
-                                   NewAEEventHandlerUPP((AEEventHandlerProcPtr) openAndPrintDocsEventHandler),
-                                   0, false);
-   if (osError != noErr)
-      fprintf(stderr, "OS X error %d\n", (int)osError);
-//                  RunApplicationEventLoop();
+   g_signal_connect(theApp, "NSApplicationOpenFile", G_CALLBACK(deal_with_open), NULL);
+// Quit from Mac OS
+   g_signal_connect(theApp, "NSApplicationBlockTermination", G_CALLBACK(deal_with_quit), NULL);
+// use command key as accelerator
+//    gtk_accel_map_load("mac_accel_map"); // does not work for GtkToggleButton
 #endif
    home_string = getenv ("HOME");
-   file_path1 = malloc(sizeof(home_string) + 30);
+   file_path1 = malloc(sizeof(home_string) + 50);
    file_path2 = malloc(sizeof(home_string) + 50);
 
-#ifdef __APPLE__
+#ifdef MAC_INTEGRATION
    sprintf(file_path1, "%s/Library/Caches/BRP-PACU", home_string);
 #else
    sprintf(file_path1, "%s/.BRP_PACU", home_string);

@@ -1,4 +1,5 @@
 BRP-PACU for Mac OS X (Intel architecture only)
+Version 2.1.2 and higher require a 64-bit computer. For 32-bit computers, download and use Version 2.1.1.
 
 Web site
 _______________________________________
