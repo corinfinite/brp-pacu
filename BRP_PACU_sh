@@ -1,0 +1,36 @@
+#!/bin/bash
+
+name=$(basename "$0")
+echo $name
+
+dirn=$(dirname "$0")
+echo $dirn
+
+bundle=$(cd "$dirn/../../" && pwd)
+bundle_contents="$bundle"/Contents
+bundle_res="$bundle_contents"/Resources
+
+export PATH="$bundle_bin:$PATH"
+
+# Help fontconfig find its configuration file
+export FONTCONFIG_FILE="$bundle_res/fonts/fonts.conf"
+
+# Help gdk find its loader modules
+export GDK_PIXBUF_MODULE_FILE="$bundle_res/gdk-pixbuf/gdk-pixbuf.loaders"
+
+# Help pango find pangorc
+export PANGO_RC_FILE="$bundle_res/pango/pangorc"
+
+# Make temporary link to application
+LNDIR=/tmp/BRP21468/BRP-PACU.app
+if [ ! -e "$LNDIR/Contents/Resources/v$VERSION" ]; then
+rm -f "$LNDIR"
+mkdir -p /tmp/BRP21468
+chmod a+w /tmp/BRP21468
+ln -s "$bundle" "$LNDIR"
+fi
+
+# set the working directory to users home
+# cd ~/ > /dev/null
+
+exec "$bundle_contents/MacOS/BRP_PACU" 

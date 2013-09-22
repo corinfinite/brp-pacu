@@ -1,8 +1,7 @@
-testfft.o testfft.o: testfft.c /usr/local/include/fftw.h \
-  /usr/include/stdlib.h /usr/include/Availability.h \
-  /usr/include/AvailabilityInternal.h /usr/include/_types.h \
-  /usr/include/sys/_types.h /usr/include/sys/cdefs.h \
-  /usr/include/sys/_symbol_aliasing.h \
+testfft.o: testfft.c /usr/local/include/fftw.h /usr/include/stdlib.h \
+  /usr/include/Availability.h /usr/include/AvailabilityInternal.h \
+  /usr/include/_types.h /usr/include/sys/_types.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/_symbol_aliasing.h \
   /usr/include/sys/_posix_availability.h /usr/include/machine/_types.h \
   /usr/include/i386/_types.h /usr/include/sys/wait.h \
   /usr/include/sys/signal.h /usr/include/sys/appleapiopts.h \
@@ -14,9 +13,8 @@ testfft.o testfft.o: testfft.c /usr/local/include/fftw.h \
   /usr/include/libkern/_OSByteOrder.h \
   /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
   /usr/include/machine/types.h /usr/include/i386/types.h \
-  /usr/include/i386/_types.h /usr/include/stdio.h \
-  /usr/include/secure/_stdio.h /usr/include/secure/_common.h \
-  /usr/include/math.h main.h \
+  /usr/include/stdio.h /usr/include/secure/_stdio.h \
+  /usr/include/secure/_common.h /usr/include/math.h main.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdk.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkapplaunchcontext.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gio.h \
@@ -29,15 +27,12 @@ testfft.o testfft.o: testfft.c /usr/local/include/fftw.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gtypes.h \
   /Users/andreasjs/gtk/inst/lib/glib-2.0/include/glibconfig.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gmacros.h \
-  /usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/stddef.h \
-  /usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/limits.h \
-  /usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/syslimits.h \
-  /Applications/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1/include/limits.h \
-  /Applications/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1/include/syslimits.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/stddef.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/limits.h \
   /usr/include/limits.h /usr/include/machine/limits.h \
   /usr/include/i386/limits.h /usr/include/i386/_limits.h \
   /usr/include/sys/syslimits.h \
-  /usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/float.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/float.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gversionmacros.h \
   /usr/include/time.h /usr/include/_structs.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/garray.h \
@@ -45,7 +40,7 @@ testfft.o testfft.o: testfft.c /usr/local/include/fftw.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gthread.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gatomic.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gerror.h \
-  /usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/stdarg.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/stdarg.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gquark.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gbacktrace.h \
   /usr/include/signal.h \
@@ -69,7 +64,6 @@ testfft.o testfft.o: testfft.c /usr/local/include/fftw.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gmem.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gnode.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/ghmac.h \
-  /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gchecksum.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/ghook.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/ghostutils.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/giochannel.h \
@@ -112,7 +106,8 @@ testfft.o testfft.o: testfft.c /usr/local/include/fftw.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/deprecated/gmain.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/deprecated/grel.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/deprecated/gthread.h \
-  /usr/include/pthread.h /usr/include/pthread_impl.h /usr/include/sched.h \
+  /usr/include/pthread.h /usr/include/pthread_impl.h \
+  /usr/include/sched.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gobject/gobject.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gobject/gtype.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gobject/gvalue.h \
@@ -219,8 +214,6 @@ testfft.o testfft.o: testfft.c /usr/local/include/fftw.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsettings.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsimpleaction.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsimpleactiongroup.h \
-  /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gactiongroup.h \
-  /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gactionmap.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsimpleasyncresult.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsimplepermission.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsocketclient.h \
@@ -258,7 +251,6 @@ testfft.o testfft.o: testfft.c /usr/local/include/fftw.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gdbusobjectmanagerclient.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gdbusobjectmanagerserver.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gdbusactiongroup.h \
-  /Users/andreasjs/gtk/inst/include/glib-2.0/gio/giotypes.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gremoteactiongroup.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gmenumodel.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gmenu.h \
@@ -296,7 +288,6 @@ testfft.o testfft.o: testfft.c /usr/local/include/fftw.h \
   /Users/andreasjs/gtk/inst/include/pango-1.0/pango/pango-utils.h \
   /Users/andreasjs/gtk/inst/lib/gtk-2.0/include/gdkconfig.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdisplay.h \
-  /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdktypes.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkevents.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkcolor.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdnd.h \
@@ -315,7 +306,6 @@ testfft.o testfft.o: testfft.c /usr/local/include/fftw.h \
   /Users/andreasjs/gtk/inst/include/gdk-pixbuf-2.0/gdk-pixbuf/gdk-pixbuf-enum-types.h \
   /Users/andreasjs/gtk/inst/include/pango-1.0/pango/pangocairo.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkcursor.h \
-  /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdisplay.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdisplaymanager.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdrawable.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkgc.h \
@@ -363,7 +353,6 @@ testfft.o testfft.o: testfft.c /usr/local/include/fftw.h \
   /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkobjectfactory.h \
   /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkplug.h \
   /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkregistry.h \
-  /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkobjectfactory.h \
   /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkrelation.h \
   /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkrelationset.h \
   /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkselection.h \
@@ -633,8 +622,6 @@ testfft.o testfft.o: testfft.c /usr/local/include/fftw.h \
 
 /usr/include/i386/types.h:
 
-/usr/include/i386/_types.h:
-
 /usr/include/stdio.h:
 
 /usr/include/secure/_stdio.h:
@@ -669,15 +656,9 @@ main.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gmacros.h:
 
-/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/stddef.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/stddef.h:
 
-/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/limits.h:
-
-/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/syslimits.h:
-
-/Applications/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1/include/limits.h:
-
-/Applications/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1/include/syslimits.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/limits.h:
 
 /usr/include/limits.h:
 
@@ -689,7 +670,7 @@ main.h:
 
 /usr/include/sys/syslimits.h:
 
-/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/float.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/float.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gversionmacros.h:
 
@@ -707,7 +688,7 @@ main.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gerror.h:
 
-/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/stdarg.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/stdarg.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gquark.h:
 
@@ -754,8 +735,6 @@ main.h:
 /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gnode.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/glib/ghmac.h:
-
-/Users/andreasjs/gtk/inst/include/glib-2.0/glib/gchecksum.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/glib/ghook.h:
 
@@ -1063,10 +1042,6 @@ main.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsimpleactiongroup.h:
 
-/Users/andreasjs/gtk/inst/include/glib-2.0/gio/gactiongroup.h:
-
-/Users/andreasjs/gtk/inst/include/glib-2.0/gio/gactionmap.h:
-
 /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsimpleasyncresult.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsimplepermission.h:
@@ -1140,8 +1115,6 @@ main.h:
 /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gdbusobjectmanagerserver.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gdbusactiongroup.h:
-
-/Users/andreasjs/gtk/inst/include/glib-2.0/gio/giotypes.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gremoteactiongroup.h:
 
@@ -1217,8 +1190,6 @@ main.h:
 
 /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdisplay.h:
 
-/Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdktypes.h:
-
 /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkevents.h:
 
 /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkcolor.h:
@@ -1254,8 +1225,6 @@ main.h:
 /Users/andreasjs/gtk/inst/include/pango-1.0/pango/pangocairo.h:
 
 /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkcursor.h:
-
-/Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdisplay.h:
 
 /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdisplaymanager.h:
 
@@ -1350,8 +1319,6 @@ main.h:
 /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkplug.h:
 
 /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkregistry.h:
-
-/Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkobjectfactory.h:
 
 /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkrelation.h:
 

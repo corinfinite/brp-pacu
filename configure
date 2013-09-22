@@ -595,6 +595,7 @@ PANGO_CFLAGS
 GTK_LIBS
 GTK_CFLAGS
 PKG_CONFIG_LIBDIR
+PKG_CONFIG_PATH
 PKG_CONFIG
 am__EXEEXT_FALSE
 am__EXEEXT_TRUE
@@ -644,7 +645,6 @@ am__isrc
 INSTALL_DATA
 INSTALL_SCRIPT
 INSTALL_PROGRAM
-PKG_CONFIG_PATH
 APPLE_FALSE
 APPLE_TRUE
 target_alias
@@ -1892,7 +1892,7 @@ else
   APPLE_FALSE=
 fi
 
-
+##AC_SUBST(PKG_CONFIG_PATH)
 #############################################
 ac_config_headers="$ac_config_headers config.h"
 

@@ -1,0 +1,8 @@
+#
+# pangorc file for uninstalled operation.
+# We set the path as ../modules, such that it works from any of
+# top level build subdirs.
+#
+
+[Pango]
+ModuleFiles = /tmp/BRP21468/BRP-PACU.app/Contents/Resources/pango/pango.modules

@@ -1,4 +1,4 @@
-Version 2.1.2 9/14/2013
+Version 2.1.2 9/22/2013
     Updated Mac version to work with 64-bit computers. For 32-bit computers, version 2.1.1 should be used. No change in functionality. File open and File save menus will be GTK-style.
 
 Version 2.1.1 1/20/2010

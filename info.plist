@@ -18,7 +18,7 @@
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>BRP_PACU</string>
+	<string>BRP_PACU_sh</string>
 	<key>CFBundleGetInfoString</key>
 	<string>VERSION © 2009 Brian Phelps</string>
 	<key>CFBundleIconFile</key>

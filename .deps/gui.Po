@@ -1,4 +1,4 @@
-gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
+gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
   /usr/include/sys/_symbol_aliasing.h \
   /usr/include/sys/_posix_availability.h /usr/include/Availability.h \
   /usr/include/AvailabilityInternal.h /usr/include/_types.h \
@@ -8,18 +8,14 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
   /System/Library/Frameworks/CoreFoundation.framework/Headers/CoreFoundation.h \
   /usr/include/sys/types.h /usr/include/sys/appleapiopts.h \
   /usr/include/machine/types.h /usr/include/i386/types.h \
-  /usr/include/i386/_types.h /usr/include/machine/endian.h \
-  /usr/include/i386/endian.h /usr/include/sys/_endian.h \
-  /usr/include/libkern/_OSByteOrder.h \
+  /usr/include/machine/endian.h /usr/include/i386/endian.h \
+  /usr/include/sys/_endian.h /usr/include/libkern/_OSByteOrder.h \
   /usr/include/libkern/i386/_OSByteOrder.h /usr/include/sys/_structs.h \
-  /usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/stdarg.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/stdarg.h \
   /usr/include/assert.h /usr/include/ctype.h /usr/include/runetype.h \
   /usr/include/errno.h /usr/include/sys/errno.h \
-  /usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/float.h \
-  /usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/limits.h \
-  /usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/syslimits.h \
-  /Applications/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1/include/limits.h \
-  /Applications/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1/include/syslimits.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/float.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/limits.h \
   /usr/include/limits.h /usr/include/machine/limits.h \
   /usr/include/i386/limits.h /usr/include/i386/_limits.h \
   /usr/include/sys/syslimits.h /usr/include/locale.h \
@@ -28,16 +24,19 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
   /usr/include/machine/signal.h /usr/include/i386/signal.h \
   /usr/include/i386/_structs.h /usr/include/machine/_structs.h \
   /usr/include/mach/i386/_structs.h \
-  /usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/stddef.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/stddef.h \
   /usr/include/stdlib.h /usr/include/sys/wait.h \
-  /usr/include/sys/resource.h /usr/include/alloca.h /usr/include/string.h \
-  /usr/include/strings.h /usr/include/secure/_string.h \
-  /usr/include/time.h /usr/include/_structs.h \
+  /usr/include/sys/resource.h /usr/include/alloca.h \
+  /usr/include/string.h /usr/include/strings.h \
+  /usr/include/secure/_string.h /usr/include/time.h \
+  /usr/include/_structs.h /usr/include/inttypes.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/stdint.h \
+  /usr/include/stdint.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/stdbool.h \
   /System/Library/Frameworks/CoreFoundation.framework/Headers/CFBase.h \
-  /usr/include/TargetConditionals.h /usr/include/stdint.h \
-  /usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/stdbool.h \
-  /usr/include/Block.h /usr/include/AvailabilityMacros.h \
-  /usr/include/MacTypes.h /usr/include/ConditionalMacros.h \
+  /usr/include/TargetConditionals.h /usr/include/Block.h \
+  /usr/include/AvailabilityMacros.h /usr/include/MacTypes.h \
+  /usr/include/ConditionalMacros.h \
   /System/Library/Frameworks/CoreFoundation.framework/Headers/CFArray.h \
   /System/Library/Frameworks/CoreFoundation.framework/Headers/CFBag.h \
   /System/Library/Frameworks/CoreFoundation.framework/Headers/CFBinaryHeap.h \
@@ -83,7 +82,8 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
   /usr/include/dispatch/time.h /usr/include/mach/clock_types.h \
   /usr/include/mach/time_value.h /usr/include/dispatch/queue.h \
   /usr/include/dispatch/source.h /usr/include/mach/message.h \
-  /usr/include/mach/kern_return.h /usr/include/mach/machine/kern_return.h \
+  /usr/include/mach/kern_return.h \
+  /usr/include/mach/machine/kern_return.h \
   /usr/include/mach/i386/kern_return.h /usr/include/dispatch/group.h \
   /usr/include/dispatch/semaphore.h /usr/include/dispatch/once.h \
   /usr/include/dispatch/data.h /usr/include/dispatch/io.h \
@@ -141,7 +141,6 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gmem.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gnode.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/ghmac.h \
-  /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gchecksum.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/ghook.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/ghostutils.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/giochannel.h \
@@ -184,7 +183,8 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/deprecated/gmain.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/deprecated/grel.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/glib/deprecated/gthread.h \
-  /usr/include/pthread.h /usr/include/pthread_impl.h /usr/include/sched.h \
+  /usr/include/pthread.h /usr/include/pthread_impl.h \
+  /usr/include/sched.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gobject/gobject.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gobject/gtype.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gobject/gvalue.h \
@@ -288,8 +288,6 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsettings.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsimpleaction.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsimpleactiongroup.h \
-  /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gactiongroup.h \
-  /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gactionmap.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsimpleasyncresult.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsimplepermission.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsocketclient.h \
@@ -327,7 +325,6 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gdbusobjectmanagerclient.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gdbusobjectmanagerserver.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gdbusactiongroup.h \
-  /Users/andreasjs/gtk/inst/include/glib-2.0/gio/giotypes.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gremoteactiongroup.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gmenumodel.h \
   /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gmenu.h \
@@ -365,7 +362,6 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
   /Users/andreasjs/gtk/inst/include/pango-1.0/pango/pango-utils.h \
   /Users/andreasjs/gtk/inst/lib/gtk-2.0/include/gdkconfig.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdisplay.h \
-  /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdktypes.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkevents.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkcolor.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdnd.h \
@@ -384,7 +380,6 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
   /Users/andreasjs/gtk/inst/include/gdk-pixbuf-2.0/gdk-pixbuf/gdk-pixbuf-enum-types.h \
   /Users/andreasjs/gtk/inst/include/pango-1.0/pango/pangocairo.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkcursor.h \
-  /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdisplay.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdisplaymanager.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdrawable.h \
   /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkgc.h \
@@ -437,7 +432,6 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
   /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkobjectfactory.h \
   /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkplug.h \
   /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkregistry.h \
-  /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkobjectfactory.h \
   /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkrelation.h \
   /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkrelationset.h \
   /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkselection.h \
@@ -687,8 +681,6 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
 
 /usr/include/i386/types.h:
 
-/usr/include/i386/_types.h:
-
 /usr/include/machine/endian.h:
 
 /usr/include/i386/endian.h:
@@ -701,7 +693,7 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
 
 /usr/include/sys/_structs.h:
 
-/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/stdarg.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/stdarg.h:
 
 /usr/include/assert.h:
 
@@ -713,15 +705,9 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
 
 /usr/include/sys/errno.h:
 
-/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/float.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/float.h:
 
-/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/limits.h:
-
-/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/syslimits.h:
-
-/Applications/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1/include/limits.h:
-
-/Applications/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1/include/syslimits.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/limits.h:
 
 /usr/include/limits.h:
 
@@ -755,7 +741,7 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
 
 /usr/include/mach/i386/_structs.h:
 
-/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/stddef.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/stddef.h:
 
 /usr/include/stdlib.h:
 
@@ -775,13 +761,17 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
 
 /usr/include/_structs.h:
 
-/System/Library/Frameworks/CoreFoundation.framework/Headers/CFBase.h:
+/usr/include/inttypes.h:
 
-/usr/include/TargetConditionals.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/stdint.h:
 
 /usr/include/stdint.h:
 
-/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/include/stdbool.h:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/5.0/include/stdbool.h:
+
+/System/Library/Frameworks/CoreFoundation.framework/Headers/CFBase.h:
+
+/usr/include/TargetConditionals.h:
 
 /usr/include/Block.h:
 
@@ -1028,8 +1018,6 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
 /Users/andreasjs/gtk/inst/include/glib-2.0/glib/gnode.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/glib/ghmac.h:
-
-/Users/andreasjs/gtk/inst/include/glib-2.0/glib/gchecksum.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/glib/ghook.h:
 
@@ -1327,10 +1315,6 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsimpleactiongroup.h:
 
-/Users/andreasjs/gtk/inst/include/glib-2.0/gio/gactiongroup.h:
-
-/Users/andreasjs/gtk/inst/include/glib-2.0/gio/gactionmap.h:
-
 /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsimpleasyncresult.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gsimplepermission.h:
@@ -1404,8 +1388,6 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
 /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gdbusobjectmanagerserver.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gdbusactiongroup.h:
-
-/Users/andreasjs/gtk/inst/include/glib-2.0/gio/giotypes.h:
 
 /Users/andreasjs/gtk/inst/include/glib-2.0/gio/gremoteactiongroup.h:
 
@@ -1481,8 +1463,6 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
 
 /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdisplay.h:
 
-/Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdktypes.h:
-
 /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkevents.h:
 
 /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkcolor.h:
@@ -1518,8 +1498,6 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
 /Users/andreasjs/gtk/inst/include/pango-1.0/pango/pangocairo.h:
 
 /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkcursor.h:
-
-/Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdisplay.h:
 
 /Users/andreasjs/gtk/inst/include/gtk-2.0/gdk/gdkdisplaymanager.h:
 
@@ -1624,8 +1602,6 @@ gui.o gui.o: gui.c /usr/include/stdio.h /usr/include/sys/cdefs.h \
 /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkplug.h:
 
 /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkregistry.h:
-
-/Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkobjectfactory.h:
 
 /Users/andreasjs/gtk/inst/include/atk-1.0/atk/atkrelation.h:
 

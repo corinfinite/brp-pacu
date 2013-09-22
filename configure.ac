@@ -8,7 +8,7 @@ if [[ `uname` = 'Darwin' ]]
   fi
 fi
 AM_CONDITIONAL([APPLE], [ test `uname` = 'Darwin'])
-AC_SUBST(PKG_CONFIG_PATH)
+##AC_SUBST(PKG_CONFIG_PATH)
 #############################################
 AC_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE

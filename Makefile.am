@@ -19,7 +19,8 @@ pkgconfigdir = $(libdir)/pkgconfig
 BRP_PACU_SOURCES = testfft.c gui.c BRP_PACU.c 
 include_HEADERS = testfft.h gui.h main.h
 EXTRA_DIST = BRP_PACU.ui sinc.png info.plist \
- sinc.icns sinc.xcf brpData.icns README-Mac.txt INSTALL-Mac.txt movelibraries.sh
+ sinc.icns sinc.xcf brpData.icns README-Mac.txt INSTALL-Mac.txt movelibraries.sh \
+ pangorc pango.modules BRP_PACU_sh
 AM_CFLAGS =  -O2 -Wall -g -arch x86_64 `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gdk-2.0` `pkg-config --cflags glib-2.0`  `pkg-config --cflags  gtkdatabox` -DDATADIR=\"$(pkgdatadir)\" -lgthread-2.0
 LIBS =   -lm  -lfftw  `pkg-config --libs  gtk+-2.0` `pkg-config --libs  gdk-2.0` `pkg-config --libs glib-2.0` `pkg-config --libs gthread-2.0` `pkg-config --libs gtkdatabox`  `pkg-config --libs jack` 
 pkgdata_DATA = BRP_PACU.ui sinc.png
@@ -37,8 +38,8 @@ AM_LDFLAGS=-framework Carbon
 AM_CFLAGS += `pkg-config --cflags gtk-mac-integration`
 LIBS += `pkg-config --libs gdk-quartz-2.0` `pkg-config --libs gtk-mac-integration`
 $(MACCONTENTS): BRP_PACU.ui AUTHORS COPYING COPYING.LESSER NEWS ChangeLog README-Mac.txt sinc.icns brpData.icns info.plist
-	mkdir -p $(MACRESOURCES)/en.lproj $(MACCONTENTS)/MacOS $(MACFRAMEWORKS)
-	cp -fp BRP_PACU.ui sinc.icns brpData.icns sinc.png $(MACRESOURCES)
+	mkdir -p $(MACRESOURCES)/en.lproj $(MACRESOURCES)/pango $(MACRESOURCES)/pango/modules $(MACCONTENTS)/MacOS $(MACFRAMEWORKS)
+	cp -fp BRP_PACU.ui sinc.icns brpData.icns $(MACRESOURCES)
 	sed -e 's/GDK_CONTROL_MASK/GDK_META_MASK/' BRP_PACU.ui > $(MACRESOURCES)/BRP_PACU.ui
 	cp -fp AUTHORS COPYING COPYING.LESSER NEWS ChangeLog README-Mac.txt $(MACRESOURCES)/en.lproj
 	sed -e 's/VERSION/$(VERSION)/' < info.plist > $(MACCONTENTS)/info.plist
@@ -47,6 +48,9 @@ $(MACCONTENTS): BRP_PACU.ui AUTHORS COPYING COPYING.LESSER NEWS ChangeLog README
 macapplication: $(MACAPPLICATION)
 $(MACAPPLICATION): $(bin_PROGRAMS) $(MACCONTENTS) 
 	cp $(bin_PROGRAMS) $(MACEXECUTABLE)
+	cp BRP_PACU_sh $(MACCONTENTS)/MacOS
+	cp pangorc pango.modules $(MACRESOURCES)/pango
+	cp `pkg-config --variable=libdir gtk+-2.0`/pango/1.8.0/modules/pango-basic-coretext.so $(MACRESOURCES)/pango/modules
 # Change install names to be relative to the executable in the application
 	./movelibraries.sh $(MACAPPLICATION) `pkg-config --variable=libdir gtk+-2.0`
 	install_name_tool \
