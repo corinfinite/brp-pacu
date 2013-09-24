@@ -1,3 +1,8 @@
+2013-09-22 Andreas Schwab <andreasjs@users.sourceforge.net>
+* Upadated Mac version for x86_64
+* Use of GtkosxApplication
+* Use of a launch script BRP_PACU_sh to find Pango resources
+
 2010-01-20 Andreas Schwab <andreasjs@users.sourceforge.net>
 * gui.glade replaced by BRP_PACU.ui to be processed by GTKBuilder
 * gui.c 

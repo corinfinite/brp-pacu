@@ -44,12 +44,11 @@
     <property name="text">Brian's Reasonably Priced Professional Audio Configuration Utility
 
 * Copyright (C) 2007-2008 Brian Phelps(lm317t@gmail.com)
-* Macintosh application Copyright (C) 2009 Andreas Schwab
+* Macintosh application Copyright (C) 2009-2013 Andreas Schwab
 * Macintosh synchronization Copyright (C) 2007 Pioneer Research Center USA, Inc.
 * Macintosh integration Copyright (C) 2007, 2008 Imendio AB
 * This program is based on the following libraries 
 * FFTW: Copyright (c) 1997-1999, 2003 Massachusetts Institute of Technology
-* libglade: Copyright (C) 1998-2002  James Henstridge
 * gtkdatabox: Copyright (C) 1998 - 2008  Dr. Roland Bock
 * 
 *  This program is free software; you can redistribute it and/or modify
@@ -75,8 +74,7 @@ Interested in contributing?
 
 Please email me at lm317t@gmail.com
 
-I need someone to help me package it for Debian/Ubuntu! 
-Also a Redhat/Fedora rpm or any other packaging help would be much appreciated.</property>
+A Redhat/Fedora rpm or any other packaging help would be much appreciated.</property>
   </object>
   <object class="GtkUIManager" id="uimanager1">
     <ui>

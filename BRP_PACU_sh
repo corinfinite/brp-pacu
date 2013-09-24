@@ -1,36 +1,36 @@
 #!/bin/bash
 
+#locate the application bundle
 name=$(basename "$0")
 echo $name
 
 dirn=$(dirname "$0")
 echo $dirn
 
+#locate application bundle subdirectories
 bundle=$(cd "$dirn/../../" && pwd)
 bundle_contents="$bundle"/Contents
 bundle_res="$bundle_contents"/Resources
 
-export PATH="$bundle_bin:$PATH"
+#make temporary directories
+TMPDIR=`mktemp -d /tmp/BRPXXXXX`
+mkdir -p "$TMPDIR"/modules
 
-# Help fontconfig find its configuration file
-export FONTCONFIG_FILE="$bundle_res/fonts/fonts.conf"
+#create pango.modules file
+echo $TMPDIR'/modules/pango-basic-coretext.so BasicScriptEngineCoreText PangoEngineShape PangoRenderCoreText common:' > $TMPDIR/pango.modules
 
-# Help gdk find its loader modules
-export GDK_PIXBUF_MODULE_FILE="$bundle_res/gdk-pixbuf/gdk-pixbuf.loaders"
+#create pangorc file
+echo '[Pango]
+ModuleFiles = '$TMPDIR'/pango.modules' > $TMPDIR/pangorc
+
+#create links to modules
+ln -s  $bundle_res/pango/modules/* $TMPDIR/modules
 
 # Help pango find pangorc
-export PANGO_RC_FILE="$bundle_res/pango/pangorc"
+export PANGO_RC_FILE="$TMPDIR/pangorc"
 
-# Make temporary link to application
-LNDIR=/tmp/BRP21468/BRP-PACU.app
-if [ ! -e "$LNDIR/Contents/Resources/v$VERSION" ]; then
-rm -f "$LNDIR"
-mkdir -p /tmp/BRP21468
-chmod a+w /tmp/BRP21468
-ln -s "$bundle" "$LNDIR"
-fi
+#execute PRP-PACU binary
+"$bundle_contents/MacOS/BRP_PACU"
 
-# set the working directory to users home
-# cd ~/ > /dev/null
-
-exec "$bundle_contents/MacOS/BRP_PACU" 
+#clean up
+rm -rf $TMPDIR 

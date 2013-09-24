@@ -15,7 +15,7 @@ http://www.jackosx.com/
 Instructions
 _______________________________________
 To install BRP-PACU, drag the BRP-PACU icon into the Application folder.
-The double-click on BRP-PACU to start.
+This application is not code-signed. To open it for the first time in Lion or Mountain-Lion with the Gatekeeper activated, right-click (or control-click) on the icon, chose "Open", and then "Open" again. 
 
 If Jack-OS X is not present or not running, a warning will appear, and Jack Pilot will open. CLick on "Start" on the JackPilot window, then on "Continue"" on the warning box.
 
@@ -51,9 +51,9 @@ What if I try it and it doesn't work?
 
 Why is there no documentation?
 - Channel 1 is the output of the system we are observing (measured), channel 2 is the input (reference).  
-   You also need a decent calibrated omnidrectional microphone (reasonably flat 20Hz-20kHz) and either a
+   You also need a decent calibrated omnidirectional microphone (reasonably flat 20Hz-20kHz) and either a
    USB-Preamp like the 2-channel M-Audio, or a mixer with a 30dB pad or so going into the laptop mic input.  No Pad is
-   neccessary if you are lucky enough to have a laptop or PC with a line input.  The headphone out will have the pink noise.
+   necessary if you are lucky enough to have a laptop or PC with a line input.  The headphone out will have the pink noise.
 
 How do you handle a delay between measured and referenced signals?
 - There is an automatic delay finding button.  You can also insert a custom delay if you want.

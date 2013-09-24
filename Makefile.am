@@ -1,5 +1,5 @@
 # Copyright (C) 2007-2008 Brian Phelps(lm317t@gmail.com)
-# Macintosh implementation Copyright (C) 2009 Andreas Schwab
+# Macintosh implementation Copyright (C) 2009-2013 Andreas Schwab
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation; either version 2 of the License, or
@@ -19,8 +19,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 BRP_PACU_SOURCES = testfft.c gui.c BRP_PACU.c 
 include_HEADERS = testfft.h gui.h main.h
 EXTRA_DIST = BRP_PACU.ui sinc.png info.plist \
- sinc.icns sinc.xcf brpData.icns README-Mac.txt INSTALL-Mac.txt movelibraries.sh \
- pangorc pango.modules BRP_PACU_sh
+ sinc.icns sinc.xcf brpData.icns README-Mac.txt INSTALL-Mac.txt movelibraries.sh BRP_PACU_sh
 AM_CFLAGS =  -O2 -Wall -g -arch x86_64 `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gdk-2.0` `pkg-config --cflags glib-2.0`  `pkg-config --cflags  gtkdatabox` -DDATADIR=\"$(pkgdatadir)\" -lgthread-2.0
 LIBS =   -lm  -lfftw  `pkg-config --libs  gtk+-2.0` `pkg-config --libs  gdk-2.0` `pkg-config --libs glib-2.0` `pkg-config --libs gthread-2.0` `pkg-config --libs gtkdatabox`  `pkg-config --libs jack` 
 pkgdata_DATA = BRP_PACU.ui sinc.png
@@ -33,23 +32,23 @@ MACCONTENTS=$(MACAPPLICATION)/Contents
 MACRESOURCES=$(MACCONTENTS)/Resources
 MACFRAMEWORKS=$(MACCONTENTS)/Frameworks
 MACEXECUTABLE=$(MACCONTENTS)/MacOS/BRP_PACU
-MACDISK=BRP-PACU-mac-$(VERSION)
+MACDISK=BRP-PACU-mac-$(VERSION).dmg
 AM_LDFLAGS=-framework Carbon
 AM_CFLAGS += `pkg-config --cflags gtk-mac-integration`
 LIBS += `pkg-config --libs gdk-quartz-2.0` `pkg-config --libs gtk-mac-integration`
-$(MACCONTENTS): BRP_PACU.ui AUTHORS COPYING COPYING.LESSER NEWS ChangeLog README-Mac.txt sinc.icns brpData.icns info.plist
+$(MACCONTENTS): BRP_PACU.ui AUTHORS COPYING COPYING.LESSER NEWS README-Mac.txt sinc.icns brpData.icns info.plist
 	mkdir -p $(MACRESOURCES)/en.lproj $(MACRESOURCES)/pango $(MACRESOURCES)/pango/modules $(MACCONTENTS)/MacOS $(MACFRAMEWORKS)
 	cp -fp BRP_PACU.ui sinc.icns brpData.icns $(MACRESOURCES)
 	sed -e 's/GDK_CONTROL_MASK/GDK_META_MASK/' BRP_PACU.ui > $(MACRESOURCES)/BRP_PACU.ui
-	cp -fp AUTHORS COPYING COPYING.LESSER NEWS ChangeLog README-Mac.txt $(MACRESOURCES)/en.lproj
+	cp -fp AUTHORS COPYING COPYING.LESSER NEWS README-Mac.txt $(MACRESOURCES)/en.lproj
 	sed -e 's/VERSION/$(VERSION)/' < info.plist > $(MACCONTENTS)/info.plist
 	echo APPLBRPP > $(MACCONTENTS)/PkgInfo
 	cp -fRP `pkg-config --variable=libdir gtkdatabox`/libgtkdatabox*.dylib $(MACFRAMEWORKS)
+	touch $(MACCONTENTS)
 macapplication: $(MACAPPLICATION)
 $(MACAPPLICATION): $(bin_PROGRAMS) $(MACCONTENTS) 
 	cp $(bin_PROGRAMS) $(MACEXECUTABLE)
 	cp BRP_PACU_sh $(MACCONTENTS)/MacOS
-	cp pangorc pango.modules $(MACRESOURCES)/pango
 	cp `pkg-config --variable=libdir gtk+-2.0`/pango/1.8.0/modules/pango-basic-coretext.so $(MACRESOURCES)/pango/modules
 # Change install names to be relative to the executable in the application
 	./movelibraries.sh $(MACAPPLICATION) `pkg-config --variable=libdir gtk+-2.0`
@@ -58,12 +57,12 @@ $(MACAPPLICATION): $(bin_PROGRAMS) $(MACCONTENTS)
 	  $(MACEXECUTABLE)
 	touch $(MACAPPLICATION)
 # create distribution disk image
-macdist: $(MACDISK).dmg
-$(MACDISK).dmg: $(MACAPPLICATION) AUTHORS COPYING COPYING.LESSER NEWS ChangeLog macdistdir README-Mac.txt
-	test -z $(MACDISK).dmg || rm -f $(MACDISK).dmg
-	cp -fp AUTHORS COPYING COPYING.LESSER NEWS ChangeLog macdistdir
+macdist: $(MACDISK)
+$(MACDISK): $(MACAPPLICATION) AUTHORS COPYING COPYING.LESSER NEWS macdistdir README-Mac.txt
+	test -z $(MACDISK) || rm -f $(MACDISK)
+	cp -fp AUTHORS COPYING COPYING.LESSER NEWS macdistdir
 	cp -fp README-Mac.txt macdistdir/README
-	hdiutil create -srcfolder macdistdir -fs HFS+J -volname $(MACDISK) $(MACDISK).dmg
+	hdiutil create -srcfolder macdistdir -fs HFS+J -volname BRP-PACU-mac-$(VERSION) $(MACDISK)
 clean-local:
 	-rm -rf macdistdir
 #############################################
