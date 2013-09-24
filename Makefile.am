@@ -36,7 +36,7 @@ MACDISK=BRP-PACU-mac-$(VERSION).dmg
 AM_LDFLAGS=-framework Carbon
 AM_CFLAGS += `pkg-config --cflags gtk-mac-integration`
 LIBS += `pkg-config --libs gdk-quartz-2.0` `pkg-config --libs gtk-mac-integration`
-$(MACCONTENTS): BRP_PACU.ui AUTHORS COPYING COPYING.LESSER NEWS README-Mac.txt sinc.icns brpData.icns info.plist
+$(MACCONTENTS): BRP_PACU.ui AUTHORS COPYING COPYING.LESSER NEWS README-Mac.txt sinc.icns brpData.icns info.plist BRP_PACU_sh
 	mkdir -p $(MACRESOURCES)/en.lproj $(MACRESOURCES)/pango $(MACRESOURCES)/pango/modules $(MACCONTENTS)/MacOS $(MACFRAMEWORKS)
 	cp -fp BRP_PACU.ui sinc.icns brpData.icns $(MACRESOURCES)
 	sed -e 's/GDK_CONTROL_MASK/GDK_META_MASK/' BRP_PACU.ui > $(MACRESOURCES)/BRP_PACU.ui

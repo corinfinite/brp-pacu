@@ -24,7 +24,7 @@ echo '[Pango]
 ModuleFiles = '$TMPDIR'/pango.modules' > $TMPDIR/pangorc
 
 #create links to modules
-ln -s  $bundle_res/pango/modules/* $TMPDIR/modules
+ln -s  "$bundle_res"/pango/modules/* $TMPDIR/modules
 
 # Help pango find pangorc
 export PANGO_RC_FILE="$TMPDIR/pangorc"
