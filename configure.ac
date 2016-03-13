@@ -11,7 +11,7 @@ AM_CONDITIONAL([APPLE], [ test `uname` = 'Darwin'])
 ##AC_SUBST(PKG_CONFIG_PATH)
 #############################################
 AC_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([foreign])
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_CONFIG_FILES([Makefile])
@@ -24,4 +24,3 @@ PKG_CHECK_MODULES(CAIRO, cairo,,exit)
 #PKG_CHECK_MODULES(GDK-2.0, gdk-2.0,,exit)
 PKG_CHECK_MODULES(GTKDATABOX, gtkdatabox,,AC_MSG_ERROR([please install gtkdatabox development version.]))
 PKG_CHECK_MODULES(JACK, jack,,AC_MSG_ERROR([please install the jack development version.]))
-

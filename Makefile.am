@@ -16,14 +16,14 @@
 
 bin_PROGRAMS = BRP_PACU
 pkgconfigdir = $(libdir)/pkgconfig
-BRP_PACU_SOURCES = testfft.c gui.c BRP_PACU.c 
+BRP_PACU_SOURCES = testfft.c gui.c BRP_PACU.c
 include_HEADERS = testfft.h gui.h main.h
 EXTRA_DIST = BRP_PACU.ui sinc.png info.plist \
  sinc.icns sinc.xcf brpData.icns README-Mac.txt INSTALL-Mac.txt movelibraries.sh BRP_PACU_sh
-AM_CFLAGS =  -O2 -Wall -g -arch x86_64 `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gdk-2.0` `pkg-config --cflags glib-2.0`  `pkg-config --cflags  gtkdatabox` -DDATADIR=\"$(pkgdatadir)\" -lgthread-2.0
-LIBS =   -lm  -lfftw  `pkg-config --libs  gtk+-2.0` `pkg-config --libs  gdk-2.0` `pkg-config --libs glib-2.0` `pkg-config --libs gthread-2.0` `pkg-config --libs gtkdatabox`  `pkg-config --libs jack` 
+AM_CFLAGS =  -O2 -Wall -g `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gdk-2.0` `pkg-config --cflags glib-2.0`  `pkg-config --cflags  gtkdatabox` -DDATADIR=\"$(pkgdatadir)\" -lgthread-2.0
+LIBS =   -lm  -lfftw  `pkg-config --libs  gtk+-2.0` `pkg-config --libs  gdk-2.0` `pkg-config --libs glib-2.0` `pkg-config --libs gthread-2.0` `pkg-config --libs gtkdatabox`  `pkg-config --libs jack`
 pkgdata_DATA = BRP_PACU.ui sinc.png
-AUTOMAKE_OPTIONS = --foreign
+AUTOMAKE_OPTIONS = foreign
 #########  Macintosh implementation #########
 if APPLE
 PKG_CONFIG_PATH+=@PKG_CONFIG_PATH@
@@ -47,7 +47,7 @@ $(MACCONTENTS): BRP_PACU.ui AUTHORS COPYING COPYING.LESSER NEWS README-Mac.txt s
 	cp -fRP `pkg-config --variable=libdir gtkdatabox`/libgtkdatabox*.dylib $(MACFRAMEWORKS)
 	touch $(MACCONTENTS)
 macapplication: $(MACAPPLICATION)
-$(MACAPPLICATION): $(bin_PROGRAMS) $(MACCONTENTS) 
+$(MACAPPLICATION): $(bin_PROGRAMS) $(MACCONTENTS)
 	cp $(bin_PROGRAMS) $(MACEXECUTABLE)
 	cp BRP_PACU_sh $(MACCONTENTS)/MacOS
 	cp `pkg-config --variable=libdir gtk+-2.0`/pango/1.8.0/modules/pango-basic-coretext.so $(MACRESOURCES)/pango/modules

@@ -1,3 +1,5 @@
+/BRP_PACU
+
 # Object files
 *.o
 *.ko
@@ -49,3 +51,6 @@ Makefile.in
 /install-sh
 /missing
 /stamp-h1
+/config.log
+/Makefile
+.deps/
