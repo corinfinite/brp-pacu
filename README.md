@@ -33,9 +33,9 @@ To compile BRP-PACU on Linux, this must be installed:
 
 If the source code comes directly from the GIT repository, instead of a release in a tar ball, you must run “aclocal && autoconf && automake” before running “./configure”.
 
-Details about the actual compilation procedure (run ./configure, then make, then sudo make install) are found in the file “INSTALL”
+This is followed by the traditional "/configure", "make", and "sudo make install" build process. Details are found in the file “INSTALL”
 
-A binary pakcage for Debian can be found at http://packages.debian.org/sid/brp-pacu .
+A binary package for Debian can be found at http://packages.debian.org/sid/brp-pacu .
 
 When BRP-PACU is installed, the executable is named “BRP_PACU”. It can be started from the Run dialog (that comes up when pressing ALt-F2), or from a command line which will give extra debugging information.
 
