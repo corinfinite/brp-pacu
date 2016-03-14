@@ -19,9 +19,9 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+#include "main.h"
 #include <fftw.h>
 #include <math.h>
-#include "main.h"
 #define DELAY_BUFFER_SIZE 44100
 #define N_FFT 8192
 #define RATIO 2
@@ -29,23 +29,22 @@
 #define BUFF_NUM 32
 #define FSAMP 44100
 #define SCALEF 32765
-#define NYQUIST FSAMP/2
-#define PLOT_PTS (N_FFT)/RATIO
-#define FBIN (float) ((float) NYQUIST)/( ((float)PLOT_PTS)/1.0)
+#define NYQUIST FSAMP / 2
+#define PLOT_PTS (N_FFT) / RATIO
+#define FBIN (float)((float)NYQUIST) / (((float)PLOT_PTS) / 1.0)
 #define BUFSIZE 256
-#define B_N N_FFT/BUFSIZE
+#define B_N N_FFT / BUFSIZE
 
 #ifndef TESTFFT_H
 #define TESTFFT_H
 
-struct AUDIO_SESSION
-{
-   fftw_plan plan;
-   short * buffer_data;
-   double * fft_returned;
+struct AUDIO_SESSION {
+    fftw_plan plan;
+    short *buffer_data;
+    double *fft_returned;
 };
 
-int fft_capture(struct FFT_Frame * session);
+int fft_capture(struct FFT_Frame *session);
 
-int impulse_capture(struct FFT_Frame * session);
+int impulse_capture(struct FFT_Frame *session);
 #endif

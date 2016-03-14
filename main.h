@@ -18,37 +18,36 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
 */
+#include <fftw.h>
 #include <gdk/gdk.h>
+#include <gtk/gtk.h>
 #include <gtk/gtkadjustment.h>
-#include <gtk/gtkwidget.h>
 #include <gtk/gtkmain.h>
 #include <gtk/gtksignal.h>
-#include <gtk/gtk.h>
-#include <fftw.h>
+#include <gtk/gtkwidget.h>
 #include <math.h>
 #define pi 3.141592653
 
 #ifndef MAIN_H
 #define MAIN_H
 
-struct FFT_Frame
-{
-   fftw_plan plan;      // FFT Plan
-   fftw_plan reverse_plan;      // FFT Plan
-   short * prewin_buffer_data_1;  // Data from channel
-   short * prewin_buffer_data_2;
-   short * buffer_data_1;  // data from channel after window function
-   short * buffer_data_2; // data from channel after window function
-   double * fft_returned_1;
-   double * fft_returned_2;
-   double * rfft_returned_1;
-   float volume_pink;
-   char pink_muted;
-   //////////////////
-   short * delay;
-   int  delay_size;
-   char find_delay;
-   char find_impulse;
+struct FFT_Frame {
+    fftw_plan plan;              // FFT Plan
+    fftw_plan reverse_plan;      // FFT Plan
+    short *prewin_buffer_data_1; // Data from channel
+    short *prewin_buffer_data_2;
+    short *buffer_data_1; // data from channel after window function
+    short *buffer_data_2; // data from channel after window function
+    double *fft_returned_1;
+    double *fft_returned_2;
+    double *rfft_returned_1;
+    float volume_pink;
+    char pink_muted;
+    //////////////////
+    short *delay;
+    int delay_size;
+    char find_delay;
+    char find_impulse;
 };
 
 #endif

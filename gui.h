@@ -19,9 +19,8 @@
 *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <gtk/gtk.h>
 #include "main.h"
-
+#include <gtk/gtk.h>
 
 #ifndef GUI_H
 #define GUI_H
@@ -34,9 +33,8 @@
 
 #define N_BUFF 5
 
+gboolean gui_idle_func(struct FFT_Frame *data);
 
-gboolean gui_idle_func (struct FFT_Frame * data);
-
-gboolean create_gui (struct FFT_Frame * data, char* datadir);
+gboolean create_gui(struct FFT_Frame *data, char *datadir);
 
 #endif
