@@ -479,15 +479,18 @@ int main(int argc, char *argv[]) {
     b0 = 0;
     b1 = 0;
     b2 = 0;
-    white = 0;
     b3 = 0;
     b4 = 0;
     b5 = 0;
     b6 = 0;
-    g_thread_init(NULL);
+    white = 0;
+    printf("BLAH\n");
     gtk_init(&argc, &argv);
     int ierr = -1;
-    thread_mutex = g_mutex_new();
+
+    thread_mutex = (GMutex *) malloc(sizeof(GMutex));
+    g_mutex_init(thread_mutex);
+
     char *jackErrMessage[8] = {"OK",
                                "Unable to connect to JACK server",
                                "No more JACK ports available",
