@@ -51,9 +51,9 @@ float scale_it = 0.98;
 float volume = 0.5;
 GMutex *thread_mutex;
 
-jack_port_t *input_port1;
-jack_port_t *input_port2;
-jack_port_t *output_port;
+jack_port_t *measured_input_port;
+jack_port_t *reference_input_port;
+jack_port_t *generator_output_port;
 jack_client_t *client;
 
 /* a simple state machine for this client */
@@ -80,9 +80,9 @@ int Fill_Buffer(jack_nframes_t nframes, void *arg) {
             if (client_state == Init)
                 client_state = Run;
 
-            in_buffer1 = jack_port_get_buffer(input_port1, nframes);
-            in_buffer2 = jack_port_get_buffer(input_port2, nframes);
-            out_buffer = jack_port_get_buffer(output_port, nframes);
+            in_buffer1 = jack_port_get_buffer(measured_input_port, nframes);
+            in_buffer2 = jack_port_get_buffer(reference_input_port, nframes);
+            out_buffer = jack_port_get_buffer(generator_output_port, nframes);
 
             for (k = 0; k < nframes; k++) {
                 white = ((float)(rand() % 10000) - 10000.0 / 2.0) / 999900.0;
@@ -402,15 +402,15 @@ int jack_init() {
 
     /* create two ports */
 
-    input_port1 = jack_port_register(client, "input1", JACK_DEFAULT_AUDIO_TYPE,
+    measured_input_port = jack_port_register(client, "Measured Signal", JACK_DEFAULT_AUDIO_TYPE,
                                      JackPortIsInput, 0);
-    input_port2 = jack_port_register(client, "input2", JACK_DEFAULT_AUDIO_TYPE,
+    reference_input_port = jack_port_register(client, "Reference Signal", JACK_DEFAULT_AUDIO_TYPE,
                                      JackPortIsInput, 0);
-    output_port = jack_port_register(client, "output", JACK_DEFAULT_AUDIO_TYPE,
+    generator_output_port = jack_port_register(client, "Generator Out", JACK_DEFAULT_AUDIO_TYPE,
                                      JackPortIsOutput, 0);
 
-    if ((input_port1 == NULL) || (input_port2 == NULL) ||
-        (output_port == NULL)) {
+    if ((measured_input_port == NULL) || (reference_input_port == NULL) ||
+        (generator_output_port == NULL)) {
         fprintf(stderr, "no more JACK ports available\n");
         return 2;
     }
@@ -438,17 +438,17 @@ int jack_init() {
         return 4;
     }
 
-    if (jack_connect(client, ports[0], jack_port_name(input_port1))) {
+    if (jack_connect(client, ports[0], jack_port_name(measured_input_port))) {
         fprintf(stderr, "cannot connect input ports\n");
         return 6;
     }
-    if (jack_connect(client, ports[1], jack_port_name(input_port2))) {
+    if (jack_connect(client, ports[1], jack_port_name(reference_input_port))) {
         fprintf(stderr, "cannot connect input ports\n");
         return 6;
     }
     // Connect the Pink Noise Output to the reference input.
-    if (jack_connect(client, jack_port_name(output_port),
-                     jack_port_name(input_port2))) {
+    if (jack_connect(client, jack_port_name(generator_output_port),
+                     jack_port_name(reference_input_port))) {
         fprintf(stderr, "cannot connect output ports\n");
         return 7;
     }
@@ -462,7 +462,7 @@ int jack_init() {
         return 5;
     }
     // Pink Noise Output
-    if (jack_connect(client, jack_port_name(output_port), ports[1])) {
+    if (jack_connect(client, jack_port_name(generator_output_port), ports[1])) {
         fprintf(stderr, "cannot connect output ports\n");
         return 7;
     }

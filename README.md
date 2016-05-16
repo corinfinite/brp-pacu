@@ -75,7 +75,7 @@ What if I try it and it doesn't work?
 - Email me and I can probably figure it out.  My email is lm317t@gmail.com.  Also try the mailing list, it should be working.
 
 Why is there no documentation?
-- Channel 1 is the output of the system we are observing (measured), channel 2 is the input (reference). You also need a decent calibrated omnidrectional microphone (reasonably flat 20Hz-20kHz) and either a USB-Preamp like the 2-channel M-Audio, or a mixer with a 30dB pad or so going into the laptop mic input.  No Pad is necessary if you are lucky enough to have a laptop or PC with a line input.  The headphone out will have the pink noise.
+- "Measured Signal" is the output of the system we are observing, "Reference Signal" is the input to the system we are observing. You also need a decent calibrated omnidrectional microphone (reasonably flat 20Hz-20kHz) and either a USB-Preamp like the 2-channel M-Audio, or a mixer with a 30dB pad or so going into the laptop mic input.  No Pad is necessary if you are lucky enough to have a laptop or PC with a line input.  The headphone out will have the pink noise.
 
 How do you handle a delay between measured and referenced signals?
 - There is an automatic delay finding button.  You can also insert a custom delay if you want.
