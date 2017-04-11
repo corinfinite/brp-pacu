@@ -18,7 +18,7 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-#include <fftw.h>
+#include <fftw3.h>
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 #include <gtk/gtkadjustment.h>
@@ -26,14 +26,23 @@
 #include <gtk/gtksignal.h>
 #include <gtk/gtkwidget.h>
 #include <math.h>
+#include <stdlib.h>
 #define pi 3.141592653
 
 #ifndef MAIN_H
 #define MAIN_H
 
+#define c_re(c) ((c)[0])
+#define c_im(c) ((c)[1])
+
 struct FFT_Frame {
-    fftw_plan plan;              // FFT Plan
+    fftw_plan plan1;              // FFT Plan
+    fftw_plan plan2;              // FFT Plan
     fftw_plan reverse_plan;      // FFT Plan
+    
+    fftw_complex *plan_buf1;
+    fftw_complex *plan_buf2;
+
     short *prewin_buffer_data_1; // Data from channel
     short *prewin_buffer_data_2;
     short *buffer_data_1; // data from channel after window function

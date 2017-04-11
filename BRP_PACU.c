@@ -217,7 +217,8 @@ static gboolean MyGTKFunction(struct FFT_Frame *frame_data) {
            N_FFT * sizeof(short));
     memcpy(temp_frame_data->buffer_data_2, frame_data->buffer_data_2,
            N_FFT * sizeof(short));
-    memcpy(temp_frame_data->plan, frame_data->plan, sizeof(frame_data->plan));
+    memcpy(temp_frame_data->plan1, frame_data->plan1, sizeof(frame_data->plan1));
+    memcpy(temp_frame_data->plan2, frame_data->plan2, sizeof(frame_data->plan2));
     g_mutex_unlock(thread_mutex);
     fft_capture((struct FFT_Frame *)temp_frame_data); // This fxn does the FFT,
     // frame_data->buffer_data_n
@@ -345,9 +346,13 @@ struct FFT_Frame *init_fft_frame(void) {
         FFT_Kit->fft_returned_2[k] = 0;
         FFT_Kit->delay[k] = 0;
     }
-    FFT_Kit->plan = fftw_create_plan(N_FFT, FFTW_FORWARD, FFTW_ESTIMATE);
-    FFT_Kit->reverse_plan =
-        fftw_create_plan(N_FFT, FFTW_BACKWARD, FFTW_ESTIMATE);
+
+    FFT_Kit->plan_buf1 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N_FFT);
+    FFT_Kit->plan_buf2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N_FFT);
+
+    FFT_Kit->plan1 = fftw_plan_dft_1d(N_FFT, FFT_Kit->plan_buf1, FFT_Kit->plan_buf1, FFTW_FORWARD, FFTW_ESTIMATE);
+    FFT_Kit->plan2 = fftw_plan_dft_1d(N_FFT, FFT_Kit->plan_buf2, FFT_Kit->plan_buf2, FFTW_FORWARD, FFTW_ESTIMATE);
+    FFT_Kit->reverse_plan = fftw_plan_dft_1d(N_FFT, FFT_Kit->plan_buf1, FFT_Kit->plan_buf1, FFTW_BACKWARD, FFTW_ESTIMATE);
     return FFT_Kit;
 }
 
@@ -565,7 +570,8 @@ int main(int argc, char *argv[]) {
     printf("Main Cleaning up.......\n");
     jack_deactivate(client);
     jack_client_close(client);
-    fftw_destroy_plan(fill_it->plan);
+    fftw_destroy_plan(fill_it->plan1);
+    fftw_destroy_plan(fill_it->plan2);
     fftw_destroy_plan(fill_it->reverse_plan);
     free(fill_it->delay);
     free(fill_it->buffer_data_1);
