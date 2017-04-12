@@ -90,8 +90,6 @@ int fft_capture(struct FFT_Frame *session) {
         session->fft_returned_2[k] = fft[k] / 32767.0 + 0.00000001;
     }
     free(fft);
-    fftw_free(in);
-    fftw_free(out);
     return 0;
 }
 
@@ -159,9 +157,5 @@ int impulse_capture(struct FFT_Frame *session) {
     for (k = 0; k < N_FFT; k++) {
         session->rfft_returned_1[k] = c_re(out1[k]) / 32767.0;
     }
-    fftw_free(in1);
-    fftw_free(out1);
-    fftw_free(in2);
-    fftw_free(out2);
     return 0;
 }
