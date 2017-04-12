@@ -1,7 +1,7 @@
-#BRP-PACU - An Audio Configuration utility
+# BRP-PACU - An Audio Configuration utility
 Wikipedia: en.wikipedia.org/wiki/BRP-PACU
 
-##Dependencies
+## Dependencies
 To compile BRP-PACU on Linux, this must be installed:
 * JACK. Any recent version will work, just take what the distribution provides, the package is probably named "jackd".
 – Tip: If jack is not already installed on your system, try to install the package "qjackctl" which depends on JACK.
@@ -13,7 +13,7 @@ To compile BRP-PACU on Linux, this must be installed:
         – In Ubuntu 10.10 you can install the package libgtkdatabox-0.9.1-1-dev , but:
         – It is recommended to use a newer version, because there are a few UI tweaks in the latest gtkdatabox. Get it from the source code released on https://sourceforge.net/projects/gtkdatabox
 
-* FFTW version 2.1.5, the package is probably named “fftw-dev”, or download it from http://www.fftw.org/download.html  (note: v. 3 is not supported)
+* FFTW version 3
 
 * the GTK+ and Glade stuff (including its dependencies such as Glib and Pango), with these packages (and their dependencies)
 	libglade2-dev
@@ -29,7 +29,7 @@ To compile BRP-PACU on Linux, this must be installed:
 	make
 	gcc
 
-##Compilation
+## Compilation
 
 If the source code comes directly from the GIT repository, instead of a release in a tar ball, you must run “aclocal && autoconf && automake” before running “./configure”.
 
@@ -51,7 +51,7 @@ and put “pulseaudio -k” in the jackd start script and “pulseaudio --start�
 
 Otherwise pulseaudio will grab ownership instantly on any sound card you try and you will never get jackd to start.
 
-##Never before asked questions
+## Never before asked questions
 What is BRP-PACU?
 - It is an analysis tool to configure any sound system with an equalizer.  It compares the
    output of the system to the input of the system and allows you to use this data to
