@@ -1,7 +1,7 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to 1 if you have the `fftw' library (-lfftw). */
-#undef HAVE_LIBFFTW
+/* Define to 1 if you have the `fftw3' library (-lfftw3). */
+#undef HAVE_LIBFFTW3
 
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM

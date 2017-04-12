@@ -21,7 +21,7 @@
 */
 #include "testfft.h"
 #include "main.h"
-#include <fftw.h>
+#include <fftw3.h>
 #include <math.h>
 
 int fft_capture(struct FFT_Frame *session) {
@@ -30,16 +30,20 @@ int fft_capture(struct FFT_Frame *session) {
     ///////////////////////////////////
     double *fft;
     short *buf;
-    fftw_plan plan = session->plan;
+    fftw_complex *in, *out;
+
+    fftw_plan plan = session->plan1;
     fft = (double *)malloc(sizeof(double) * N_FFT);
 
-    fftw_complex *in, *out; //, power_spectrum[N/2+1];
-    in = fftw_malloc(sizeof(fftw_complex) * N_FFT);
-    out = fftw_malloc(sizeof(fftw_complex) * N_FFT);
+    //fftw_complex *in, *out; //, power_spectrum[N/2+1];
+    //in = fftw_malloc(sizeof(fftw_complex) * N_FFT);
+    //out = fftw_malloc(sizeof(fftw_complex) * N_FFT);
 
     ///////////////////////////////////////////////////////////////////
 
     buf = session->buffer_data_1;
+    in  = session->plan_buf1;
+    out = session->plan_buf1;
     for (k = 0; k < N_FFT; k++) {
         // Fill empty slots with 0's, Copy interleaved audio data
         fft[k] = 0;
@@ -50,7 +54,8 @@ int fft_capture(struct FFT_Frame *session) {
         c_im(in[k]) = 0.0;
     }
 
-    fftw_one(plan, in, out);
+    //fftw_one(plan, in, out);
+    fftw_execute(plan);
 
     for (k = 0; k < N_FFT; k++) {
         datapt = (double)(sqrt(c_re(out[k]) * c_re(out[k]) +
@@ -72,7 +77,8 @@ int fft_capture(struct FFT_Frame *session) {
         c_im(in[k]) = 0.0;
     }
 
-    fftw_one(plan, in, out);
+    //fftw_one(plan, in, out);
+    fftw_execute(plan);
 
     for (k = 0; k < N_FFT; k++) {
         datapt = (double)(sqrt(c_re(out[k]) * c_re(out[k]) +
@@ -84,8 +90,6 @@ int fft_capture(struct FFT_Frame *session) {
         session->fft_returned_2[k] = fft[k] / 32767.0 + 0.00000001;
     }
     free(fft);
-    fftw_free(in);
-    fftw_free(out);
     return 0;
 }
 
@@ -94,26 +98,28 @@ int impulse_capture(struct FFT_Frame *session) {
     int tmr;
     ///////////////////////////////////
     short *buf;
-    fftw_plan plan = session->plan;
-    fftw_plan reverse_plan = session->reverse_plan;
 
-    fftw_complex *in1, *out1; //, power_spectrum[N/2+1];
-    fftw_complex *in2, *out2; //, power_spectrum[N/2+1];
-    in1 = fftw_malloc(sizeof(fftw_complex) * N_FFT);
-    out1 = fftw_malloc(sizeof(fftw_complex) * N_FFT);
-    in2 = fftw_malloc(sizeof(fftw_complex) * N_FFT);
-    out2 = fftw_malloc(sizeof(fftw_complex) * N_FFT);
+    fftw_complex *in1, *in2, *out1, *out2;
+
+    fftw_plan plan1 = session->plan1;
+    fftw_plan plan2 = session->plan2;
+    fftw_plan reverse_plan = session->reverse_plan;
 
     ///////////////////////////////////////////////////////////////////
 
-    buf = session->buffer_data_1;
+    buf  = session->buffer_data_1;
+    in1  = session->plan_buf1;
+    out1 = session->plan_buf1;
+    in2  = session->plan_buf2;
+    out2 = session->plan_buf2;
 
     for (k = 0; k < N_FFT; k++) {
         c_re(in1[k]) = (double)buf[k];
         c_im(in1[k]) = 0.0;
     }
 
-    fftw_one(plan, in1, out1);
+    //fftw_one(plan, in1, out1);
+    fftw_execute(plan1);
 
     buf = session->buffer_data_2;
 
@@ -122,7 +128,8 @@ int impulse_capture(struct FFT_Frame *session) {
         c_im(in2[k]) = 0.0;
     }
 
-    fftw_one(plan, in2, out2);
+    //fftw_one(plan, in2, out2);
+    fftw_execute(plan2);
 
     for (k = 0; k < N_FFT; k++) {
         c_re(in1[k]) =
@@ -144,14 +151,11 @@ int impulse_capture(struct FFT_Frame *session) {
         // line, H(f) = Y(f) / X(f) =  ( Y(f) x X*(f) ) / ( X(f) x X*(f) )
     }
 
-    fftw_one(reverse_plan, in1, out1);
+    //fftw_one(reverse_plan, in1, out1);
+    fftw_execute(reverse_plan);
 
     for (k = 0; k < N_FFT; k++) {
         session->rfft_returned_1[k] = c_re(out1[k]) / 32767.0;
     }
-    fftw_free(in1);
-    fftw_free(out1);
-    fftw_free(in2);
-    fftw_free(out2);
     return 0;
 }

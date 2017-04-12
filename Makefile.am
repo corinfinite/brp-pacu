@@ -21,7 +21,7 @@ include_HEADERS = testfft.h gui.h main.h
 EXTRA_DIST = BRP_PACU.ui sinc.png info.plist \
  sinc.icns sinc.xcf brpData.icns README-Mac.txt INSTALL-Mac.txt movelibraries.sh BRP_PACU_sh
 AM_CFLAGS =  -O2 -Wall -g `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gdk-2.0` `pkg-config --cflags glib-2.0`  `pkg-config --cflags  gtkdatabox` -DDATADIR=\"$(pkgdatadir)\" -lgthread-2.0
-LIBS =   -lm  -lfftw  `pkg-config --libs  gtk+-2.0` `pkg-config --libs  gdk-2.0` `pkg-config --libs glib-2.0` `pkg-config --libs gthread-2.0` `pkg-config --libs gtkdatabox`  `pkg-config --libs jack`
+LIBS =   -lm  -lfftw3  `pkg-config --libs  gtk+-2.0` `pkg-config --libs  gdk-2.0` `pkg-config --libs glib-2.0` `pkg-config --libs gthread-2.0` `pkg-config --libs gtkdatabox`  `pkg-config --libs jack`
 pkgdata_DATA = BRP_PACU.ui sinc.png
 AUTOMAKE_OPTIONS = foreign
 #########  Macintosh implementation #########

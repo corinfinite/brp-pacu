@@ -20,7 +20,7 @@
 *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 #include "main.h"
-#include <fftw.h>
+#include <fftw3.h>
 #include <math.h>
 #define DELAY_BUFFER_SIZE 44100
 #define N_FFT 8192
