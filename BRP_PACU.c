@@ -46,7 +46,6 @@ volatile char run = 1;
 static guint timer_id = 0;
 // static guint BUF_SIZE = BUFSIZE;
 float b0, b1, b2, b3, b4, b5, b6, white;
-float tmp_time = 0.0;
 float scale_it = 0.98;
 float volume = 0.5;
 GMutex *thread_mutex;
@@ -95,7 +94,6 @@ int Fill_Buffer(jack_nframes_t nframes, void *arg) {
                 b3 = (0.86650 * b3 + white * 0.3104856) * scale_it;
                 b4 = (0.55000 * b4 + white * 0.5329522) * scale_it;
                 b5 = (-0.7616 * b5 - white * 0.0168980) * scale_it;
-                tmp_time = tmp_time + 1.0 / 44100;
                 if (fill_it->pink_muted)
                     pink_noise[k] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 +
                                      (white * 0.5362) * scale_it) *
