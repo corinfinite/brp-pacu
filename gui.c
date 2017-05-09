@@ -1174,6 +1174,11 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     datadir = gtkosx_application_get_resource_path();
 #endif
     sprintf(gtkbuilder_path, "%s/BRP_PACU.ui", datadir);
+    if (access(gtkbuilder_path, R_OK) != 0 ) {
+        fprintf(stderr, "Notice: system-wide UI file %s doesn't exist, assume we're running from the build environment and try './'",
+                gtkbuilder_path);
+        sprintf(gtkbuilder_path, "./BRP_PACU.ui");
+    }
     if (gtk_builder_add_from_file(builder, gtkbuilder_path, &error) == 0) {
         // gtk_builder_add_from_file throws error about the path
         message("Couldn't load builder file: %s", gtkbuilder_path, TRUE);
