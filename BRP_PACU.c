@@ -46,7 +46,10 @@ volatile char run = 1;
 static guint timer_id = 0;
 // static guint BUF_SIZE = BUFSIZE;
 float b0, b1, b2, b3, b4, b5, b6, white;
-float scale_it = 0.98;
+float scale_it = 1.0f; // was 0.98, which is wrong (shifts the
+                       // poles to create a highpass. Let's hope
+                       // this wasn't a quick hack to work around
+                       // a numerical instability...
 float volume = 0.5;
 GMutex *thread_mutex;
 
