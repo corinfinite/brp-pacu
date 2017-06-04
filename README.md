@@ -1,33 +1,26 @@
 # BRP-PACU - An Audio Configuration utility
-Wikipedia: en.wikipedia.org/wiki/BRP-PACU
+Wikipedia: http://en.wikipedia.org/wiki/BRP-PACU
 
 ## Dependencies
-To compile BRP-PACU on Linux, this must be installed:
-* JACK. Any recent version will work, just take what the distribution provides, the package is probably named "jackd".
+Building BRP-PACU from source requires the following packages:
+* JACK. Any recent version will work, just take what the distribution provides, the package is probably named "jackd".  
 – Tip: If jack is not already installed on your system, try to install the package "qjackctl" which depends on JACK.
 
-* The development files that matches the installed version of JACK.
+* The development files that matches the installed version of JACK.  
 – Finding the right development package: Search for packages with libjack in their names. Notice the name of the installed libjack*, and find the most similar named package which name is ending in "-dev", and install that one.
 
-* GTK databox, library and header files, in version 0.9.1-1 (that will work) or preferable newer.
+* GTK databox, library and header files, in version 0.9.1-1 (that will work) or preferable newer.  
         – In Ubuntu 10.10 you can install the package libgtkdatabox-0.9.1-1-dev , but:
         – It is recommended to use a newer version, because there are a few UI tweaks in the latest gtkdatabox. Get it from the source code released on https://sourceforge.net/projects/gtkdatabox
 
 * FFTW version 3
 
-* the GTK+ and Glade stuff (including its dependencies such as Glib and Pango), with these packages (and their dependencies)
-	libglade2-dev
-	libgtk2.0-dev
-	libglib2.0-dev
-	GTK+ stable release from http://gtk.org
-* The building tools in these packages:
-	build-essential
-	autotools-dev
-	autoconf
-	automake
-	pkg-config
-	make
-	gcc
+* the GTK+ and Glade stuff (including its dependencies such as Glib and Pango), with these packages (and their dependencies)  
+	`libglade2-dev`, `libgtk2.0-dev`, `libglib2.0-dev` GTK+ stable release from http://gtk.org  `
+* `build-essential` for build tools
+      
+To install these dependencies from the command line on Ubuntu 16.04 (Xenial) run `sudo apt install build-essential fftw3 libc6 libglib2.0-0 libgtk2.0-0 libgtkdatabox-0.9.2-0 libjack-jackd2-0`
+ * This list of packages was built based on the [brp-pacu xenial package](https://packages.ubuntu.com/xenial/brp-pacu).
 
 ## Compilation
 
@@ -51,14 +44,14 @@ and put “pulseaudio -k” in the jackd start script and “pulseaudio --start�
 
 Otherwise pulseaudio will grab ownership instantly on any sound card you try and you will never get jackd to start.
 
-## Never before asked questions
+## FAQ
 What is BRP-PACU?
 - It is an analysis tool to configure any sound system with an equalizer.  It compares the
    output of the system to the input of the system and allows you to use this data to
    perform final equalization by matching the results with actual DSP/EQ.
 
 How do you do this?
-- There are many tutorials on doing this, but it takes practice, experience, and a good
+- There are many online resources on dual FFT analysis, but it takes practice, experience, and a good
    ear.  You could try: http://www.sounddevices.com/notes/usbpre/usbpre-with-sia-smaart-software/
    its a brief introduction to the concept, although the USBPre is not supported by linux as of writing this,
    so you couldn't use it with this software.  Try the M-Audio usb preamp, its what I use.  You
