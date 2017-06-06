@@ -31,4 +31,4 @@ A binary package for Debian can be found at http://packages.debian.org/sid/brp-p
 When BRP-PACU is installed, the executable is named “BRP_PACU”. It can be started from the Run dialog (that comes up when pressing ALT-F2), or from a command line which will give extra debugging information.
 
 ## Usage
-See (docs/Usage.md)[docs/Usage.md]
+See [docs/Usage.md](docs/Usage.md)
