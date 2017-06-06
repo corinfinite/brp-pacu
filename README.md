@@ -19,8 +19,8 @@ Building BRP-PACU from source requires the following packages:
 	`libglade2-dev`, `libgtk2.0-dev`, `libglib2.0-dev` GTK+ stable release from http://gtk.org  `
 * `build-essential` for build tools
       
-To install these dependencies from the command line on Ubuntu 16.04 (Xenial) run `sudo apt install build-essential fftw3 libc6 libglib2.0-0 libgtk2.0-0 libgtkdatabox-0.9.2-0 libjack-jackd2-0`
- * This list of packages was built based on the [brp-pacu xenial package](https://packages.ubuntu.com/xenial/brp-pacu).
+To install these dependencies from the command line on Ubuntu 16.04 (Xenial) run `sudo apt install build-essential libfftw3-dev libc6 libglib2.0-dev libgtk2.0-dev libgtkdatabox-0.9.2-0-dev libjack-jackd2-0`
+ * This list of packages was tested on Ubuntu Stduio 16.04.
 
 ## Compilation
 
