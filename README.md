@@ -29,16 +29,15 @@ To compile BRP-PACU on Linux, this must be installed:
 	make
 	gcc
 
-## Compilation
+## Building
 
-If the source code comes directly from the GIT repository, instead of a release in a tar ball, you must run “aclocal && autoconf && automake” before running “./configure”.
+If you are building from the git repo you must first run `./autogen.sh` to generate the Autotools files.
 
-This is followed by the traditional "/configure", "make", and "sudo make install" build process. Details are found in the file “INSTALL”
+Run the traditional `./configure`, `make`, and `make install` to install BRP-PACU.
 
-A binary package for Debian can be found at http://packages.debian.org/sid/brp-pacu .
+When BRP-PACU is installed on your system using `make install`, the executable is named “BRP_PACU”. It can be started from the Run dialog (that comes up when pressing ALt-F2), or from a command line which will give extra debugging information.
 
-When BRP-PACU is installed, the executable is named “BRP_PACU”. It can be started from the Run dialog (that comes up when pressing ALt-F2), or from a command line which will give extra debugging information.
-
+If you just ran `make` you can start BRP-PACU `./BRP-PACU`.
 
 ## A tip for JACK and PulseAudio co-existense (not unique to BRP-PACU)
 
