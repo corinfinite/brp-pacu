@@ -37,7 +37,7 @@ Run the traditional `./configure`, `make`, and `make install` to install BRP-PAC
 
 When BRP-PACU is installed on your system using `make install`, the executable is named “BRP_PACU”. It can be started from the Run dialog (that comes up when pressing ALt-F2), or from a command line which will give extra debugging information.
 
-If you just ran `make` you can start BRP-PACU `./BRP-PACU`.
+If you just ran `make` you can start BRP-PACU with `./BRP-PACU`.
 
 ## A tip for JACK and PulseAudio co-existense (not unique to BRP-PACU)
 
