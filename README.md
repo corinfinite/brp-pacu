@@ -31,7 +31,7 @@ To compile BRP-PACU on Linux, this must be installed:
 
 ## Building
 
-If you are building from the git repo you must first run `./autogen.sh` to generate the Autotools files.
+If you are building from the git repo you must first run `./autogen.sh` to setup the build.
 
 Run the traditional `./configure`, `make`, and `make install` to install BRP-PACU.
 
