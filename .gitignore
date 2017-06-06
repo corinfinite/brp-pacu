@@ -52,6 +52,7 @@ Makefile.in
 /compile
 /config.guess
 /config.h.in
+/config.status
 /config.sub
 /configure
 /configure.scan
