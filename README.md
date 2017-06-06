@@ -15,20 +15,20 @@ This list of packages was tested on Ubuntu Studio 16.04.
   * Finding the right development package: Search for packages with libjack in their names. Notice the name of the installed libjack*, and find the most similar named package which name is ending in "-dev", and install that one.
 * GTK+ and Glade packages (including its dependencies such as Glib and Pango), with these packages (and their dependencies):  
 ```
-libglade2-dev`, `libgtk2.0-dev`, `libglib2.0-dev`
+libglade2-dev libgtk2.0-dev libglib2.0-dev
 ```
 * (GTKdatabox)[https://sourceforge.net/projects/gtkdatabox], library and header files, in version 0.9.1-1 (that will work) or preferable newer.
 * FFTW version 3
 
 ## Building
 
-If the source code comes directly from the GIT repository, instead of a release in a tar ball, you must run “aclocal && autoconf && automake” before running “./configure”.
+If you are building from the git repo you must first run `./autogen.sh` to setup the build.
 
-This is followed by the traditional "/configure", "make", and "sudo make install" build process. Details are found in the file “INSTALL”
+Run the traditional `./configure`, `make`, and `make install` to install BRP-PACU.
 
-A binary package for Debian can be found at http://packages.debian.org/sid/brp-pacu .
+When BRP-PACU is installed on your system using `make install`, the executable is named “BRP_PACU”. It can be started from the Run dialog (that comes up when pressing ALt-F2), or from a command line which will give extra debugging information.
 
-When BRP-PACU is installed, the executable is named “BRP_PACU”. It can be started from the Run dialog (that comes up when pressing ALT-F2), or from a command line which will give extra debugging information.
+If you just ran `make` you can start BRP-PACU with `./BRP-PACU`.
 
 ## Usage
 See [docs/Usage.md](docs/Usage.md)
