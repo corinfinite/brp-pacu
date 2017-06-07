@@ -29,15 +29,10 @@
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 #include <gtkdatabox.h>
-#include <gtkdatabox_lines.h>
-#include <gtkdatabox_points.h>
-//#include <gtkdatabox_ruler.h>
 #include "config.h"
 #include "gui.h"
 #include "testfft.h"
 #include <errno.h>
-#include <gtkdatabox_graph.h>
-#include <gtkdatabox_grid.h>
 #include <math.h>
 #include <string.h>
 #define COLOR_T                                                                \
@@ -162,8 +157,8 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
         fprintf(stderr, "Box not a gtk_databox\n");
         return FALSE;
     }
-    gc1 = gdk_gc_new(measured_draw->window);
-    gc2 = gdk_gc_new(reference_draw->window);
+    gc1 = gdk_gc_new(gtk_widget_get_window(measured_draw));
+    gc2 = gdk_gc_new(gtk_widget_get_window(reference_draw));
     /////   label = g_new0(gchar*, 10);
     data->pink_muted = pinknoise_muted;
 
@@ -259,7 +254,7 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
         data->find_delay = 0;
     }
     if (update_delay) {
-        tmp_spin = gtk_spin_button_get_value_as_float(GTK_SPIN_BUTTON(gui_sb));
+        tmp_spin = gtk_spin_button_get_value(GTK_SPIN_BUTTON(gui_sb));
         data->delay_size = (int)(((gfloat)tmp_spin) * (gfloat)FSAMP);
         update_delay = 0;
         gtk_widget_hide_all(delay_window);
@@ -303,8 +298,8 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
     gdk_gc_set_rgb_fg_color(gc1, &myColor1);
     gdk_draw_rectangle(measured_pixmap, gc1, TRUE, 7, 7, 16, 16);
     gdk_draw_drawable(
-        measured_draw->window,
-        measured_draw->style->fg_gc[GTK_WIDGET_STATE(measured_draw)],
+        gtk_widget_get_window(measured_draw),
+        gtk_widget_get_style(measured_draw)->fg_gc[gtk_widget_get_state(measured_draw)],
         measured_pixmap, 5, 5, 5, 5, 20, 20);
 
     max = 0;
@@ -339,8 +334,8 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
 
     gdk_draw_rectangle(reference_pixmap, gc2, TRUE, 7, 7, 16, 16);
     gdk_draw_drawable(
-        reference_draw->window,
-        reference_draw->style->fg_gc[GTK_WIDGET_STATE(reference_draw)],
+        gtk_widget_get_window(reference_draw),
+        gtk_widget_get_style(reference_draw)->fg_gc[gtk_widget_get_state(reference_draw)],
         reference_pixmap, 5, 5, 5, 5, 20, 20);
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     gtk_widget_queue_draw(GTK_WIDGET(box));
@@ -383,7 +378,7 @@ static void pinknoise_mute(GtkWidget *widget,
 static void volume_gui(GtkWidget *widget) // , gtkwidget *widget)
 {
     volume_pink_value =
-        gtk_spin_button_get_value_as_float(GTK_SPIN_BUTTON(volume_pink_gui));
+        gtk_spin_button_get_value(GTK_SPIN_BUTTON(volume_pink_gui));
 }
 static void delay_keep_cb(GtkWidget *widget) // , gtkwidget *widget)
 {
@@ -503,7 +498,7 @@ static void capture_cb(GtkWidget *widget,
 // Increase/Decrease the gain of Averaging buffer
 static void gain_cb(GtkWidget *widget, GtkSpinButton *spin) {
     int k;
-    avg_gain = gtk_spin_button_get_value_as_float(spin);
+    avg_gain = gtk_spin_button_get_value(spin);
     for (k = 0; k < PLOT_PTS; k++)
         guiYBuf[N_BUFF - 1][k] = avg_gain + guiYBufAvgHold[k];
 }
@@ -1038,18 +1033,20 @@ static gboolean configure_event_measured(GtkWidget *widget,
                                          GdkEventConfigure *event) {
     // GdkColor *myColor;
     GdkGC *gc = NULL;
-    gc = gdk_gc_new(measured_draw->window);
+    gc = gdk_gc_new(gtk_widget_get_window(measured_draw));
     // red       grn     blu
     GdkColor myColor = {0, 0x8888, 0x8888, 0x8888};
     gdk_gc_set_rgb_fg_color(gc, &myColor);
     if (measured_pixmap)
         g_object_unref(measured_pixmap);
 
+	GtkAllocation* alloc = g_new(GtkAllocation, 1);
+	gtk_widget_get_allocation(widget, alloc);
     measured_pixmap =
-        gdk_pixmap_new(measured_draw->window, widget->allocation.width,
-                       widget->allocation.height, -1);
+        gdk_pixmap_new(gtk_widget_get_window(measured_draw), alloc->width,
+                       alloc->height, -1);
     gdk_draw_rectangle(measured_pixmap, gc, TRUE, 0, 0,
-                       widget->allocation.width, widget->allocation.height);
+                       alloc->width, alloc->height);
 
     myColor.red = 0x3333;
     myColor.green = 0x3333;
@@ -1064,18 +1061,20 @@ static gboolean configure_event_reference(GtkWidget *widget,
                                           GdkEventConfigure *event) {
     // GdkColor *myColor;
     GdkGC *gc = NULL;
-    gc = gdk_gc_new(reference_draw->window);
+    gc = gdk_gc_new(gtk_widget_get_window(reference_draw));
     // red       grn     blu
     GdkColor myColor = {0, 0x8888, 0x8888, 0x8888};
     gdk_gc_set_rgb_fg_color(gc, &myColor);
     if (reference_pixmap)
         g_object_unref(reference_pixmap);
 
+	GtkAllocation* alloc = g_new(GtkAllocation, 1);
+	gtk_widget_get_allocation(widget, alloc);
     reference_pixmap =
-        gdk_pixmap_new(reference_draw->window, widget->allocation.width,
-                       widget->allocation.height, -1);
+        gdk_pixmap_new(gtk_widget_get_window(reference_draw), alloc->width,
+                       alloc->height, -1);
     gdk_draw_rectangle(reference_pixmap, gc, TRUE, 0, 0,
-                       widget->allocation.width, widget->allocation.height);
+                       alloc->width, alloc->height);
 
     myColor.red = 0x3333;
     myColor.green = 0x3333;
@@ -1448,7 +1447,7 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
                      G_CALLBACK(configure_event_measured), NULL);
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     volume_pink_value =
-        gtk_spin_button_get_value_as_float(GTK_SPIN_BUTTON(volume_pink_gui));
+        gtk_spin_button_get_value(GTK_SPIN_BUTTON(volume_pink_gui));
     gtk_widget_show_all(window);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
