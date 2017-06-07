@@ -272,7 +272,7 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
         if (max < data->buffer_data_1[k])
             max = data->buffer_data_1[k];
     }
-
+	
     if (max > 20000) {
         myColor1.red = 0xFFFF;
         myColor1.green = 0x3333;
@@ -295,12 +295,14 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
         myColor1.blue = 0x0000;
     }
 
-    gdk_gc_set_rgb_fg_color(gc1, &myColor1);
-    gdk_draw_rectangle(measured_pixmap, gc1, TRUE, 7, 7, 16, 16);
-    gdk_draw_drawable(
-        gtk_widget_get_window(measured_draw),
-        gtk_widget_get_style(measured_draw)->fg_gc[gtk_widget_get_state(measured_draw)],
-        measured_pixmap, 5, 5, 5, 5, 20, 20);
+	cairo_t *cr;
+	cr = gdk_cairo_create (gtk_widget_get_window (measured_draw));
+	cairo_pattern_set_extend (cairo_get_source (cr), CAIRO_EXTEND_REPEAT);
+	
+	cairo_rectangle (cr, 0, 7, 16, 16);
+	gdk_cairo_set_source_color (cr, &myColor1);
+	cairo_fill (cr);
+	cairo_destroy (cr);
 
     max = 0;
     for (k = N_FFT - 2000; k < N_FFT; k++) {
@@ -329,14 +331,14 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
         myColor2.green = 0x0000;
         myColor2.blue = 0x0000;
     }
-    gdk_gc_set_rgb_fg_color(gc2, &myColor2);
-    // gdk_gc_set_rgb_fg_color (gc2, &myColor);
-
-    gdk_draw_rectangle(reference_pixmap, gc2, TRUE, 7, 7, 16, 16);
-    gdk_draw_drawable(
-        gtk_widget_get_window(reference_draw),
-        gtk_widget_get_style(reference_draw)->fg_gc[gtk_widget_get_state(reference_draw)],
-        reference_pixmap, 5, 5, 5, 5, 20, 20);
+	
+	cr = gdk_cairo_create (gtk_widget_get_window (reference_draw));
+	cairo_pattern_set_extend (cairo_get_source (cr), CAIRO_EXTEND_REPEAT);
+	
+	cairo_rectangle (cr, 0, 7, 16, 16);
+	gdk_cairo_set_source_color (cr, &myColor2);
+	cairo_fill (cr);
+	cairo_destroy (cr);
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     gtk_widget_queue_draw(GTK_WIDGET(box));
     g_object_unref(gc1);
@@ -1031,7 +1033,10 @@ static gint show_motion_notify_cb(GtkWidget *widget,
  * Part of gui initialization*/
 static gboolean configure_event_measured(GtkWidget *widget,
                                          GdkEventConfigure *event) {
-    // GdkColor *myColor;
+	//Unsure why or if this is needed since drawing is done in gui_idle_func()
+	//Leaving it for now but it can probably be removed in the future.
+
+	/*// GdkColor *myColor;
     GdkGC *gc = NULL;
     gc = gdk_gc_new(gtk_widget_get_window(measured_draw));
     // red       grn     blu
@@ -1054,12 +1059,14 @@ static gboolean configure_event_measured(GtkWidget *widget,
     gdk_gc_set_rgb_fg_color(gc, &myColor);
 
     gdk_draw_rectangle(measured_pixmap, gc, TRUE, 7, 7, 16, 16);
-    g_object_unref(gc);
+    g_object_unref(gc);*/
     return TRUE;
 }
 static gboolean configure_event_reference(GtkWidget *widget,
                                           GdkEventConfigure *event) {
-    // GdkColor *myColor;
+	//Unsure why or if this is needed since drawing is done in gui_idle_func()
+	//Leaving it for now but it can probably be removed in the future.
+	/*// GdkColor *myColor;
     GdkGC *gc = NULL;
     gc = gdk_gc_new(gtk_widget_get_window(reference_draw));
     // red       grn     blu
@@ -1082,7 +1089,7 @@ static gboolean configure_event_reference(GtkWidget *widget,
     gdk_gc_set_rgb_fg_color(gc, &myColor);
 
     gdk_draw_rectangle(reference_pixmap, gc, TRUE, 7, 7, 16, 16);
-    g_object_unref(gc);
+    g_object_unref(gc);*/
     return TRUE;
 }
 
@@ -1441,10 +1448,12 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     //  Pixmap stuff
-    g_signal_connect(G_OBJECT(reference_draw), "configure_event",
+	//Unsure why or if this is needed since drawing is done in gui_idle_func()
+	//Leaving it for now but it can probably be removed in the future.
+    /*g_signal_connect(G_OBJECT(reference_draw), "configure_event",
                      G_CALLBACK(configure_event_reference), NULL);
     g_signal_connect(G_OBJECT(measured_draw), "configure_event",
-                     G_CALLBACK(configure_event_measured), NULL);
+                     G_CALLBACK(configure_event_measured), NULL);*/
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     volume_pink_value =
         gtk_spin_button_get_value(GTK_SPIN_BUTTON(volume_pink_gui));
