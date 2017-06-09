@@ -1028,71 +1028,6 @@ static gint show_motion_notify_cb(GtkWidget *widget,
     return FALSE;
 }
 
-////////////////////////////////////
-/* LED Signal stuff: Create a new backing pixmap of the appropriate size
- * Part of gui initialization*/
-static gboolean configure_event_measured(GtkWidget *widget,
-                                         GdkEventConfigure *event) {
-	//Unsure why or if this is needed since drawing is done in gui_idle_func()
-	//Leaving it for now but it can probably be removed in the future.
-
-	/*// GdkColor *myColor;
-    GdkGC *gc = NULL;
-    gc = gdk_gc_new(gtk_widget_get_window(measured_draw));
-    // red       grn     blu
-    GdkColor myColor = {0, 0x8888, 0x8888, 0x8888};
-    gdk_gc_set_rgb_fg_color(gc, &myColor);
-    if (measured_pixmap)
-        g_object_unref(measured_pixmap);
-
-	GtkAllocation* alloc = g_new(GtkAllocation, 1);
-	gtk_widget_get_allocation(widget, alloc);
-    measured_pixmap =
-        gdk_pixmap_new(gtk_widget_get_window(measured_draw), alloc->width,
-                       alloc->height, -1);
-    gdk_draw_rectangle(measured_pixmap, gc, TRUE, 0, 0,
-                       alloc->width, alloc->height);
-
-    myColor.red = 0x3333;
-    myColor.green = 0x3333;
-    myColor.blue = 0x3333;
-    gdk_gc_set_rgb_fg_color(gc, &myColor);
-
-    gdk_draw_rectangle(measured_pixmap, gc, TRUE, 7, 7, 16, 16);
-    g_object_unref(gc);*/
-    return TRUE;
-}
-static gboolean configure_event_reference(GtkWidget *widget,
-                                          GdkEventConfigure *event) {
-	//Unsure why or if this is needed since drawing is done in gui_idle_func()
-	//Leaving it for now but it can probably be removed in the future.
-	/*// GdkColor *myColor;
-    GdkGC *gc = NULL;
-    gc = gdk_gc_new(gtk_widget_get_window(reference_draw));
-    // red       grn     blu
-    GdkColor myColor = {0, 0x8888, 0x8888, 0x8888};
-    gdk_gc_set_rgb_fg_color(gc, &myColor);
-    if (reference_pixmap)
-        g_object_unref(reference_pixmap);
-
-	GtkAllocation* alloc = g_new(GtkAllocation, 1);
-	gtk_widget_get_allocation(widget, alloc);
-    reference_pixmap =
-        gdk_pixmap_new(gtk_widget_get_window(reference_draw), alloc->width,
-                       alloc->height, -1);
-    gdk_draw_rectangle(reference_pixmap, gc, TRUE, 0, 0,
-                       alloc->width, alloc->height);
-
-    myColor.red = 0x3333;
-    myColor.green = 0x3333;
-    myColor.blue = 0x3333;
-    gdk_gc_set_rgb_fg_color(gc, &myColor);
-
-    gdk_draw_rectangle(reference_pixmap, gc, TRUE, 7, 7, 16, 16);
-    g_object_unref(gc);*/
-    return TRUE;
-}
-
 static void preferences_dialog_cb(GtkWidget *widget) // , gtkwidget *widget)
 {
     gtk_window_set_transient_for(GTK_WINDOW(preferences_dialog),
@@ -1240,7 +1175,7 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     g_signal_connect(
         G_OBJECT(gtk_builder_get_object(builder, "apply_preferences")),
         "clicked", G_CALLBACK(apply_preferences_cb), NULL);
-    g_signal_connect(GTK_OBJECT(preferences_dialog), "delete_event",
+    g_signal_connect(G_OBJECT(preferences_dialog), "delete_event",
                      G_CALLBACK(gtk_widget_hide_on_delete), NULL);
     gtk_window_set_decorated(GTK_WINDOW(preferences_dialog), FALSE);
 
@@ -1278,7 +1213,7 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
                      "activate", G_CALLBACK(delay_cb), data);
     g_signal_connect(GTK_OBJECT(window), "destroy", G_CALLBACK(cleanup_gui),
                      NULL);
-    g_signal_connect(GTK_OBJECT(window), "delete_event",
+    g_signal_connect(G_OBJECT(window), "delete_event",
                      G_CALLBACK(cleanup_gui), NULL);
     g_signal_connect(GTK_OBJECT(delay_window), "delete_event",
                      G_CALLBACK(gtk_widget_hide_on_delete), NULL);
@@ -1288,7 +1223,7 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     g_signal_connect(
         G_OBJECT(gtk_builder_get_object(builder, "impulse_response")),
         "activate", G_CALLBACK(impulse_cb), data);
-    g_signal_connect(GTK_OBJECT(impulse_window), "delete_event",
+    g_signal_connect(G_OBJECT(impulse_window), "delete_event",
                      G_CALLBACK(gtk_widget_hide_on_delete), NULL);
 
     g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "pink_noise")),
@@ -1446,15 +1381,6 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
                      "value-changed", G_CALLBACK(gain_cb),
                      (G_OBJECT(gtk_builder_get_object(builder, "gain1"))));
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    //  Pixmap stuff
-	//Unsure why or if this is needed since drawing is done in gui_idle_func()
-	//Leaving it for now but it can probably be removed in the future.
-    /*g_signal_connect(G_OBJECT(reference_draw), "configure_event",
-                     G_CALLBACK(configure_event_reference), NULL);
-    g_signal_connect(G_OBJECT(measured_draw), "configure_event",
-                     G_CALLBACK(configure_event_measured), NULL);*/
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
     volume_pink_value =
         gtk_spin_button_get_value(GTK_SPIN_BUTTON(volume_pink_gui));
     gtk_widget_show_all(window);

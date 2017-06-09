@@ -21,10 +21,6 @@
 #include <fftw3.h>
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
-#include <gtk/gtkadjustment.h>
-#include <gtk/gtkmain.h>
-#include <gtk/gtksignal.h>
-#include <gtk/gtkwidget.h>
 #include <math.h>
 #include <stdlib.h>
 #define pi 3.141592653
