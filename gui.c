@@ -1118,15 +1118,15 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     if (access(gtkbuilder_path, R_OK) != 0 ) {
         fprintf(stderr, "Notice: system-wide UI file %s doesn't exist, assume we're running from the build environment and try './'",
                 gtkbuilder_path);
-        sprintf(gtkbuilder_path, "./BRP_PACU.ui\n");
+        sprintf(gtkbuilder_path, "./BRP_PACU.ui");
     }
     if (gtk_builder_add_from_file(builder, gtkbuilder_path, &error) == 0) {
         // gtk_builder_add_from_file throws error about the path
-        message("Couldn't load builder file: %s\n", gtkbuilder_path, TRUE);
-        /// printf(1,"\n\n-----------Error--------------\n\n\n");
+        message("Couldn't load builder file: %s", gtkbuilder_path, TRUE);
+        //printf(1,"\n\n-----------Error--------------\n\n\n");
         return (FALSE);
     }
-    window = GTK_WIDGET(gtk_builder_get_object(builder, "window1"));
+    window = GTK_WIDGET(gtk_builder_get_object(builder, "main_window"));
     bkg_dialog = GTK_WIDGET(gtk_builder_get_object(builder, "bkg_dialog"));
     about_me_window =
         GTK_WIDGET(gtk_builder_get_object(builder, "about_me_window"));
@@ -1143,7 +1143,7 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     save_now = GTK_ACTION(gtk_builder_get_object(builder, "save_now"));
     open_menuitem = GTK_ACTION(gtk_builder_get_object(builder, "open"));
     box_container_impulse =
-        GTK_WIDGET(gtk_builder_get_object(builder, "vbox_impulse"));
+        GTK_WIDGET(gtk_builder_get_object(builder, "impulse_box"));
     measured_draw =
         GTK_WIDGET(gtk_builder_get_object(builder, "Measured_Draw"));
     reference_draw =
