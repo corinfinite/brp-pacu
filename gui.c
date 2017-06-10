@@ -40,8 +40,6 @@
 
 /////////////////////////////////////////////
 // LED Pixmap stuff
-static GdkPixmap *measured_pixmap = NULL;
-static GdkPixmap *reference_pixmap = NULL;
 static GtkWidget *measured_draw;
 static GtkWidget *reference_draw;
 /////////////////////////////////////////////
