@@ -18,7 +18,7 @@ AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 AC_CHECK_LIB(m,cos,,AC_MSG_ERROR([could not link to mathlib.]))
 AC_CHECK_LIB(fftw3,fftw_execute,,AC_MSG_ERROR([could not link to fftw please install the fftw package.]))
-PKG_CHECK_MODULES(GTK, gtk+-2.0,,exit)
+PKG_CHECK_MODULES(GTK, gtk+-3.0,,exit)
 PKG_CHECK_MODULES(PANGO, pango,,exit)
 PKG_CHECK_MODULES(CAIRO, cairo,,exit)
 #PKG_CHECK_MODULES(GDK-2.0, gdk-2.0,,exit)
