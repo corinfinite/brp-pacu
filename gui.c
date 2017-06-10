@@ -54,11 +54,11 @@ static GtkWidget *delay_window = NULL;
 static GtkWidget *impulse_window = NULL;
 static GtkWidget *volume_pink_gui = NULL;
 static GtkWidget *pinknoise_button = NULL;
-static GtkToggleAction *pinknoise_menu_item = NULL;
+static GAction *pinknoise_menu_item = NULL;
 static GtkWidget *transfer_function_toggle = NULL;
-static GtkToggleAction *transfer_function_menu = NULL;
+static GAction *transfer_function_menu = NULL;
 static GtkWidget *buffer_button[N_BUFF] = {NULL, NULL, NULL, NULL, NULL};
-static GtkToggleAction *buffer_menu[N_BUFF] = {NULL, NULL, NULL, NULL, NULL};
+static GAction *buffer_menu[N_BUFF] = {NULL, NULL, NULL, NULL, NULL};
 static GtkWidget *preferences_dialog = NULL;
 static GtkWidget *smoothing_spin_button = NULL;
 static GtkWidget *averaging_spin_button = NULL;
@@ -84,9 +84,9 @@ static int buffer_last_clicked;
 static GtkWidget *bkg_dialog;
 
 // static GtkWidget *cb;
-static GtkAction *save_now;
-static GtkAction *save_as;
-static GtkAction *open_menuitem;
+static GAction *save_now;
+static GAction *save_as;
+static GAction *open_menuitem;
 
 static gint avg_index = 0;
 static gchar tf = 1;
@@ -148,15 +148,16 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
     gint max;
     gfloat temp, max_x, min_x, max_y, min_y, tmp_spin;
     gchar *label = NULL;
-    GdkGC *gc1 = NULL;
-    GdkGC *gc2 = NULL;
+    //GdkGC *gc1 = NULL;
+    //GdkGC *gc2 = NULL;
 
     if (!GTK_IS_DATABOX(box)) {
         fprintf(stderr, "Box not a gtk_databox\n");
         return FALSE;
     }
-    gc1 = gdk_gc_new(gtk_widget_get_window(measured_draw));
-    gc2 = gdk_gc_new(gtk_widget_get_window(reference_draw));
+	
+    //gc1 = gdk_gc_new(gtk_widget_get_window(measured_draw));
+    //gc2 = gdk_gc_new(gtk_widget_get_window(reference_draw));
     /////   label = g_new0(gchar*, 10);
     data->pink_muted = pinknoise_muted;
 
@@ -255,7 +256,7 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
         tmp_spin = gtk_spin_button_get_value(GTK_SPIN_BUTTON(gui_sb));
         data->delay_size = (int)(((gfloat)tmp_spin) * (gfloat)FSAMP);
         update_delay = 0;
-        gtk_widget_hide_all(delay_window);
+        gtk_widget_hide(delay_window);
     }
     label =
         g_strdup_printf("Delay %3.2f msecs", (float)data->delay_size *
@@ -339,8 +340,8 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
 	cairo_destroy (cr);
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     gtk_widget_queue_draw(GTK_WIDGET(box));
-    g_object_unref(gc1);
-    g_object_unref(gc2);
+    //g_object_unref(gc1);
+    //g_object_unref(gc2);
     return TRUE;
 }
 
@@ -382,11 +383,12 @@ static void volume_gui(GtkWidget *widget) // , gtkwidget *widget)
 }
 static void delay_keep_cb(GtkWidget *widget) // , gtkwidget *widget)
 {
-    gtk_widget_hide_all(delay_window);
+    gtk_widget_hide
+(delay_window);
 }
 static gboolean about_ok_cb(GtkWidget *widget) // , gtkwidget *widget)
 {
-    gtk_widget_hide_all(about_me_window);
+    gtk_widget_hide(about_me_window);
     return TRUE;
 }
 static void about_me_cb(GtkWidget *widget) // , gtkwidget *widget)
@@ -1043,7 +1045,7 @@ static void preferences_dialog_cb(GtkWidget *widget) // , gtkwidget *widget)
 
 static gboolean close_preferences_cb(GtkWidget *widget) // , gtkwidget *widget)
 {
-    gtk_widget_hide_all(preferences_dialog);
+    gtk_widget_hide(preferences_dialog);
     return TRUE;
 }
 
@@ -1116,11 +1118,11 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     if (access(gtkbuilder_path, R_OK) != 0 ) {
         fprintf(stderr, "Notice: system-wide UI file %s doesn't exist, assume we're running from the build environment and try './'",
                 gtkbuilder_path);
-        sprintf(gtkbuilder_path, "./BRP_PACU.ui");
+        sprintf(gtkbuilder_path, "./BRP_PACU.ui\n");
     }
     if (gtk_builder_add_from_file(builder, gtkbuilder_path, &error) == 0) {
         // gtk_builder_add_from_file throws error about the path
-        message("Couldn't load builder file: %s", gtkbuilder_path, TRUE);
+        message("Couldn't load builder file: %s\n", gtkbuilder_path, TRUE);
         /// printf(1,"\n\n-----------Error--------------\n\n\n");
         return (FALSE);
     }
@@ -1209,11 +1211,11 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
                      "clicked", G_CALLBACK(delay_cb), data);
     g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "find_delay_m")),
                      "activate", G_CALLBACK(delay_cb), data);
-    g_signal_connect(GTK_OBJECT(window), "destroy", G_CALLBACK(cleanup_gui),
+    g_signal_connect(G_OBJECT(window), "destroy", G_CALLBACK(cleanup_gui),
                      NULL);
     g_signal_connect(G_OBJECT(window), "delete_event",
                      G_CALLBACK(cleanup_gui), NULL);
-    g_signal_connect(GTK_OBJECT(delay_window), "delete_event",
+    g_signal_connect(G_OBJECT(delay_window), "delete_event",
                      G_CALLBACK(gtk_widget_hide_on_delete), NULL);
     g_signal_connect(
         G_OBJECT(gtk_builder_get_object(builder, "delay_keep_button")),
