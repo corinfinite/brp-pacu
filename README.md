@@ -15,10 +15,13 @@ This list of packages was tested on Ubuntu Studio 16.04.
   * Finding the right development package: Search for packages with libjack in their names. Notice the name of the installed libjack*, and find the most similar named package which name is ending in "-dev", and install that one.
 * GTK+ and Glade packages (including its dependencies such as Glib and Pango), with these packages (and their dependencies):  
 ```
-libglade2-dev libgtk2.0-dev libglib2.0-dev
+libglade2-dev libgtk-3-dev libglib2.0-dev
 ```
 * (GTKdatabox)[https://sourceforge.net/projects/gtkdatabox], library and header files, in version 0.9.1-1 (that will work) or preferable newer.
+  * ./configure --enable-glade
 * FFTW version 3
+
+libgladeui-dev glade
 
 ## Building
 

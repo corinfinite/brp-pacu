@@ -95,7 +95,6 @@ int fft_capture(struct FFT_Frame *session) {
 
 int impulse_capture(struct FFT_Frame *session) {
     int k;
-    int tmr;
     ///////////////////////////////////
     short *buf;
 
