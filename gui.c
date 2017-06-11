@@ -116,8 +116,8 @@ static GdkColor line_color[N_BUFF] = {
     {0, 65535, 0, 0},
     {0, 65535, 16384, 65535},
     {0, 65535, 65535, 65535}};
-static GdkColor myColor1 = {0, 0x3333, 0x3333, 0x3333};
-static GdkColor myColor2 = {0, 0x3333, 0x3333, 0x3333};
+static GdkRGBA myColor1 = {0.3, 0.3, 0.3, 1.0};
+static GdkRGBA myColor2 = {0.3, 0.3, 0.3, 1.0};
 
 void message(char *format, char *text, gboolean error) {
     GtkWidget *dialog = gtk_message_dialog_new(
@@ -273,25 +273,25 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
     }
 	
     if (max > 20000) {
-        myColor1.red = 0xFFFF;
-        myColor1.green = 0x3333;
-        myColor1.blue = 0x3333;
+        myColor1.red = 1.0;
+        myColor1.green = 0.3;
+        myColor1.blue = 0.3;
     } else if (max > 5000) {
-        myColor1.red = 0xCCCC;
-        myColor1.green = 0xFFFF;
-        myColor1.blue = 0x3333;
+        myColor1.red = 0.8;
+        myColor1.green = 1.0;
+        myColor1.blue = 0.3;
     } else if (max > 1000) {
-        myColor1.red = 0x3333;
-        myColor1.green = 0xDDDD;
-        myColor1.blue = 0x3333;
+        myColor1.red = 0.3;
+        myColor1.green = 0.85;
+        myColor1.blue = 0.3;
     } else if (max > 40) {
-        myColor1.red = 0x3333;
-        myColor1.green = 0x8888;
-        myColor1.blue = 0x3333;
+        myColor1.red = 0.3;
+        myColor1.green = 0.9;
+        myColor1.blue = 0.3;
     } else {
-        myColor1.red = 0x0000;
-        myColor1.green = 0x0000;
-        myColor1.blue = 0x0000;
+        myColor1.red = 0.0;
+        myColor1.green = 0.0;
+        myColor1.blue = 0.0;
     }
 
 	cairo_t *cr;
@@ -299,7 +299,7 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
 	cairo_pattern_set_extend (cairo_get_source (cr), CAIRO_EXTEND_REPEAT);
 	
 	cairo_rectangle (cr, 0, 7, 16, 16);
-	gdk_cairo_set_source_color (cr, &myColor1);
+	gdk_cairo_set_source_rgba(cr, &myColor1);
 	cairo_fill (cr);
 	cairo_destroy (cr);
 
@@ -335,7 +335,7 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
 	cairo_pattern_set_extend (cairo_get_source (cr), CAIRO_EXTEND_REPEAT);
 	
 	cairo_rectangle (cr, 0, 7, 16, 16);
-	gdk_cairo_set_source_color (cr, &myColor2);
+	gdk_cairo_set_source_rgba(cr, &myColor2);
 	cairo_fill (cr);
 	cairo_destroy (cr);
     /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -855,11 +855,10 @@ static void open_cb(GtkWidget *widget, gchar *data) {
     if (open_dialog != NULL) {
         gtk_window_present(GTK_WINDOW(open_dialog));
     }
-
     open_dialog = gtk_file_chooser_dialog_new(
         "Open Capture Buffers From", GTK_WINDOW(bkg_dialog),
-        GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-        GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+        GTK_FILE_CHOOSER_ACTION_OPEN, ("_Cancel"), GTK_RESPONSE_CANCEL,
+        ("_Open"), GTK_RESPONSE_ACCEPT, NULL);
     //   if(save_name_str)
     //      gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(open_dialog),save_name_str->str);
     //   else
@@ -899,8 +898,8 @@ static void save_as_cb(GtkWidget *widget, char *data) {
 
     save_as_dialog = gtk_file_chooser_dialog_new(
         "Save Capture Buffers As (*.brp recommended)", GTK_WINDOW(bkg_dialog),
-        GTK_FILE_CHOOSER_ACTION_SAVE, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-        GTK_STOCK_SAVE_AS, GTK_RESPONSE_ACCEPT, NULL);
+        GTK_FILE_CHOOSER_ACTION_SAVE, ("_Cancel"), GTK_RESPONSE_CANCEL,
+        ("_Save_As"), GTK_RESPONSE_ACCEPT, NULL);
     if (save_name_str)
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(save_as_dialog),
                                       save_name_str->str);
@@ -1139,9 +1138,9 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     gui_sb_label = GTK_WIDGET(gtk_builder_get_object(builder, "delay_label"));
     gui_sb = GTK_WIDGET(gtk_builder_get_object(builder, "spinbutton1"));
     gui_db_label = GTK_WIDGET(gtk_builder_get_object(builder, "label4"));
-    save_as = GTK_ACTION(gtk_builder_get_object(builder, "save_as"));
-    save_now = GTK_ACTION(gtk_builder_get_object(builder, "save_now"));
-    open_menuitem = GTK_ACTION(gtk_builder_get_object(builder, "open"));
+    save_as = G_ACTION(gtk_builder_get_object(builder, "save_as"));
+    save_now = G_ACTION(gtk_builder_get_object(builder, "save_now"));
+    open_menuitem = G_ACTION(gtk_builder_get_object(builder, "open"));
     box_container_impulse =
         GTK_WIDGET(gtk_builder_get_object(builder, "impulse_box"));
     measured_draw =
