@@ -105,11 +105,11 @@ static guint gui_counter = 0;
 static guint smooth_factor;
 static guint smooth_constant;
 
-static GdkColor background_color;
-static GdkColor grid_color;
-static GdkColor trace_transfer_color;
-static GdkColor trace_impulse_color;
-static GdkColor line_color[N_BUFF] = {
+static GdkRGBA background_color;
+static GdkRGBA grid_color;
+static GdkRGBA trace_transfer_color;
+static GdkRGBA trace_impulse_color;
+static GdkRGBA line_color[N_BUFF] = {
     // unused, red, green, blue
     {0, 16384, 16384, 65535},
     {0, 0, 62000, 0},
@@ -310,25 +310,25 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
     }
 
     if (max > 20000) {
-        myColor2.red = 0xFFFF;
-        myColor2.green = 0x3333;
-        myColor2.blue = 0x3333;
+        myColor2.red = 1.0;
+        myColor2.green = 0.3;
+        myColor2.blue = 0.3;
     } else if (max > 5000) {
-        myColor2.red = 0xCCCC;
-        myColor2.green = 0xFFFF;
-        myColor2.blue = 0x3333;
+        myColor2.red = 0.8;
+        myColor2.green = 1.0;
+        myColor2.blue = 0.3;
     } else if (max > 1000) {
-        myColor2.red = 0x3333;
-        myColor2.green = 0xDDDD;
-        myColor2.blue = 0x3333;
+        myColor2.red = 0.3;
+        myColor2.green = 0.85;
+        myColor2.blue = 0.3;
     } else if (max > 40) {
-        myColor2.red = 0x3333;
-        myColor2.green = 0x8888;
-        myColor2.blue = 0x3333;
+        myColor2.red = 0.3;
+        myColor2.green = 0.9;
+        myColor2.blue = 0.3;
     } else {
-        myColor2.red = 0x0000;
-        myColor2.green = 0x0000;
-        myColor2.blue = 0x0000;
+        myColor2.red = 0.0;
+        myColor2.green = 0.0;
+        myColor2.blue = 0.0;
     }
 	
 	cr = gdk_cairo_create (gtk_widget_get_window (reference_draw));
@@ -1056,7 +1056,7 @@ static void apply_preferences_cb(GtkWidget *widget) {
         GTK_SPIN_BUTTON(averaging_spin_button));
 }
 
-#ifdef MAC_INTEGRATION
+/*#ifdef MAC_INTEGRATION
 static gboolean deal_with_quit(GtkosxApplication *app, gpointer user_data) {
     if (open_dialog)
         gtk_widget_destroy(GTK_WIDGET(open_dialog));
@@ -1071,12 +1071,12 @@ static gboolean deal_with_open(GtkosxApplication *app, gchar *path,
                                gpointer user_data) {
     return open_file(path);
 }
-#endif
+#endif*/
 
 gboolean create_gui(struct FFT_Frame *data, char *datadir) {
-#ifdef MAC_INTEGRATION
+/*#ifdef MAC_INTEGRATION
     GtkosxApplication *theApp = g_object_new(GTKOSX_TYPE_APPLICATION, NULL);
-#endif
+#endif*/
     GtkWidget *box_container;
     GtkWidget *box_container_impulse;
     /////   GtkWidget *label;
@@ -1109,10 +1109,10 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
 
     GError *error = NULL;
 
-#ifdef MAC_INTEGRATION
+/*#ifdef MAC_INTEGRATION
     // Find GtkBuilder file in application resource directory first
     datadir = gtkosx_application_get_resource_path();
-#endif
+#endif*/
     sprintf(gtkbuilder_path, "%s/BRP_PACU.ui", datadir);
     if (access(gtkbuilder_path, R_OK) != 0 ) {
         fprintf(stderr, "Notice: system-wide UI file %s doesn't exist, assume we're running from the build environment and try './'",
@@ -1289,10 +1289,11 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     gtk_box_pack_start(GTK_BOX(box_container), table, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(box_container_impulse), table_impulse, TRUE,
                        TRUE, 0);
-
-    background_color.red = 2048;
-    background_color.green = 2048;
-    background_color.blue = 2048;
+	
+    background_color.red = 0.0;
+    background_color.green = 0.0;
+    background_color.blue = 0.0;
+	background_color.alpha = 1.0;
 
     gtk_widget_modify_bg(box, GTK_STATE_NORMAL, &background_color);
 
@@ -1315,9 +1316,10 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
         guiYBufAvgHold[i] = 0.0;
         // guiY[i] = i * 40.0 / (float) PLOT_PTS - 20;
     }
-    trace_transfer_color.red = 16384;
-    trace_transfer_color.green = 65535;
-    trace_transfer_color.blue = 45000;
+    trace_transfer_color.red = 1.0;
+    trace_transfer_color.green = 1.0;
+    trace_transfer_color.blue = 1.0;
+	trace_transfer_color.alpha = 1.0;
 
     graph[0] =
         gtk_databox_lines_new(PLOT_PTS, guiX, guiY, &trace_transfer_color, 1);
@@ -1325,16 +1327,19 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     for (i = 0; i < N_BUFF; i++)
         graph[i + 1] = gtk_databox_lines_new(PLOT_PTS, guiX, guiYBuf[i],
                                              &line_color[i], 1);
-    grid_color.red = 65535;
-    grid_color.green = 65535;
-    grid_color.blue = 32767;
+    grid_color.red = 1.0;
+    grid_color.green = 1.0;
+    grid_color.blue = 0.5;
+	grid_color.alpha = 0.5;
     my_grid = gtk_databox_grid_array_new(19, 10, NULL, grid_x, &grid_color, 1);
     // my_grid = gtk_databox_grid_new (19, 21.5, &grid_color, 1);
     gtk_databox_graph_add(GTK_DATABOX(box), my_grid);
 
-    trace_impulse_color.red = 16384;
-    trace_impulse_color.green = 16384;
-    trace_impulse_color.blue = 65535;
+    trace_impulse_color.red = 0.25;
+    trace_impulse_color.green = 0.25;
+    trace_impulse_color.blue = 1.0;
+	trace_impulse_color.alpha = 1.0;
+	
     graph_impulse = gtk_databox_lines_new(
         PLOT_PTS, gui_impulse_X, gui_impulse_Y, &trace_impulse_color, 1);
     gtk_databox_graph_add(GTK_DATABOX(impulse_box), graph_impulse);
