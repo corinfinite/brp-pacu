@@ -53,8 +53,6 @@ static GtkWidget *about_ok = NULL;
 static GtkWidget *delay_window = NULL;
 static GtkWidget *impulse_window = NULL;
 static GtkWidget *volume_pink_gui = NULL;
-static GtkWidget *pinknoise_button = NULL;
-static GAction *pinknoise_menu_item = NULL;
 static GtkWidget *transfer_function_toggle = NULL;
 static GAction *transfer_function_menu = NULL;
 static GtkWidget *buffer_button[N_BUFF] = {NULL, NULL, NULL, NULL, NULL};
@@ -349,33 +347,14 @@ static void delay_custom_cb(GtkWidget *widget) // , gtkwidget *widget)
 {
     update_delay = 1;
 }
-static void pinknoise_mute(GtkWidget *widget,
-                           char *data) // , gtkwidget *widget)
+
+void pinknoise_button_toggled_cb(GtkWidget *widget,
+                                        char* user_data)
 {
-    if (strcmp(data, "menu") == 0) // what button was pressed
-    {
-        if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pinknoise_button)) !=
-            gtk_toggle_action_get_active(
-                pinknoise_menu_item)) // is this the first call
-        {
-            gtk_toggle_button_set_active(
-                GTK_TOGGLE_BUTTON(pinknoise_button),
-                !gtk_toggle_button_get_active(
-                    GTK_TOGGLE_BUTTON(pinknoise_button)));
-            pinknoise_muted ^= 1;
-        }
-    } else {
-        if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pinknoise_button)) !=
-            gtk_toggle_action_get_active(
-                pinknoise_menu_item)) // is this the first call
-        {
-            gtk_toggle_action_set_active(
-                pinknoise_menu_item,
-                !gtk_toggle_action_get_active(pinknoise_menu_item));
-            pinknoise_muted ^= 1;
-        }
-    }
+	// TODO: change the state of the menu item to be in sync.
+	pinknoise_muted ^= 1;
 }
+
 static void volume_gui(GtkWidget *widget) // , gtkwidget *widget)
 {
     volume_pink_value =
@@ -1125,6 +1104,7 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
         //printf(1,"\n\n-----------Error--------------\n\n\n");
         return (FALSE);
     }
+
     window = GTK_WIDGET(gtk_builder_get_object(builder, "main_window"));
     bkg_dialog = GTK_WIDGET(gtk_builder_get_object(builder, "bkg_dialog"));
     about_me_window =
@@ -1149,13 +1129,15 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
         GTK_WIDGET(gtk_builder_get_object(builder, "Reference_Draw"));
     gui_status_delay_label =
         GTK_WIDGET(gtk_builder_get_object(builder, "delay_status_label"));
-    volume_pink_gui =
+
+	// Pink noise
+	volume_pink_gui =
         GTK_WIDGET(gtk_builder_get_object(builder, "volumebutton1"));
-    pinknoise_button =
-        GTK_WIDGET(gtk_builder_get_object(builder, "pinknoise_button"));
-    pinknoise_menu_item =
-        GTK_TOGGLE_ACTION(gtk_builder_get_object(builder, "pink_noise"));
-    transfer_function_toggle =
+	g_signal_connect(
+        G_OBJECT(gtk_builder_get_object(builder, "pinknoise_button")),
+        "toggled", G_CALLBACK(pinknoise_button_toggled_cb), NULL);
+
+	transfer_function_toggle =
         GTK_WIDGET(gtk_builder_get_object(builder, "TransferFxn"));
     transfer_function_menu =
         GTK_TOGGLE_ACTION(gtk_builder_get_object(builder, "transfer_fxn"));
@@ -1178,9 +1160,6 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
                      G_CALLBACK(gtk_widget_hide_on_delete), NULL);
     gtk_window_set_decorated(GTK_WINDOW(preferences_dialog), FALSE);
 
-    g_signal_connect(
-        G_OBJECT(gtk_builder_get_object(builder, "pinknoise_button")),
-        "clicked", G_CALLBACK(pinknoise_mute), "button");
     // g_signal_connect (G_OBJECT (gtk_builder_get_object (builder,
     // "volumebutton1")), "popdown", G_CALLBACK (volume_popdown_gui), NULL);
     g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "volumebutton1")),
@@ -1225,8 +1204,6 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     g_signal_connect(G_OBJECT(impulse_window), "delete_event",
                      G_CALLBACK(gtk_widget_hide_on_delete), NULL);
 
-    g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "pink_noise")),
-                     "activate", G_CALLBACK(pinknoise_mute), "menu");
     g_signal_connect(
         G_OBJECT(gtk_builder_get_object(builder, "delay_custom_button")),
         "clicked", G_CALLBACK(delay_custom_cb), NULL);
