@@ -550,10 +550,17 @@ gboolean open_file(gchar *fn) {
     printf("%s is being opened\n", fn);
     file_handle = fopen(fn, "rb");
     if (file_handle != NULL) {
-        fread(read_plot_pts, sizeof(gint), 1, file_handle);
+		size_t elements_read;
+        elements_read = fread(read_plot_pts, sizeof(gint), 1, file_handle);
+		if (elements_read != 1) {
+			fprintf (stderr, "WARNING: fread: # elements read != # elements desired");
+		}
         if (read_plot_pts[0] == PLOT_PTS) {
             for (k = 0; k < N_BUFF; k++)
-                fread(guiYBuf[k], sizeof(gfloat), PLOT_PTS, file_handle);
+                elements_read = fread(guiYBuf[k], sizeof(gfloat), PLOT_PTS, file_handle);
+				if (elements_read != PLOT_PTS) {
+					fprintf (stderr, "WARNING: fread: # elements read != # elements desired");
+				}
             if (save_name_str)
                 g_string_assign(save_name_str, fn);
             else
@@ -565,7 +572,7 @@ gboolean open_file(gchar *fn) {
                             "last captured size.");
             fprintf(stderr, "N_FFT has been changed from N_FFT=%d "
                             "* 2 since your last capture.\n",
-                    (int)read_plot_pts);
+                    read_plot_pts);
             return FALSE;
         }
     } else {
@@ -1414,10 +1421,18 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
                 "created for you on your next capture.",
                 NULL, FALSE);
     else {
-        fread(read_plot_pts, sizeof(gint), 1, file_handle);
+		size_t elements_read;
+        elements_read = fread(read_plot_pts, sizeof(gint), 1, file_handle);
+		if (elements_read != 1) {
+			fprintf (stderr, "WARNING: fread: # elements read != # elements desired");
+		}
         if (read_plot_pts[0] == PLOT_PTS) {
             for (i = 0; i < N_BUFF; i++)
-                fread(guiYBuf[i], sizeof(gfloat), PLOT_PTS, file_handle);
+                elements_read = fread(guiYBuf[i], sizeof(gfloat), PLOT_PTS, file_handle);
+				if (elements_read != PLOT_PTS) {
+					fprintf (stderr, "WARNING: fread: # elements read != # elements desired");
+				}
+	
         } else {
             message("The BRP_PACU initialization file has the "
                     "wrong format. An initialization file will be "
