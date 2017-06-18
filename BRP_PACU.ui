@@ -53,9 +53,10 @@
     <property name="title" translatable="yes">My Window</property>
     <property name="icon">sinc.png</property>
     <child>
-      <object class="GtkVBox" id="vbox1">
+      <object class="GtkBox" id="vbox1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
         <child>
           <object class="GtkMenuBar" id="menubar1">
             <property name="visible">True</property>
@@ -71,7 +72,7 @@
           <placeholder/>
         </child>
         <child>
-          <object class="GtkHBox" id="hbox3">
+          <object class="GtkBox" id="hbox3">
             <property name="height_request">28</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -332,7 +333,7 @@
           <placeholder/>
         </child>
         <child>
-          <object class="GtkHBox" id="hbox1">
+          <object class="GtkBox" id="hbox1">
             <property name="height_request">33</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -358,7 +359,7 @@
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <child>
-                  <object class="GtkHBox" id="hbox2">
+                  <object class="GtkBox" id="hbox2">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
@@ -404,7 +405,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <child>
-                  <object class="GtkHBox" id="hbox5">
+                  <object class="GtkBox" id="hbox5">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
@@ -621,10 +622,11 @@
           </packing>
         </child>
         <child>
-          <object class="GtkVBox" id="vbox2">
+          <object class="GtkBox" id="vbox2">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="orientation">vertical</property>
             <child>
               <object class="GtkLabel" id="label2">
                 <property name="visible">True</property>
@@ -723,6 +725,7 @@
         <property name="can_focus">False</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="spacing">2</property>
+        <property name="orientation">vertical</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox" id="dialog-action_area6">
             <property name="visible">True</property>
@@ -766,7 +769,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkVBox" id="vbox5">
+          <object class="GtkBox" id="vbox5">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
@@ -883,10 +886,10 @@
 * Macintosh application Copyright (C) 2009-2013 Andreas Schwab
 * Macintosh synchronization Copyright (C) 2007 Pioneer Research Center USA, Inc.
 * Macintosh integration Copyright (C) 2007, 2008 Imendio AB
-* This program is based on the following libraries 
+* This program is based on the following libraries
 * FFTW: Copyright (c) 1997-1999, 2003 Massachusetts Institute of Technology
 * gtkdatabox: Copyright (C) 1998 - 2008  Dr. Roland Bock
-* 
+*
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
 *  the Free Software Foundation; either version 2 of the License, or
@@ -905,7 +908,7 @@
 Written by Brian R. Phelps aka Electronjunkie
 http://electronjunkie.wordpress.com
 
-Questions or comments? 
+Questions or comments?
 Interested in contributing?
 
 Please email me at lm317t@gmail.com
@@ -916,9 +919,10 @@ A Redhat/Fedora rpm or any other packaging help would be much appreciated.</prop
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">About BRP-PACU</property>
     <child>
-      <object class="GtkVBox" id="vbox3">
+      <object class="GtkBox" id="vbox3">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
         <child>
           <object class="GtkTextView" id="textview1">
             <property name="visible">True</property>
@@ -934,7 +938,7 @@ A Redhat/Fedora rpm or any other packaging help would be much appreciated.</prop
           </packing>
         </child>
         <child>
-          <object class="GtkHBox" id="hbox7">
+          <object class="GtkBox" id="hbox7">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
