@@ -747,11 +747,8 @@ static void apply_preferences_cb(GtkWidget *widget) {
 gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     GtkWidget *box_container;
     GtkWidget *box_container_impulse;
-    /////   GtkWidget *label;
     GtkWidget *table;
     GtkWidget *table_impulse;
-    GtkWidget *separator;
-    ////   GtkRuler * hruler;
     GtkDataboxGraph *my_grid;
     GtkBuilder *builder = gtk_builder_new();
     avg_num = 32;
@@ -792,13 +789,24 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
 
     window = GTK_WIDGET(gtk_builder_get_object(builder, "main_window"));
     bkg_dialog = GTK_WIDGET(gtk_builder_get_object(builder, "bkg_dialog"));
+
+	// About Window
     about_me_window =
         GTK_WIDGET(gtk_builder_get_object(builder, "about_me_window"));
-    about_ok = GTK_WIDGET(gtk_builder_get_object(builder, "about_ok"));
+	sprintf(tmp_string, "BRP-PACU v%s", VERSION);
+    gtk_window_set_title(GTK_WINDOW(about_me_window), tmp_string);
+	g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "about_menu_item")),
+                     "activate", G_CALLBACK(about_me_cb), NULL);
+	g_signal_connect(G_OBJECT(about_me_window), "delete_event",
+                     G_CALLBACK(gtk_widget_hide_on_delete), NULL);
+	about_ok = GTK_WIDGET(gtk_builder_get_object(builder, "about_ok"));
+    g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "about_ok")),
+                     "clicked", G_CALLBACK(about_ok_cb), NULL);
+
     delay_window = GTK_WIDGET(gtk_builder_get_object(builder, "delay1"));
     impulse_window =
         GTK_WIDGET(gtk_builder_get_object(builder, "impulse_window"));
-    box_container = GTK_WIDGET(gtk_builder_get_object(builder, "vbox1"));
+    box_container = GTK_WIDGET(gtk_builder_get_object(builder, "graph_box"));
     gui_label = GTK_WIDGET(gtk_builder_get_object(builder, "label3"));
     gui_sb_label = GTK_WIDGET(gtk_builder_get_object(builder, "delay_label"));
     gui_sb = GTK_WIDGET(gtk_builder_get_object(builder, "spinbutton1"));
@@ -858,12 +866,6 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
                      "activate", G_CALLBACK(save_now_cb), NULL);
     g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "open")),
                      "activate", G_CALLBACK(open_cb), NULL);
-    g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "about_me")),
-                     "activate", G_CALLBACK(about_me_cb), NULL);
-    g_signal_connect(G_OBJECT(about_me_window), "delete_event",
-                     G_CALLBACK(gtk_widget_hide_on_delete), NULL);
-    g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "about_ok")),
-                     "clicked", G_CALLBACK(about_ok_cb), NULL);
     g_signal_connect(G_OBJECT(transfer_function_toggle_button), "toggled",
                      G_CALLBACK(transfer_function_toggle_button_toggled_cb), NULL);
     g_signal_connect(GTK_BUTTON(gtk_builder_get_object(builder, "find_delay")),
@@ -892,10 +894,6 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     gui_frequency = 0;
     gtk_widget_set_size_request(GTK_WIDGET(window), WINDOW_W, WINDOW_H);
 
-    sprintf(tmp_string, "BRP-PACU v%s", VERSION);
-    gtk_window_set_title(GTK_WINDOW(window), tmp_string);
-    gtk_container_set_border_width(GTK_CONTAINER(window), 0);
-
     ///// Impulse response Window  /////////////////////////
     gtk_widget_set_size_request(impulse_window, IMPULSE_WINDOW_W,
                                 IMPULSE_WINDOW_H);
@@ -905,8 +903,6 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     gtk_container_set_border_width(GTK_CONTAINER(impulse_window), 0);
     ////////////////////////////////////////////////////////
 
-    separator = gtk_hseparator_new();
-    gtk_box_pack_start(GTK_BOX(box_container), separator, FALSE, FALSE, 0);
     gtk_label_set_text(GTK_LABEL(gui_label), "0");
 
     gui_idle = 0;
@@ -930,19 +926,11 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     gtk_databox_set_total_limits(GTK_DATABOX(impulse_box), min_x, max_x, max_y,
                                  min_y);
 
-    // hruler = gtk_databox_get_hruler (GTK_DATABOX(box));
-    // gtk_databox_set_scale_type_x (GTK_DATABOX (box),
-    // GTK_DATABOX_SCALE_LOG);
     gtk_databox_set_scale_type_x(GTK_DATABOX(box), GTK_DATABOX_SCALE_LOG2);
     gtk_databox_set_scale_type_y(GTK_DATABOX(box), GTK_DATABOX_SCALE_LINEAR);
-    /*for(index=0; index<10; index++)
-       hruler->metric->ruler_scale[index] = lscale[index];
-    */
-    // gtk_databox_set_hruler (box,hruler);
+
     g_signal_connect(G_OBJECT(box), "motion_notify_event",
                      G_CALLBACK(show_motion_notify_cb), NULL);
-    // g_signal_connect (G_OBJECT (hruler), "state_changed", G_CALLBACK
-    // (show_motion_notify_cb),NULL);
 
     gtk_box_pack_start(GTK_BOX(box_container), table, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(box_container_impulse), table_impulse, TRUE,
