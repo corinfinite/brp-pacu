@@ -338,13 +338,12 @@
             <property name="can_focus">False</property>
             <property name="homogeneous">True</property>
             <child>
-              <object class="GtkToggleButton" id="TransferFxn">
+              <object class="GtkToggleButton" id="transfer_function_toggle_button">
                 <property name="label" translatable="yes">Transfer Function</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">False</property>
                 <property name="active">True</property>
-                <property name="draw_indicator">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
