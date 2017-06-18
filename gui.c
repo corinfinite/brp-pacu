@@ -120,12 +120,6 @@ void message(char *format, char *text, gboolean error) {
         GTK_WINDOW(window), GTK_DIALOG_DESTROY_WITH_PARENT,
         error ? GTK_MESSAGE_ERROR : GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
         format, text);
-#ifdef MAC_INTEGRATION
-    GtkosxApplication *theApp = g_object_new(GTKOSX_TYPE_APPLICATION, NULL);
-    // Bounce icon in dock
-    gtkosx_application_attention_request(theApp, error ? CRITICAL_REQUEST
-                                                       : INFO_REQUEST);
-#endif
     fprintf(stderr, error ? "BRP-PACU error: " : "BRP-PACU warning: ");
     fprintf(stderr, format, text);
     gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
@@ -542,232 +536,6 @@ static void save_file(char *fn) {
                 fn, TRUE);
 }
 
-/* #ifdef MAC_INTEGRATION
-
-static char strBuffer[PATH_MAX];
-
-// To open a file, pass docList containing one record with the file to open
-//     and set basename to NULL.
-// To save a flle, pass basename with the file name
-//     and docList containing one record with the encloseing folder
-// doclist must contain exactly one entry.
-
-static OSStatus DoOpenSave(AEDescList docList, CFStringRef basename)
-
-{
-    int i; // Loop counter.
-
-    // Create the File Open Dialog class.
-    NSOpenPanel* openDlg = [NSOpenPanel openPanel];
-
-    // Enable the selection of files in the dialog.
-    [openDlg setCanChooseFiles:YES];
-
-    // Disable the selection of directories in the dialog.
-    [openDlg setCanChooseDirectories:NO];
-
-    // Disable multiple selections.
-    [openDlg setAllowsMultipleSelection:NO];
-
-    // Display the dialog.  If the OK button was pressed,
-    // process the files.
-    if ( [openDlg runModalForDirectory:nil file:nil] == NSOKButton )
-    {
-        // Get an array containing the full filenames of all
-        // files and directories selected.
-        NSArray* files = [openDlg filenames];
-
-        // Loop through all the files and process them.
-        if ( [files count] == 1)
-        {
-            NSString* fileName = [files objectAtIndex:0];
-
-            return fileName
-        }
-        else
-            message("Cannot open more than one file at a time.", NULL, TRUE);
-            return(0);
-        }
-    }
-}
-
-// Handler function for opening files from the OS X finder
-// such as double-click on a data file
-OSErr
-openAndPrintDocsEventHandler(AppleEvent *theAppleEvent, AppleEvent *reply,
-                                       SInt32 handlerRefcon)
-{
-   AEDescList  docList;
-   OSErr       osError;
-
-   osError = AEGetParamDesc(theAppleEvent, keyDirectObject,
-                            typeAEList, &docList);
-
-   if (osError == noErr)
-      osError = DoOpenSave(docList, NULL);
-   fprintf(stderr, "OS X error %d\n", (int)osError);
-   return(0);
-}
-
-static void
-open_cb(GtkWidget *widget, char *data)
-{
-   OSStatus status;
-   NavDialogCreationOptions navOptions;
-   CFStringRef              uti;
-   CFMutableArrayRef		 identifiers;
-   NavDialogRef             theDialog = NULL;
-
-   status = NavGetDefaultDialogCreationOptions(&navOptions);
-   require_noerr(status, NavGetDefaultDialogCreationOptions);
-
-   navOptions.preferenceKey = 1;
-   navOptions.optionFlags &= ~kNavAllowMultipleFiles;
-
-   gtk_action_set_sensitive(open_menuitem, 0);
-   gtk_action_set_sensitive(save_as, 0);
-   gtk_action_set_sensitive(save_now, 0);
-
-   status = NavCreateGetFileDialog(&navOptions, NULL, NULL, NULL, NULL, NULL,
-&theDialog);
-   require_noerr(status, NavCreateChooseFileDialog);
-
-   // BRP-PACU can open files with the ".brp" extension
-   identifiers = CFArrayCreateMutable( kCFAllocatorDefault, 0,
-&kCFTypeArrayCallBacks );
-   require_action( identifiers != NULL, CantCreateChooseFileFilterIdentifiers,
-status = coreFoundationUnknownErr );
-
-   // create the image browser UTI conforming to "public.data" because it's a
-data file rather than a bundle
-   uti = UTTypeCreatePreferredIdentifierForTag( kUTTagClassFilenameExtension,
-CFSTR("brp"),
-         kUTTypeData );
-   require_action( uti != NULL, CantCreateImageBrowserUTI, status =
-coreFoundationUnknownErr );
-
-   CFArrayAppendValue( identifiers, uti );
-
-   // filter by image browser UTI
-   status = NavDialogSetFilterTypeIdentifiers( theDialog, identifiers );
-   require_noerr( status, CantSetChooseFileFilterIdentifiers );
-
-   status = NavDialogRun(theDialog);
-   require_noerr(status, NavDialogRun);
-
-   NavReplyRecord aNavReplyRecord;
-   status = NavDialogGetReply(theDialog, &aNavReplyRecord);
-   require((status == noErr) || (status == userCanceledErr), NavDialogGetReply);
-
-   if (aNavReplyRecord.validRecord)
-      status = DoOpenSave(aNavReplyRecord.selection, NULL);
-   else
-      status = userCanceledErr;
-
-NavDialogGetReply:
-
-   NavDisposeReply(&aNavReplyRecord);
-
-CantCreateChooseFileFilterIdentifiers:
-CantCreateImageBrowserUTI:
-// coreFoundationUnknownErr:
-CantSetChooseFileFilterIdentifiers:
-NavDialogRun:
-NavCreateChooseFileDialog:
-NavGetDefaultDialogCreationOptions:
-
-   if (status && status != userCanceledErr)
-      fprintf(stderr, "OS X error %d\n", (int) status);
-   if (theDialog != NULL)
-      NavDialogDispose(theDialog);
-
-   gtk_action_set_sensitive(save_as, 1);
-   gtk_action_set_sensitive(save_now, 1);
-   gtk_action_set_sensitive(open_menuitem, 1);
-   return;
-}
-
-// static OSStatus Do_SaveAs(WindowRef inWindow)
-static void
-save_as_cb(GtkWidget *widget, char *data)
-{
-   OSStatus status = noErr;
-   CFStringRef theFileName;
-
-   NavDialogCreationOptions navOptions;
-   status = NavGetDefaultDialogCreationOptions(&navOptions);
-   require_noerr(status, NavGetDefaultDialogCreationOptions);
-
-   theFileName = CFStringCreateWithCString
-                 (NULL, save_name_str ? strrchr(save_name_str->str, '/') + 1 :
-"Untitled.brp",
-                  kCFStringEncodingUTF8);
-   CFMutableStringRef newFileName = CFStringCreateMutableCopy(NULL, 0,
-theFileName);
-   CFRelease(theFileName);
-
-   CFIndex len = CFStringGetLength(newFileName);
-   if (len > 255)
-      len = 255;
-
-   UniChar buffer[255];
-   CFStringGetCharacters(newFileName, CFRangeMake(0, len), buffer);
-
-   UniCharCount extIndex;
-   status = LSGetExtensionInfo(len, buffer, &extIndex);
-   require_noerr(status, LSGetExtensionInfo);
-
-   if (extIndex != kLSInvalidExtensionIndex)
-      CFStringReplace(newFileName, CFRangeMake(extIndex, len - extIndex),
-CFSTR("brp"));
-   else
-      CFStringAppend(newFileName, CFSTR(".brp"));
-
-   navOptions.preferenceKey = 2;
-   navOptions.optionFlags |= kNavPreserveSaveFileExtension;
-   navOptions.saveFileName = newFileName;
-
-   NavDialogRef theDialog = NULL;
-   gtk_action_set_sensitive(open_menuitem, 0);
-   gtk_action_set_sensitive(save_as, 0);
-   gtk_action_set_sensitive(save_now, 0);
-
-   status = NavCreatePutFileDialog(&navOptions, (OSType) NULL, (OSType) "BRPP",
-NULL, NULL, &theDialog);
-   CFRelease(newFileName);
-   require_noerr(status, NavCreatePutFileDialog);
-
-   status = NavDialogRun(theDialog);
-   require_noerr(status, NavDialogRun);
-
-   NavReplyRecord aNavReplyRecord;
-   status = NavDialogGetReply(theDialog, &aNavReplyRecord);
-   require((status == noErr) || (status == userCanceledErr), NavDialogGetReply);
-
-   if (aNavReplyRecord.validRecord)
-      status = DoOpenSave(aNavReplyRecord.selection,
-aNavReplyRecord.saveFileName);
-   else
-      status = userCanceledErr;
-
-NavDialogRun:
-NavCreatePutFileDialog:
-LSGetExtensionInfo:
-NavGetDefaultDialogCreationOptions:
-NavDialogGetReply:
-
-   if (status && status != userCanceledErr)
-      fprintf(stderr, "OS X error %d\n", (int) status);
-   if (theDialog != NULL)
-      NavDialogDispose(theDialog);
-
-   gtk_action_set_sensitive(save_as, 1);
-   gtk_action_set_sensitive(save_now, 1);
-   gtk_action_set_sensitive(open_menuitem, 1);
-   return;
-}   // Do_SaveAs
-
-     #else */
 static void open_cb(GtkWidget *widget, gchar *data) {
     GtkFileFilter *file_filter = NULL;
     gint result;
@@ -976,27 +744,7 @@ static void apply_preferences_cb(GtkWidget *widget) {
         GTK_SPIN_BUTTON(averaging_spin_button));
 }
 
-/*#ifdef MAC_INTEGRATION
-static gboolean deal_with_quit(GtkosxApplication *app, gpointer user_data) {
-    if (open_dialog)
-        gtk_widget_destroy(GTK_WIDGET(open_dialog));
-    if (save_as_dialog)
-        gtk_widget_destroy(GTK_WIDGET(save_as_dialog));
-    gtk_main_quit();
-    printf("GUI is done with cleanup\n");
-    return TRUE;
-}
-
-static gboolean deal_with_open(GtkosxApplication *app, gchar *path,
-                               gpointer user_data) {
-    return open_file(path);
-}
-#endif*/
-
 gboolean create_gui(struct FFT_Frame *data, char *datadir) {
-/*#ifdef MAC_INTEGRATION
-    GtkosxApplication *theApp = g_object_new(GTKOSX_TYPE_APPLICATION, NULL);
-#endif*/
     GtkWidget *box_container;
     GtkWidget *box_container_impulse;
     /////   GtkWidget *label;
@@ -1029,10 +777,6 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
 
     GError *error = NULL;
 
-/*#ifdef MAC_INTEGRATION
-    // Find GtkBuilder file in application resource directory first
-    datadir = gtkosx_application_get_resource_path();
-#endif*/
     sprintf(gtkbuilder_path, "%s/BRP_PACU.ui", datadir);
     if (access(gtkbuilder_path, R_OK) != 0 ) {
         fprintf(stderr, "Notice: system-wide UI file %s doesn't exist, assume we're running from the build environment and try './'",
