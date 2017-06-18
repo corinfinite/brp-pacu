@@ -29,6 +29,7 @@
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 #include <gtkdatabox.h>
+#include <glib.h>
 #include "config.h"
 #include "gui.h"
 #include "testfft.h"
@@ -53,8 +54,7 @@ static GtkWidget *about_ok = NULL;
 static GtkWidget *delay_window = NULL;
 static GtkWidget *impulse_window = NULL;
 static GtkWidget *volume_pink_gui = NULL;
-static GtkWidget *transfer_function_toggle = NULL;
-static GAction *transfer_function_menu = NULL;
+static GtkToggleButton *transfer_function_toggle_button = NULL;
 static GtkWidget *buffer_button[N_BUFF] = {NULL, NULL, NULL, NULL, NULL};
 static GAction *buffer_menu[N_BUFF] = {NULL, NULL, NULL, NULL, NULL};
 static GtkWidget *preferences_dialog = NULL;
@@ -376,44 +376,8 @@ static void about_me_cb(GtkWidget *widget) // , gtkwidget *widget)
     gtk_window_present(GTK_WINDOW(about_me_window));
 }
 // Trigger the gui to do the transfer function
-static void transfer_function_toggled_cb(GtkWidget *widget) {
-    if (gtk_toggle_button_get_active(
-            GTK_TOGGLE_BUTTON(transfer_function_toggle))) {
-        if (tf == 0) // Don't do anything if initiated by transfer_fxn_cb()
-        {
-            tf = 1;
-            gtk_toggle_action_set_active(
-                GTK_TOGGLE_ACTION(transfer_function_menu), TRUE);
-        }
-    } else {
-        if (tf != 0) // Don't do anything if initiated by transfer_fxn_cb()
-        {
-            tf = 0;
-            gtk_toggle_action_set_active(
-                GTK_TOGGLE_ACTION(transfer_function_menu), FALSE);
-        }
-    }
-}
-
-static void transfer_fxn_cb(GtkWidget *widget) {
-    if (gtk_toggle_action_get_active(
-            GTK_TOGGLE_ACTION(transfer_function_menu))) {
-        if (tf != 1) // Don't do anything if initiated by
-                     // transfer_function_toggled_cb()
-        {
-            tf = 1;
-            gtk_toggle_button_set_active(
-                GTK_TOGGLE_BUTTON(transfer_function_toggle), TRUE);
-        }
-    } else {
-        if (tf == 1) // Don't do anything if initiated by
-                     // transfer_function_toggled_cb()
-        {
-            tf = 0;
-            gtk_toggle_button_set_active(
-                GTK_TOGGLE_BUTTON(transfer_function_toggle), FALSE);
-        }
-    }
+static void transfer_function_toggle_button_toggled_cb(GtkWidget *widget) {
+	tf ^= 1;
 }
 
 // capture call back
@@ -572,7 +536,7 @@ gboolean open_file(gchar *fn) {
                             "last captured size.");
             fprintf(stderr, "N_FFT has been changed from N_FFT=%d "
                             "* 2 since your last capture.\n",
-                    read_plot_pts);
+                    (int) read_plot_pts);
             return FALSE;
         }
     } else {
@@ -1144,10 +1108,8 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
         G_OBJECT(gtk_builder_get_object(builder, "pinknoise_button")),
         "toggled", G_CALLBACK(pinknoise_button_toggled_cb), NULL);
 
-	transfer_function_toggle =
-        GTK_WIDGET(gtk_builder_get_object(builder, "TransferFxn"));
-    transfer_function_menu =
-        GTK_TOGGLE_ACTION(gtk_builder_get_object(builder, "transfer_fxn"));
+	transfer_function_toggle_button =
+        GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder, "transfer_function_toggle_button"));
     preferences_dialog =
         GTK_WIDGET(gtk_builder_get_object(builder, "preferences_dialog"));
     smoothing_spin_button =
@@ -1188,10 +1150,8 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
                      G_CALLBACK(gtk_widget_hide_on_delete), NULL);
     g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "about_ok")),
                      "clicked", G_CALLBACK(about_ok_cb), NULL);
-    g_signal_connect(G_OBJECT(transfer_function_menu), "activate",
-                     G_CALLBACK(transfer_fxn_cb), NULL);
-    g_signal_connect(G_OBJECT(transfer_function_toggle), "clicked",
-                     G_CALLBACK(transfer_function_toggled_cb), NULL);
+    g_signal_connect(G_OBJECT(transfer_function_toggle_button), "toggled",
+                     G_CALLBACK(transfer_function_toggle_button_toggled_cb), NULL);
     g_signal_connect(GTK_BUTTON(gtk_builder_get_object(builder, "find_delay")),
                      "clicked", G_CALLBACK(delay_cb), data);
     g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "find_delay_m")),
