@@ -56,7 +56,6 @@ static GtkWidget *impulse_window = NULL;
 static GtkWidget *volume_pink_gui = NULL;
 static GtkToggleButton *transfer_function_toggle_button = NULL;
 static GtkWidget *buffer_button[N_BUFF] = {NULL, NULL, NULL, NULL, NULL};
-static GAction *buffer_menu[N_BUFF] = {NULL, NULL, NULL, NULL, NULL};
 static GtkWidget *preferences_dialog = NULL;
 static GtkWidget *smoothing_spin_button = NULL;
 static GtkWidget *averaging_spin_button = NULL;
@@ -108,12 +107,11 @@ static GdkRGBA grid_color;
 static GdkRGBA trace_transfer_color;
 static GdkRGBA trace_impulse_color;
 static GdkRGBA line_color[N_BUFF] = {
-    // unused, red, green, blue
-    {0, 16384, 16384, 65535},
-    {0, 0, 62000, 0},
-    {0, 65535, 0, 0},
-    {0, 65535, 16384, 65535},
-    {0, 65535, 65535, 65535}};
+    {1.0, 0.0, 0.0, 1.0},
+    {0.0, 0.0, 1.0, 1.0},
+    {1.0, 1.0, 0.0, 1.0},
+    {0.0, 1.0, 1.0, 1.0},
+    {1.0, 0.0, 1.0, 1.0}};
 static GdkRGBA myColor1 = {0.3, 0.3, 0.3, 1.0};
 static GdkRGBA myColor2 = {0.3, 0.3, 0.3, 1.0};
 
@@ -457,7 +455,6 @@ static void buffer_button_cb(GtkWidget *widget, gpointer p) {
         {
             gtk_databox_graph_add(GTK_DATABOX(box), graph[i + 1]);
             buffer[i] = 1; // Its not on the screen
-            gtk_toggle_action_set_active(buffer_menu[i], TRUE);
         }
     } else {
         if (buffer[i] ==
@@ -465,33 +462,6 @@ static void buffer_button_cb(GtkWidget *widget, gpointer p) {
         {
             gtk_databox_graph_remove(GTK_DATABOX(box), graph[i + 1]);
             buffer[i] = 0; // Its on the screen
-            gtk_toggle_action_set_active(buffer_menu[i], FALSE);
-        }
-    }
-    buffer_last_clicked = i;
-}
-
-static void buffer_menu_cb(GtkWidget *widget, gpointer p) {
-    gint i;
-    i = GPOINTER_TO_INT(p);
-
-    if (gtk_toggle_action_get_active(buffer_menu[i])) {
-        if (buffer[i] !=
-            1) // Don't do anything if initiated by buffer_button_cb()
-        {
-            gtk_databox_graph_add(GTK_DATABOX(box), graph[i + 1]);
-            buffer[i] = 1; // Its not on the screen
-            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(buffer_button[i]),
-                                         TRUE);
-        }
-    } else {
-        if (buffer[i] ==
-            1) // Don't do anything if initiated by buffer_button_cb()
-        {
-            gtk_databox_graph_remove(GTK_DATABOX(box), graph[i + 1]);
-            buffer[i] = 0; // Its on the screen
-            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(buffer_button[i]),
-                                         FALSE);
         }
     }
     buffer_last_clicked = i;
@@ -1293,16 +1263,6 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     buffer_button[2] = GTK_WIDGET(gtk_builder_get_object(builder, "buff3"));
     buffer_button[3] = GTK_WIDGET(gtk_builder_get_object(builder, "buff4"));
     buffer_button[4] = GTK_WIDGET(gtk_builder_get_object(builder, "buffAvg"));
-    buffer_menu[0] =
-        GTK_TOGGLE_ACTION(gtk_builder_get_object(builder, "buffer_1"));
-    buffer_menu[1] =
-        GTK_TOGGLE_ACTION(gtk_builder_get_object(builder, "buffer_2"));
-    buffer_menu[2] =
-        GTK_TOGGLE_ACTION(gtk_builder_get_object(builder, "buffer_3"));
-    buffer_menu[3] =
-        GTK_TOGGLE_ACTION(gtk_builder_get_object(builder, "buffer_4"));
-    buffer_menu[4] =
-        GTK_TOGGLE_ACTION(gtk_builder_get_object(builder, "bufferAvg"));
 
     g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "auto_resize")),
                      "clicked", G_CALLBACK(resize_cb), (gpointer)box);
@@ -1318,8 +1278,8 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
         g_signal_connect(G_OBJECT(buffer_button[i]), "clicked",
                          G_CALLBACK(buffer_button_cb),
                          GINT_TO_POINTER((gint)i));
-        g_signal_connect(G_OBJECT(buffer_menu[i]), "activate",
-                         G_CALLBACK(buffer_menu_cb), GINT_TO_POINTER((gint)i));
+		fprintf(stderr, "Signal for buffer %d connected\n", i);
+
     }
     g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "capt")),
                      "clicked", G_CALLBACK(capture_cb), (gpointer)box);
