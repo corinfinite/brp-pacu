@@ -30,6 +30,7 @@
 #include <gtk/gtk.h>
 #include <gtkdatabox.h>
 #include <glib.h>
+#include <sys/stat.h> //mkdir
 #include "config.h"
 #include "gui.h"
 #include "testfft.h"
@@ -81,9 +82,9 @@ static int buffer_last_clicked;
 static GtkWidget *bkg_dialog;
 
 // static GtkWidget *cb;
-static GAction *save_now;
-static GAction *save_as;
-static GAction *open_menuitem;
+static GSimpleAction *save_now;
+static GSimpleAction *save_as;
+static GSimpleAction *open_menuitem;
 
 static gint avg_index = 0;
 static gchar tf = 1;
@@ -500,7 +501,7 @@ gboolean open_file(gchar *fn) {
                             "last captured size.");
             fprintf(stderr, "N_FFT has been changed from N_FFT=%d "
                             "* 2 since your last capture.\n",
-                    (int) read_plot_pts);
+                    (int) read_plot_pts[0]);
             return FALSE;
         }
     } else {
@@ -557,8 +558,8 @@ static void open_cb(GtkWidget *widget, gchar *data) {
     gtk_file_chooser_set_filter(GTK_FILE_CHOOSER(open_dialog),
                                 GTK_FILE_FILTER(file_filter));
     gtk_window_set_transient_for(GTK_WINDOW(open_dialog), GTK_WINDOW(window));
-    gtk_action_set_sensitive(save_as, 0);
-    gtk_action_set_sensitive(save_now, 0);
+    g_simple_action_set_enabled (save_as, 0);
+    g_simple_action_set_enabled (save_now, 0);
     result = gtk_dialog_run(GTK_DIALOG(open_dialog));
     switch (result) {
     case GTK_RESPONSE_ACCEPT:
@@ -568,8 +569,8 @@ static void open_cb(GtkWidget *widget, gchar *data) {
         break;
     }
     gtk_widget_destroy(open_dialog);
-    gtk_action_set_sensitive(save_as, 1);
-    gtk_action_set_sensitive(save_now, 1);
+    g_simple_action_set_enabled (save_as, 1);
+    g_simple_action_set_enabled (save_now, 1);
     open_dialog = NULL;
     return;
 }
@@ -603,7 +604,7 @@ static void save_as_cb(GtkWidget *widget, char *data) {
     gtk_file_chooser_set_do_overwrite_confirmation(
         GTK_FILE_CHOOSER(save_as_dialog), TRUE);
 
-    gtk_action_set_sensitive(open_menuitem, 0);
+    g_simple_action_set_enabled (open_menuitem, 0);
     if (save_name_str)
         g_string_assign(file_name_str, save_name_str->str);
     while (TRUE) {
@@ -630,7 +631,7 @@ static void save_as_cb(GtkWidget *widget, char *data) {
     }
     gtk_widget_destroy(save_as_dialog);
     save_as_dialog = NULL;
-    gtk_action_set_sensitive(open_menuitem, 1);
+    g_simple_action_set_enabled (open_menuitem, 1);
     return;
 }
 ///   #endif  ** ****** */
@@ -811,9 +812,9 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     gui_sb_label = GTK_WIDGET(gtk_builder_get_object(builder, "delay_label"));
     gui_sb = GTK_WIDGET(gtk_builder_get_object(builder, "spinbutton1"));
     gui_db_label = GTK_WIDGET(gtk_builder_get_object(builder, "label4"));
-    save_as = G_ACTION(gtk_builder_get_object(builder, "save_as"));
-    save_now = G_ACTION(gtk_builder_get_object(builder, "save_now"));
-    open_menuitem = G_ACTION(gtk_builder_get_object(builder, "open"));
+    save_as = G_SIMPLE_ACTION(gtk_builder_get_object(builder, "save_as"));
+    save_now = G_SIMPLE_ACTION(gtk_builder_get_object(builder, "save_now"));
+    open_menuitem = G_SIMPLE_ACTION(gtk_builder_get_object(builder, "open"));
     box_container_impulse =
         GTK_WIDGET(gtk_builder_get_object(builder, "impulse_box"));
     measured_draw =
@@ -941,7 +942,7 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     background_color.blue = 0.0;
 	background_color.alpha = 1.0;
 
-    gtk_widget_modify_bg(box, GTK_STATE_NORMAL, &background_color);
+    gtk_widget_override_background_color (box, GTK_STATE_NORMAL, &background_color);
 
     guiX = g_new0(gfloat, PLOT_PTS);
     guiY = g_new0(gfloat, PLOT_PTS);
