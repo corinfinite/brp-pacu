@@ -16,8 +16,8 @@
 
 bin_PROGRAMS = BRP_PACU
 pkgconfigdir = $(libdir)/pkgconfig
-BRP_PACU_SOURCES = testfft.c gui.c BRP_PACU.c
-include_HEADERS = testfft.h gui.h main.h
+BRP_PACU_SOURCES = testfft.c gui.c BRP_PACU.c generator.c
+include_HEADERS = testfft.h gui.h main.h generator.h
 EXTRA_DIST = BRP_PACU.ui sinc.png info.plist \
  sinc.icns sinc.xcf brpData.icns README-Mac.txt INSTALL-Mac.txt movelibraries.sh BRP_PACU_sh
 AM_CFLAGS =  -O2 -Wall -g `pkg-config --cflags gtk+-3.0` `pkg-config --cflags gdk-3.0` `pkg-config --cflags glib-2.0`  `pkg-config --cflags  gtkdatabox` -DDATADIR=\"$(pkgdatadir)\" -lgthread-2.0 -DGTK_DISABLE_SINGLE_INCLUDES -DGSEAL_ENABLE

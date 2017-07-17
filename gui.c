@@ -26,14 +26,15 @@
 #include <gtkosxapplication.h>
 #endif
 
+#include "generator.h"
+#include "config.h"
+#include "gui.h"
+#include "testfft.h"
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 #include <gtkdatabox.h>
 #include <glib.h>
 #include <sys/stat.h> //mkdir
-#include "config.h"
-#include "gui.h"
-#include "testfft.h"
 #include <errno.h>
 #include <math.h>
 #include <string.h>
@@ -60,7 +61,6 @@ static GtkWidget *buffer_button[N_BUFF] = {NULL, NULL, NULL, NULL, NULL};
 static GtkWidget *preferences_dialog = NULL;
 static GtkWidget *smoothing_spin_button = NULL;
 static GtkWidget *averaging_spin_button = NULL;
-static gfloat volume_pink_value = 0;
 static gfloat *guiX = NULL;
 static gfloat *guiY = NULL;
 static gfloat *gui_impulse_Y = NULL;
@@ -71,7 +71,6 @@ static GString *file_name_str = NULL;
 static GString *save_name_str = NULL;
 static char *home_string, *file_path1, *file_path2;
 
-static char pinknoise_muted = 0;
 static char update_delay = 0;
 static char buffer[N_BUFF] = {2, 2, 2, 2, 2};
 static gfloat grid_x[] = {32.0,   64.0,   128.0,  256.0,  512.0,
@@ -150,9 +149,7 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
     //gc1 = gdk_gc_new(gtk_widget_get_window(measured_draw));
     //gc2 = gdk_gc_new(gtk_widget_get_window(reference_draw));
     /////   label = g_new0(gchar*, 10);
-    data->pink_muted = pinknoise_muted;
 
-    data->volume_pink = volume_pink_value;
     avg_index++;
     if (avg_index >= avg_num)
         avg_index = 0;
@@ -345,13 +342,14 @@ void pinknoise_button_toggled_cb(GtkWidget *widget,
                                         char* user_data)
 {
 	// TODO: change the state of the menu item to be in sync.
-	pinknoise_muted ^= 1;
+	//pinknoise_muted ^= 1;
+	generator_toggle_muted();
 }
 
-static void volume_gui(GtkWidget *widget) // , gtkwidget *widget)
+static void generator_volume_change_cb(GtkWidget *widget)
 {
-    volume_pink_value =
-        gtk_spin_button_get_value(GTK_SPIN_BUTTON(volume_pink_gui));
+	generator_set_volume(
+        gtk_spin_button_get_value(GTK_SPIN_BUTTON(volume_pink_gui)));
 }
 static void delay_keep_cb(GtkWidget *widget) // , gtkwidget *widget)
 {
@@ -855,7 +853,8 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     // g_signal_connect (G_OBJECT (gtk_builder_get_object (builder,
     // "volumebutton1")), "popdown", G_CALLBACK (volume_popdown_gui), NULL);
     g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "volumebutton1")),
-                     "value-changed", G_CALLBACK(volume_gui), NULL);
+                     "value-changed", G_CALLBACK(generator_volume_change_cb),
+                     NULL);
     //  g_signal_connect (G_OBJECT (gtk_builder_get_object (builder,
     //  "volumebutton1")), "clicked", G_CALLBACK (volume_popup_gui), NULL);
 
@@ -1022,8 +1021,9 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
                      "value-changed", G_CALLBACK(gain_cb),
                      (G_OBJECT(gtk_builder_get_object(builder, "gain1"))));
 
-    volume_pink_value =
-        gtk_spin_button_get_value(GTK_SPIN_BUTTON(volume_pink_gui));
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(volume_pink_gui),
+                              generator_get_volume());
+
     gtk_widget_show_all(window);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

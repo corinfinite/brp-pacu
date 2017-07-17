@@ -23,6 +23,7 @@
 *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "generator.h"
 #include "gui.h"
 #include "main.h"
 #include "testfft.h"
@@ -38,16 +39,10 @@ volatile struct FFT_Frame
     *temp_frame_data; // tmp copy so mutexes don't need to wait
 static float audio1[8192];
 static float audio2[8192];
-static float pink_noise[8192];
 volatile char run = 1;
 static guint timer_id = 0;
 // static guint BUF_SIZE = BUFSIZE;
-float b0, b1, b2, b3, b4, b5, b6, white;
-float scale_it = 1.0f; // was 0.98, which is wrong (shifts the
-                       // poles to create a highpass. Let's hope
-                       // this wasn't a quick hack to work around
-                       // a numerical instability...
-float volume = 0.5;
+
 GMutex *thread_mutex;
 
 jack_port_t *measured_input_port;
@@ -83,32 +78,11 @@ int Fill_Buffer(jack_nframes_t nframes, void *arg) {
             in_buffer2 = jack_port_get_buffer(reference_input_port, nframes);
             out_buffer = jack_port_get_buffer(generator_output_port, nframes);
 
-            for (k = 0; k < nframes; k++) {
-                white = ((float)(rand() % 10000) - 10000.0 / 2.0) / 999900.0;
-                // Shamelessly taken from
-                // http://www.firstpr.com.au/dsp/pink-noise/
-                // Based on a filter by  Robert Bristow-Johnson
-                b0 = (0.99886 * b0 + white * 0.0555179) * scale_it;
-                b1 = (0.99332 * b1 + white * 0.0750759) * scale_it;
-                b2 = (0.96900 * b2 + white * 0.1538520) * scale_it;
-                b3 = (0.86650 * b3 + white * 0.3104856) * scale_it;
-                b4 = (0.55000 * b4 + white * 0.5329522) * scale_it;
-                b5 = (-0.7616 * b5 - white * 0.0168980) * scale_it;
-                if (fill_it->pink_muted)
-                    pink_noise[k] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 +
-                                     (white * 0.5362) * scale_it) *
-                                    (pow(2.0, fill_it->volume_pink + 29) /
-                                     (pow(2.0, 32.0)));
-                else
-                    pink_noise[k] = 0.0;
-                b6 = (white * 0.115926) * scale_it;
-            }
+			generator_fill_buffer(nframes, out_buffer);
 
             memcpy(audio1, in_buffer1,
                    sizeof(jack_default_audio_sample_t) * nframes);
             memcpy(audio2, in_buffer2,
-                   sizeof(jack_default_audio_sample_t) * nframes);
-            memcpy(out_buffer, pink_noise,
                    sizeof(jack_default_audio_sample_t) * nframes);
 
         } else if (ts == JackTransportStopped) {
@@ -478,16 +452,8 @@ int jack_init() {
 
 int main(int argc, char *argv[]) {
     //        struct FFT_Frame *FFT_Kit = g_new0 (struct FFT_Frame, 1);
-
-    b0 = 0;
-    b1 = 0;
-    b2 = 0;
-    b3 = 0;
-    b4 = 0;
-    b5 = 0;
-    b6 = 0;
-    white = 0;
-    printf("BLAH\n");
+    generator_setup();
+    printf("BRP-PACU is starting\n");
     gtk_init(&argc, &argv);
     int ierr = -1;
 
