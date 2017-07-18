@@ -86,7 +86,7 @@ static GSimpleAction *save_as;
 static GSimpleAction *open_menuitem;
 
 static gint avg_index = 0;
-static gchar tf = 1;
+static gchar tf = 1; // Should the transfer function be applied?
 static gfloat avgY[PLOT_PTS][MAX_AVG_NUM];
 
 static gint gui_idle = 0;
@@ -174,9 +174,11 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
                     (0.0 +
                      20.0 * log10((gfloat)data->fft_returned_1[i] /
                                   (gfloat)data->fft_returned_2[i]));
+				// Transfer function and then scaled to dB
             else
                 avgY[i][avg_index] =
                     (0.0 + 20.0 * log10((gfloat)data->fft_returned_1[i]));
+				// Measured FFT scaled to dB
             //      avgY[i][avg_index] =
             //      (20*log10((gfloat)data->fft_returned_1[index]+1));
 

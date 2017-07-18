@@ -148,6 +148,11 @@ int impulse_capture(struct FFT_Frame *session) {
         // (a+b*i)/(c+d*i) = (a*c+c*b*i-d*i*a+d*b)/(c^2+d^2)
         // The impulse response, h(t) is the Inv Fourier Trxfm of the above
         // line, H(f) = Y(f) / X(f) =  ( Y(f) x X*(f) ) / ( X(f) x X*(f) )
+		// X(f): FFT of reference signal
+		// Y(f): FFT of measured signal
+		//
+		// Further reading: "Dual Channel FFT Analysis (Part I)" (BV0013) - Brüel & Kjær
+		// https://www.bksv.com/media/doc/bv0013.pdf
     }
 
     //fftw_one(reverse_plan, in1, out1);
