@@ -35,7 +35,7 @@ struct FFT_Frame {
     fftw_plan plan1;              // FFT Plan
     fftw_plan plan2;              // FFT Plan
     fftw_plan reverse_plan;      // FFT Plan
-    
+
     fftw_complex *plan_buf1;
     fftw_complex *plan_buf2;
 
@@ -46,8 +46,6 @@ struct FFT_Frame {
     double *fft_returned_1;
     double *fft_returned_2;
     double *rfft_returned_1;
-    float volume_pink;
-    char pink_muted;
     //////////////////
     short *delay;
     int delay_size;

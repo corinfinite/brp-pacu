@@ -255,8 +255,6 @@ static gboolean MyGTKFunction(struct FFT_Frame *frame_data) {
     }
 
     g_mutex_lock(thread_mutex);
-    temp_frame_data->pink_muted = frame_data->pink_muted;
-    temp_frame_data->volume_pink = frame_data->volume_pink;
     temp_frame_data->find_delay = frame_data->find_delay;
     temp_frame_data->find_impulse = frame_data->find_impulse;
     temp_frame_data->delay_size = frame_data->delay_size;
@@ -277,8 +275,6 @@ static gboolean MyGTKFunction(struct FFT_Frame *frame_data) {
     gui_idle_func((struct FFT_Frame *)temp_frame_data);
 
     g_mutex_lock(thread_mutex);
-    frame_data->pink_muted = temp_frame_data->pink_muted;
-    frame_data->volume_pink = temp_frame_data->volume_pink;
     frame_data->find_delay = temp_frame_data->find_delay;
     frame_data->find_impulse = temp_frame_data->find_impulse;
     frame_data->delay_size = temp_frame_data->delay_size;
@@ -303,7 +299,6 @@ struct FFT_Frame *init_fft_frame(void) {
     FFT_Kit->delay = (short *)malloc(sizeof(short) * DELAY_BUFFER_SIZE);
 
     FFT_Kit->delay_size = 0;
-    FFT_Kit->volume_pink = 0.0;
     FFT_Kit->find_delay = 0;
     FFT_Kit->find_impulse = 0;
 
