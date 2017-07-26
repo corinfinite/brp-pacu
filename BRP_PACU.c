@@ -26,7 +26,7 @@
 #include "generator.h"
 #include "gui.h"
 #include "main.h"
-#include "testfft.h"
+#include "analysis.h"
 #include <gdk/gdk.h>
 #include <glib.h>
 #include <gtk/gtk.h>

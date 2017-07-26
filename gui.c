@@ -29,7 +29,7 @@
 #include "generator.h"
 #include "config.h"
 #include "gui.h"
-#include "testfft.h"
+#include "analysis.h"
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 #include <gtkdatabox.h>
@@ -145,7 +145,7 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
         fprintf(stderr, "Box not a gtk_databox\n");
         return FALSE;
     }
-	
+
     //gc1 = gdk_gc_new(gtk_widget_get_window(measured_draw));
     //gc2 = gdk_gc_new(gtk_widget_get_window(reference_draw));
     /////   label = g_new0(gchar*, 10);
@@ -261,7 +261,7 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
         if (max < data->buffer_data_1[k])
             max = data->buffer_data_1[k];
     }
-	
+
     if (max > 20000) {
         myColor1.red = 1.0;
         myColor1.green = 0.3;
@@ -287,7 +287,7 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
 	cairo_t *cr;
 	cr = gdk_cairo_create (gtk_widget_get_window (measured_draw));
 	cairo_pattern_set_extend (cairo_get_source (cr), CAIRO_EXTEND_REPEAT);
-	
+
 	cairo_rectangle (cr, 0, 7, 16, 16);
 	gdk_cairo_set_source_rgba(cr, &myColor1);
 	cairo_fill (cr);
@@ -320,10 +320,10 @@ gboolean gui_idle_func(struct FFT_Frame *data) {
         myColor2.green = 0.0;
         myColor2.blue = 0.0;
     }
-	
+
 	cr = gdk_cairo_create (gtk_widget_get_window (reference_draw));
 	cairo_pattern_set_extend (cairo_get_source (cr), CAIRO_EXTEND_REPEAT);
-	
+
 	cairo_rectangle (cr, 0, 7, 16, 16);
 	gdk_cairo_set_source_rgba(cr, &myColor2);
 	cairo_fill (cr);
@@ -937,7 +937,7 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     gtk_box_pack_start(GTK_BOX(box_container), table, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(box_container_impulse), table_impulse, TRUE,
                        TRUE, 0);
-	
+
     background_color.red = 0.0;
     background_color.green = 0.0;
     background_color.blue = 0.0;
@@ -987,7 +987,7 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
     trace_impulse_color.green = 0.25;
     trace_impulse_color.blue = 1.0;
 	trace_impulse_color.alpha = 1.0;
-	
+
     graph_impulse = gtk_databox_lines_new(
         PLOT_PTS, gui_impulse_X, gui_impulse_Y, &trace_impulse_color, 1);
     gtk_databox_graph_add(GTK_DATABOX(impulse_box), graph_impulse);
@@ -1087,7 +1087,7 @@ gboolean create_gui(struct FFT_Frame *data, char *datadir) {
 				if (elements_read != PLOT_PTS) {
 					fprintf (stderr, "WARNING: fread: # elements read != # elements desired");
 				}
-	
+
         } else {
             message("The BRP_PACU initialization file has the "
                     "wrong format. An initialization file will be "

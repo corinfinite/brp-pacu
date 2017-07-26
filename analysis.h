@@ -1,5 +1,5 @@
 /*
-* testfft.h : defines Audio_Sesssion struct, various FFT Parameters
+* analysis.h : defines Audio_Sesssion struct, various FFT Parameters
 *             such as window size.
 *
 *
@@ -35,8 +35,8 @@
 #define BUFSIZE 256
 #define B_N N_FFT / BUFSIZE
 
-#ifndef TESTFFT_H
-#define TESTFFT_H
+#ifndef ANALYSIS_H
+#define ANALYSIS_H
 
 struct AUDIO_SESSION {
     fftw_plan plan;

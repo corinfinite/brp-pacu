@@ -1,5 +1,5 @@
 /*
-* testfft.c : Simply perform the fft of channel 1 and channel 2 inputs,
+* analysis.c : Simply perform the fft of channel 1 and channel 2 inputs,
 *             Assumes data is windowed.  Modifies and reads input memory pointed
 *             to by struct session.
 *
@@ -19,7 +19,7 @@
 *  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA.
 */
-#include "testfft.h"
+#include "analysis.h"
 #include "main.h"
 #include <fftw3.h>
 #include <math.h>
@@ -49,6 +49,7 @@ int fft_capture(struct FFT_Frame *session) {
         fft[k] = 0;
     }
 
+	// Copy real values from buffer into complex fftw array
     for (k = 0; k < N_FFT; k++) {
         c_re(in[k]) = (double)buf[k];
         c_im(in[k]) = 0.0;
@@ -57,14 +58,18 @@ int fft_capture(struct FFT_Frame *session) {
     //fftw_one(plan, in, out);
     fftw_execute(plan);
 
+	// Calculate power:
     for (k = 0; k < N_FFT; k++) {
         datapt = (double)(sqrt(c_re(out[k]) * c_re(out[k]) +
                                c_im(out[k]) * c_im(out[k])));
         fft[k] = datapt;
     }
+	// Put result in
     for (k = 0; k < N_FFT; k++) {
         session->fft_returned_1[k] = fft[k] / 32767.0 + 0.00000001;
     }
+
+	////////////////////////////////////////////////////////////////////////
 
     buf = session->buffer_data_2;
     for (k = 0; k < N_FFT; k++) {
