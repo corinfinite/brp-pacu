@@ -38,13 +38,38 @@
 #ifndef ANALYSIS_H
 #define ANALYSIS_H
 
-struct AUDIO_SESSION {
-    fftw_plan plan;
-    short *buffer_data;
-    double *fft_returned;
+#define c_re(c) ((c)[0]) // Get real element of FFTW complex type
+#define c_im(c) ((c)[1]) // Get imaginary element of FFTW complex type
+
+// An AnalysisSession contains the components of a dual channel analysis
+struct AnalysisSession {
+	// 1 = measured, 2 = reference
+    fftw_plan plan1;              // FFT Plan
+    fftw_plan plan2;              // FFT Plan
+    fftw_plan reverse_plan;       // FFT Plan
+
+    fftw_complex *plan_buf1;
+    fftw_complex *plan_buf2;
+
+    short *prewin_buffer_data_1; // Data from channel
+    short *prewin_buffer_data_2;
+    short *buffer_data_1; // data from channel after window function
+    short *buffer_data_2; // data from channel after window function
+    double *fft_returned_1;
+    double *fft_returned_2;
+    double *rfft_returned_1;
+
+    short *delay;
+    int delay_size;
+    char find_delay;
+    char find_impulse;
 };
 
-int fft_capture(struct FFT_Frame *session);
+struct AnalysisSession *analysis_create();
 
-int impulse_capture(struct FFT_Frame *session);
+void analysis_destroy(volatile struct AnalysisSession *session);
+
+int fft_capture(struct AnalysisSession *session);
+
+int impulse_capture(struct AnalysisSession *session);
 #endif

@@ -34,8 +34,8 @@
 #include <jack/jack.h>
 #include <string.h>
 
-volatile struct FFT_Frame *fill_it;
-volatile struct FFT_Frame
+volatile struct AnalysisSession *fill_it;
+volatile struct AnalysisSession
     *temp_frame_data; // tmp copy so mutexes don't need to wait
 static float audio1[8192];
 static float audio2[8192];
@@ -61,7 +61,7 @@ volatile enum { Init, Run, Started, Exit } client_state = Init;
 }*/
 
 int Fill_Buffer(jack_nframes_t nframes, void *arg) {
-    // fill_it = (struct FFT_Frame *) malloc(sizeof(struct FFT_Frame ));
+    // fill_it = (struct AnalysisSession *) malloc(sizeof(struct AnalysisSession ));
     int k, j, period_size;
     jack_default_audio_sample_t *in_buffer1, *in_buffer2, *out_buffer;
 
@@ -179,7 +179,7 @@ int Fill_Buffer(jack_nframes_t nframes, void *arg) {
     return 0;
 }
 
-static gboolean MyGTKFunction(struct FFT_Frame *frame_data) {
+static gboolean MyGTKFunction(struct AnalysisSession *frame_data) {
     int j, max_index = 0;
     //   float avg[2000], min;
     double max, tmp;
@@ -192,7 +192,7 @@ static gboolean MyGTKFunction(struct FFT_Frame *frame_data) {
     memcpy(temp_frame_data->plan1, frame_data->plan1, sizeof(frame_data->plan1));
     memcpy(temp_frame_data->plan2, frame_data->plan2, sizeof(frame_data->plan2));
     g_mutex_unlock(thread_mutex);
-    fft_capture((struct FFT_Frame *)temp_frame_data); // This fxn does the FFT,
+    fft_capture((struct AnalysisSession *)temp_frame_data); // This fxn does the FFT,
     // frame_data->buffer_data_n
     // is used to get
     // frame_data->fft_returned_n
@@ -272,7 +272,7 @@ static gboolean MyGTKFunction(struct FFT_Frame *frame_data) {
            N_FFT * sizeof(double));
     g_mutex_unlock(thread_mutex);
 
-    gui_idle_func((struct FFT_Frame *)temp_frame_data);
+    gui_idle_func((struct AnalysisSession *)temp_frame_data);
 
     g_mutex_lock(thread_mutex);
     frame_data->find_delay = temp_frame_data->find_delay;
@@ -281,46 +281,6 @@ static gboolean MyGTKFunction(struct FFT_Frame *frame_data) {
     g_mutex_unlock(thread_mutex);
 
     return TRUE;
-}
-
-struct FFT_Frame *init_fft_frame(void) {
-    int k;
-    struct FFT_Frame *FFT_Kit =
-        (struct FFT_Frame *)malloc(sizeof(struct FFT_Frame));
-    // p_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-    FFT_Kit->fft_returned_1 = (double *)malloc(sizeof(double) * N_FFT);
-    FFT_Kit->fft_returned_2 = (double *)malloc(sizeof(double) * N_FFT);
-    FFT_Kit->rfft_returned_1 = (double *)malloc(sizeof(double) * N_FFT);
-    FFT_Kit->prewin_buffer_data_1 = (short *)malloc(sizeof(short) * N_FFT);
-    FFT_Kit->prewin_buffer_data_2 = (short *)malloc(sizeof(short) * N_FFT);
-    FFT_Kit->buffer_data_1 = (short *)malloc(sizeof(short) * N_FFT);
-    FFT_Kit->buffer_data_2 = (short *)malloc(sizeof(short) * N_FFT);
-    FFT_Kit->delay = (short *)malloc(sizeof(short) * DELAY_BUFFER_SIZE);
-
-    FFT_Kit->delay_size = 0;
-    FFT_Kit->find_delay = 0;
-    FFT_Kit->find_impulse = 0;
-
-    for (k = 0; k < N_FFT; k++) {
-        FFT_Kit->delay[k] = 0;
-        // FFT_Kit->audio[k] = 0;
-        FFT_Kit->prewin_buffer_data_1[k] = 0;
-        FFT_Kit->prewin_buffer_data_2[k] = 0;
-        FFT_Kit->buffer_data_1[k] = 0;
-        FFT_Kit->buffer_data_2[k] = 0;
-        FFT_Kit->fft_returned_1[k] = 0;
-        FFT_Kit->fft_returned_2[k] = 0;
-        FFT_Kit->delay[k] = 0;
-    }
-
-    FFT_Kit->plan_buf1 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N_FFT);
-    FFT_Kit->plan_buf2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N_FFT);
-
-    FFT_Kit->plan1 = fftw_plan_dft_1d(N_FFT, FFT_Kit->plan_buf1, FFT_Kit->plan_buf1, FFTW_FORWARD, FFTW_ESTIMATE);
-    FFT_Kit->plan2 = fftw_plan_dft_1d(N_FFT, FFT_Kit->plan_buf2, FFT_Kit->plan_buf2, FFTW_FORWARD, FFTW_ESTIMATE);
-    FFT_Kit->reverse_plan = fftw_plan_dft_1d(N_FFT, FFT_Kit->plan_buf1, FFT_Kit->plan_buf1, FFTW_BACKWARD, FFTW_ESTIMATE);
-    return FFT_Kit;
 }
 
 void jack_shutdown(void *arg) {
@@ -446,7 +406,7 @@ int jack_init() {
 }
 
 int main(int argc, char *argv[]) {
-    //        struct FFT_Frame *FFT_Kit = g_new0 (struct FFT_Frame, 1);
+    //        struct AnalysisSession *FFT_Kit = g_new0 (struct AnalysisSession, 1);
     generator_setup();
     printf("BRP-PACU is starting\n");
     gtk_init(&argc, &argv);
@@ -464,8 +424,8 @@ int main(int argc, char *argv[]) {
                                "Cannot connect input ports",
                                "Cannot connect output ports"};
 
-    fill_it = init_fft_frame();
-    temp_frame_data = init_fft_frame();
+    fill_it = analysis_create();
+    temp_frame_data = analysis_create();
 
     GtkWidget *jack_error_dialog = gtk_message_dialog_new(
         NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR,
@@ -515,7 +475,7 @@ int main(int argc, char *argv[]) {
         };
     }
     gtk_widget_destroy(GTK_WIDGET(jack_error_dialog));
-    if (create_gui((struct FFT_Frame *)fill_it, DATADIR)) {
+    if (create_gui((struct AnalysisSession *)fill_it, DATADIR)) {
         timer_id = g_timeout_add(90, (GSourceFunc)MyGTKFunction,
                                  (gpointer)fill_it); // Start the initial delay
         gtk_main();
@@ -529,18 +489,8 @@ int main(int argc, char *argv[]) {
     printf("Main Cleaning up.......\n");
     jack_deactivate(client);
     jack_client_close(client);
-    fftw_destroy_plan(fill_it->plan1);
-    fftw_destroy_plan(fill_it->plan2);
-    fftw_destroy_plan(fill_it->reverse_plan);
-    free(fill_it->delay);
-    free(fill_it->buffer_data_1);
-    free(fill_it->buffer_data_2);
-    free(fill_it->prewin_buffer_data_1);
-    free(fill_it->prewin_buffer_data_2);
-    free(fill_it->fft_returned_1);
-    free(fill_it->rfft_returned_1);
-    free(fill_it->fft_returned_2);
-    free((struct FFT_Frame *)fill_it);
+	analysis_destroy(fill_it);
+	//analysis_destroy(temp_frame_data); // this causes a seg fault
     printf("Main has exited. Thank you for using BRP-PACU\n");
     return 0;
 }

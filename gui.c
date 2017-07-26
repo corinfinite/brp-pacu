@@ -129,7 +129,7 @@ void message(char *format, char *text, gboolean error) {
     gtk_widget_destroy(dialog);
 }
 
-gboolean gui_idle_func(struct FFT_Frame *data) {
+gboolean gui_idle_func(struct AnalysisSession *data) {
     gfloat tmp[PLOT_PTS];
     gint smoothing;
     gint index;
@@ -463,7 +463,7 @@ static void buffer_button_cb(GtkWidget *widget, gpointer p) {
 }
 
 // cleanup and quit
-static void cleanup_gui(GtkWidget *widget, struct FFT_Frame *data) {
+static void cleanup_gui(GtkWidget *widget, struct AnalysisSession *data) {
     if (open_dialog)
         gtk_widget_destroy(GTK_WIDGET(open_dialog));
     if (save_as_dialog)
@@ -644,7 +644,7 @@ static void save_now_cb(GtkWidget *widget, char *data) {
 
 // Trigger the gtk callback to find the impulse response in BRP_PACU.c
 static void impulse_cb(GtkWidget *widget,
-                       struct FFT_Frame *data) // , gtkwidget *widget)
+                       struct AnalysisSession *data) // , gtkwidget *widget)
 {
     gtk_widget_show_all(impulse_window);
     gtk_window_present(GTK_WINDOW(impulse_window));
@@ -654,7 +654,7 @@ static void impulse_cb(GtkWidget *widget,
 
 // Trigger the gtk callback to find the delay in BRP_PACU.c
 static void delay_cb(GtkWidget *widget,
-                     struct FFT_Frame *data) // , gtkwidget *widget)
+                     struct AnalysisSession *data) // , gtkwidget *widget)
 {
     gtk_window_set_transient_for(GTK_WINDOW(delay_window), GTK_WINDOW(window));
     gtk_window_set_decorated(GTK_WINDOW(delay_window), FALSE);
@@ -745,7 +745,7 @@ static void apply_preferences_cb(GtkWidget *widget) {
         GTK_SPIN_BUTTON(averaging_spin_button));
 }
 
-gboolean create_gui(struct FFT_Frame *data, char *datadir) {
+gboolean create_gui(struct AnalysisSession *data, char *datadir) {
     GtkWidget *box_container;
     GtkWidget *box_container_impulse;
     GtkWidget *table;
