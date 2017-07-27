@@ -77,6 +77,30 @@ void analysis_destroy(volatile struct AnalysisSession *session) {
     free((struct AnalysisSession *)session);
 }
 
+/*
+ * Applies a window to the incoming audio
+ */
+void analysis_apply_window(volatile struct AnalysisSession *session) {
+	for (int k = 0; k < N_FFT; k++)
+	{
+		// Apply Window function
+		// Blackman window
+		// https://en.wikipedia.org/wiki/Window_function#Blackman_windows
+		// Previously reported to cause errors in the response but appears fine
+		// as of writing
+		session->buffer_data_1[k] = (short)(
+		                                    (((float)session->buffer_data_1[k])*(0.42 - 0.5 *
+		                                                                          cos(2.0 * M_PI * ((float)k) / (  ((float)N_FFT) - 1.0))
+		                                                                          + 0.08 * cos(4.0 * M_PI * ((float)k) / (((float)N_FFT) -
+		                                                                                                                1.0)))  ));
+		session->buffer_data_2[k] = (short)(
+		                                    ((float)session->buffer_data_2[k])*(0.42 - 0.5 * cos(2.0 *
+		                                                                                         M_PI * ((float)k) / (  ((float)N_FFT) - 1.0))
+		                                                                        + 0.08 * cos(4.0 * M_PI * ((float)k) / (((float)N_FFT) -
+		                                                                                                              1.0))));
+	}
+}
+
 int fft_capture(struct AnalysisSession *session) {
     int k;
     double datapt;

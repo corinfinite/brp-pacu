@@ -69,6 +69,8 @@ struct AnalysisSession *analysis_create();
 
 void analysis_destroy(volatile struct AnalysisSession *session);
 
+void analysis_apply_window(volatile struct AnalysisSession *session);
+
 int fft_capture(struct AnalysisSession *session);
 
 int impulse_capture(struct AnalysisSession *session);

@@ -156,24 +156,8 @@ int Fill_Buffer(jack_nframes_t nframes, void *arg) {
                                                          // (oldest)
                                                          // buffer_data_2
         }
-		//for (k = 0; k < N_FFT; k++)
-		//{
-		//	// Apply Window function
-		//	// Blackman window
-		//	// https://en.wikipedia.org/wiki/Window_function#Blackman_windows
-		//	// For some reason this causes errors in the response, maybe
-		//	// someone knows better than me why?
-		//	fill_it->buffer_data_1[k] = (short)(
-		//	                                    ( ((float)fill_it->buffer_data_1[k])*(0.42 - 0.5 *
-		//	                                                                          cos(2.0 * pi * ((float)k) / (  ((float)N_FFT) - 1.0))
-		//	                                                                          + 0.08 * cos(4.0 * pi * ((float)k) / (((float)N_FFT) -
-		//	                                                                                                                1.0)))  ));
-		//	fill_it->buffer_data_2[k] = (short)(
-		//	                                    ((float)fill_it->buffer_data_2[k])*(0.42 - 0.5 * cos(2.0 *
-		//	                                                                                         pi * ((float)k) / (  ((float)N_FFT) - 1.0))
-		//	                                                                        + 0.08 * cos(4.0 * pi * ((float)k) / (((float)N_FFT) -
-		//	                                                                                                              1.0))));
-		//}
+
+		analysis_apply_window(fill_it);
     }
     g_mutex_unlock(thread_mutex);
     return 0;
