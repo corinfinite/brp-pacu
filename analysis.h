@@ -21,6 +21,7 @@
 */
 #include "main.h"
 #include <fftw3.h>
+#include <jack/jack.h>
 #include <math.h>
 #define DELAY_BUFFER_SIZE 44100
 #define N_FFT 8192
@@ -44,23 +45,23 @@
 // An AnalysisSession contains the components of a dual channel analysis
 struct AnalysisSession {
 	// 1 = measured, 2 = reference
-    fftw_plan plan1;              // FFT Plan
-    fftw_plan plan2;              // FFT Plan
-    fftw_plan reverse_plan;       // FFT Plan
 
-    fftw_complex *plan_buf1;
-    fftw_complex *plan_buf2;
-
+	short *delay;
+    int delay_size;
     short *prewin_buffer_data_1; // Data from channel
     short *prewin_buffer_data_2;
     short *buffer_data_1; // data from channel after window function
     short *buffer_data_2; // data from channel after window function
+
+	fftw_complex *plan_buf1;
+    fftw_complex *plan_buf2;
+	fftw_plan plan1;              // FFT Plan
+    fftw_plan plan2;              // FFT Plan
+    fftw_plan reverse_plan;       // FFT Plan
     double *fft_returned_1;
     double *fft_returned_2;
     double *rfft_returned_1;
 
-    short *delay;
-    int delay_size;
     char find_delay;
     char find_impulse;
 };
@@ -68,6 +69,8 @@ struct AnalysisSession {
 struct AnalysisSession *analysis_create();
 
 void analysis_destroy(volatile struct AnalysisSession *session);
+
+void analysis_process_new_input(volatile struct AnalysisSession *session, jack_nframes_t nframes, float measured[8192], float reference[8192]);
 
 void analysis_apply_window(volatile struct AnalysisSession *session);
 

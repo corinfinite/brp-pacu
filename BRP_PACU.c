@@ -61,8 +61,6 @@ volatile enum { Init, Run, Started, Exit } client_state = Init;
 }*/
 
 int Fill_Buffer(jack_nframes_t nframes, void *arg) {
-    // fill_it = (struct AnalysisSession *) malloc(sizeof(struct AnalysisSession ));
-    int k, j, period_size;
     jack_default_audio_sample_t *in_buffer1, *in_buffer2, *out_buffer;
 
     g_mutex_lock(thread_mutex);
@@ -85,79 +83,17 @@ int Fill_Buffer(jack_nframes_t nframes, void *arg) {
             memcpy(audio2, in_buffer2,
                    sizeof(jack_default_audio_sample_t) * nframes);
 
+			analysis_process_new_input(fill_it, nframes, audio1, audio2);
+			// TODO: This function should not be called here, instead it should
+			// send a signal to the main thread or a processing thread that
+			// there is new data to be processed
+			// Otherwise the JACK callback may not finish in time
+
         } else if (ts == JackTransportStopped) {
             if (client_state == Run)
                 client_state = Exit;
             jack_transport_start(client);
         }
-
-        period_size = nframes;
-        // fprintf(stderr, "The period size is %d\n",period_size);
-        //
-        // Fill delay with old data
-        for (k = 0; k < (DELAY_BUFFER_SIZE - period_size); k++) {
-            // Rotate dellay data to the left to make room for new
-            // samples
-            fill_it->delay[k] = fill_it->delay[k + period_size];
-        }
-
-        j = N_FFT - period_size;
-        for (k = DELAY_BUFFER_SIZE - period_size; k < DELAY_BUFFER_SIZE; k++) {
-            //// Copy old delay data to end of delayed buffer 2
-            // Copy old buffer data to end of delay buffer
-            fill_it->delay[k] =
-                fill_it->prewin_buffer_data_2[j - N_FFT + period_size];
-            j++;
-        }
-
-        // Rotate data to the left to make room for new samples
-        for (k = 0; k < (N_FFT - period_size); k++) {
-            fill_it->prewin_buffer_data_1[k] =
-                fill_it->prewin_buffer_data_1[k + period_size];
-            fill_it->prewin_buffer_data_2[k] =
-                fill_it->prewin_buffer_data_2[k + period_size];
-        }
-
-        j = 0;
-        for (k = N_FFT - period_size; k < N_FFT; k++) {
-            // copy channels to the end of the data
-
-            fill_it->prewin_buffer_data_1[k] =
-                (short)32767.0 * audio1[j]; // Copy Begining of
-                                            // Audio buff to end of
-                                            // delay from last
-                                            // buffer fill
-            fill_it->prewin_buffer_data_2[k] = (short)32767.0 * audio2[j];
-            j++;
-        }
-
-        for (k = 0; k < N_FFT; k++) {
-            // Copy data to working buffer #2
-            fill_it->buffer_data_1[k] = fill_it->prewin_buffer_data_1[k];
-            // Copy data to working #1 and apply delay
-            if (k - fill_it->delay_size >= 0)
-                fill_it->buffer_data_2[k] =
-                    fill_it
-                        ->prewin_buffer_data_2[k -
-                                               fill_it->delay_size]; // copy end
-            // of normal
-            // buffer to
-            // working
-            // buffer
-            else
-                fill_it->buffer_data_2[k] =
-                    fill_it->delay[k + DELAY_BUFFER_SIZE -
-                                   fill_it->delay_size]; // copy
-                                                         // most
-                                                         // recent samples
-                                                         // of the delay
-                                                         // buffer to
-                                                         // beginning
-                                                         // (oldest)
-                                                         // buffer_data_2
-        }
-
-		analysis_apply_window(fill_it);
     }
     g_mutex_unlock(thread_mutex);
     return 0;

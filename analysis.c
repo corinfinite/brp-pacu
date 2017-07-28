@@ -21,6 +21,7 @@
 */
 #include "analysis.h"
 #include <fftw3.h>
+#include <jack/jack.h>
 #include <math.h>
 
 // Creates a new AnalysisSession
@@ -29,16 +30,23 @@ struct AnalysisSession *analysis_create() {
     struct AnalysisSession *session =
         (struct AnalysisSession *)malloc(sizeof(struct AnalysisSession));
 
-    session->fft_returned_1 = (double *)malloc(sizeof(double) * N_FFT);
+	session->buffer_data_1 = (short *)malloc(sizeof(short) * N_FFT);
+    session->buffer_data_2 = (short *)malloc(sizeof(short) * N_FFT);
+	session->delay = (short *)malloc(sizeof(short) * DELAY_BUFFER_SIZE);
+	session->delay_size = 0;
+	session->prewin_buffer_data_1 = (short *)malloc(sizeof(short) * N_FFT);
+    session->prewin_buffer_data_2 = (short *)malloc(sizeof(short) * N_FFT);
+
+	session->plan_buf1 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N_FFT);
+    session->plan_buf2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N_FFT);
+	session->plan1 = fftw_plan_dft_1d(N_FFT, session->plan_buf1, session->plan_buf1, FFTW_FORWARD, FFTW_ESTIMATE);
+    session->plan2 = fftw_plan_dft_1d(N_FFT, session->plan_buf2, session->plan_buf2, FFTW_FORWARD, FFTW_ESTIMATE);
+    session->reverse_plan = fftw_plan_dft_1d(N_FFT, session->plan_buf1, session->plan_buf1, FFTW_BACKWARD, FFTW_ESTIMATE);
+
+	session->fft_returned_1 = (double *)malloc(sizeof(double) * N_FFT);
     session->fft_returned_2 = (double *)malloc(sizeof(double) * N_FFT);
     session->rfft_returned_1 = (double *)malloc(sizeof(double) * N_FFT);
-    session->prewin_buffer_data_1 = (short *)malloc(sizeof(short) * N_FFT);
-    session->prewin_buffer_data_2 = (short *)malloc(sizeof(short) * N_FFT);
-    session->buffer_data_1 = (short *)malloc(sizeof(short) * N_FFT);
-    session->buffer_data_2 = (short *)malloc(sizeof(short) * N_FFT);
-    session->delay = (short *)malloc(sizeof(short) * DELAY_BUFFER_SIZE);
 
-    session->delay_size = 0;
     session->find_delay = 0;
     session->find_impulse = 0;
 
@@ -53,12 +61,6 @@ struct AnalysisSession *analysis_create() {
         session->delay[k] = 0;
     }
 
-    session->plan_buf1 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N_FFT);
-    session->plan_buf2 = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N_FFT);
-
-    session->plan1 = fftw_plan_dft_1d(N_FFT, session->plan_buf1, session->plan_buf1, FFTW_FORWARD, FFTW_ESTIMATE);
-    session->plan2 = fftw_plan_dft_1d(N_FFT, session->plan_buf2, session->plan_buf2, FFTW_FORWARD, FFTW_ESTIMATE);
-    session->reverse_plan = fftw_plan_dft_1d(N_FFT, session->plan_buf1, session->plan_buf1, FFTW_BACKWARD, FFTW_ESTIMATE);
     return session;
 }
 
@@ -75,6 +77,79 @@ void analysis_destroy(volatile struct AnalysisSession *session) {
     free(session->rfft_returned_1);
     free(session->fft_returned_2);
     free((struct AnalysisSession *)session);
+}
+
+void analysis_process_new_input(volatile struct AnalysisSession *session, jack_nframes_t nframes, float measured[8192], float reference[8192]) {
+	int k, j, period_size;
+	period_size = nframes;
+
+	period_size = nframes;
+	// fprintf(stderr, "The period size is %d\n",period_size);
+	//
+	// Fill delay with old data
+	for (k = 0; k < (DELAY_BUFFER_SIZE - period_size); k++) {
+		// Rotate dellay data to the left to make room for new
+		// samples
+		session->delay[k] = session->delay[k + period_size];
+	}
+
+	j = N_FFT - period_size;
+	for (k = DELAY_BUFFER_SIZE - period_size; k < DELAY_BUFFER_SIZE; k++) {
+		//// Copy old delay data to end of delayed buffer 2
+		// Copy old buffer data to end of delay buffer
+		session->delay[k] =
+			session->prewin_buffer_data_2[j - N_FFT + period_size];
+		j++;
+	}
+
+	// Rotate data to the left to make room for new samples
+	for (k = 0; k < (N_FFT - period_size); k++) {
+		session->prewin_buffer_data_1[k] =
+			session->prewin_buffer_data_1[k + period_size];
+		session->prewin_buffer_data_2[k] =
+			session->prewin_buffer_data_2[k + period_size];
+	}
+
+	j = 0;
+	for (k = N_FFT - period_size; k < N_FFT; k++) {
+		// copy channels to the end of the data
+
+		session->prewin_buffer_data_1[k] =
+			(short)32767.0 * measured[j]; // Copy Begining of
+										// Audio buff to end of
+										// delay from last
+										// buffer fill
+		session->prewin_buffer_data_2[k] = (short)32767.0 * reference[j];
+		j++;
+	}
+
+	for (k = 0; k < N_FFT; k++) {
+		// Copy data to working buffer #2
+		session->buffer_data_1[k] = session->prewin_buffer_data_1[k];
+		// Copy data to working #1 and apply delay
+		if (k - session->delay_size >= 0)
+			session->buffer_data_2[k] =
+				session
+					->prewin_buffer_data_2[k -
+										   session->delay_size]; // copy end
+		// of normal
+		// buffer to
+		// working
+		// buffer
+		else
+			session->buffer_data_2[k] =
+				session->delay[k + DELAY_BUFFER_SIZE -
+							   session->delay_size]; // copy
+													 // most
+													 // recent samples
+													 // of the delay
+													 // buffer to
+													 // beginning
+													 // (oldest)
+													 // buffer_data_2
+	}
+
+	analysis_apply_window(session);
 }
 
 /*
