@@ -68,7 +68,6 @@ int Fill_Buffer(jack_nframes_t nframes, void *arg) {
 			client_state = Run;
 
 		g_mutex_lock(fill_it->input_audio);
-		g_mutex_lock(thread_mutex);
 		in_buffer_mea = jack_port_get_buffer(measured_input_port, nframes);
 		in_buffer_ref = jack_port_get_buffer(reference_input_port, nframes);
 		out_buffer = jack_port_get_buffer(generator_output_port, nframes);
@@ -80,13 +79,9 @@ int Fill_Buffer(jack_nframes_t nframes, void *arg) {
 
 		fill_it->unprocessed_samples += nframes;
 
-		analysis_process_new_input(fill_it);
 		g_mutex_unlock(fill_it->input_audio);
-		g_mutex_unlock(thread_mutex);
-		// TODO: This function should not be called here, instead it should
-		// send a signal to the main thread or a processing thread that
-		// there is new data to be processed
-		// Otherwise the JACK callback may not finish in time
+		g_timeout_add(0, (GSourceFunc) analysis_process, (gpointer) fill_it);
+			// Tell the main loop to process the new input
 
 		generator_fill_buffer(nframes, out_buffer);
 

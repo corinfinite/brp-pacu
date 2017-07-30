@@ -91,6 +91,17 @@ void analysis_destroy(volatile struct AnalysisSession *session) {
 	free(session->impulse_response);
     free((struct AnalysisSession *)session);
 }
+/*
+ * This function should on be called when the JACK callback signals to the main
+ * loop to run it.
+ */
+gboolean analysis_process(volatile struct AnalysisSession *session) {
+	static int i = 0;
+	i++;
+	//fprintf(stderr, "analysis_process called %d\n", i);
+	analysis_process_new_input(session);
+	return FALSE; // Tell the main loop to not call it again
+}
 
 void analysis_process_new_input(volatile struct AnalysisSession *session) {
 	int k, j, period_size;
@@ -123,6 +134,7 @@ void analysis_process_new_input(volatile struct AnalysisSession *session) {
 	}
 
 	j = 0;
+	g_mutex_lock(session->input_audio);
 	for (k = N_FFT - period_size; k < N_FFT; k++) {
 		// copy channels to the end of the data
 
@@ -134,6 +146,9 @@ void analysis_process_new_input(volatile struct AnalysisSession *session) {
 		session->prewin_buffer_data_2[k] = (short)32767.0 * session->jack_buffer_ref[j];
 		j++;
 	}
+	session->unprocessed_samples = 0;
+	g_mutex_unlock(session->input_audio);
+
 
 	for (k = 0; k < N_FFT; k++) {
 		// Copy data to working buffer #2
@@ -162,7 +177,6 @@ void analysis_process_new_input(volatile struct AnalysisSession *session) {
 	}
 
 	analysis_apply_window(session);
-	session->unprocessed_samples = 0;
 }
 
 /*

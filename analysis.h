@@ -80,7 +80,7 @@ struct AnalysisSession *analysis_create();
 
 void analysis_destroy(volatile struct AnalysisSession *session);
 
-void analysis_process_new_input(volatile struct AnalysisSession *session);
+gboolean analysis_process(volatile struct AnalysisSession *session);
 
 void analysis_apply_window(volatile struct AnalysisSession *session);
 
