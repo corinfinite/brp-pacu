@@ -159,7 +159,7 @@ gboolean gui_idle_func(struct AnalysisSession *data) {
     if (data->find_impulse == 2) {
         for (i = 0; i < N_FFT; i++) {
             index = i;
-            temp = (gfloat)data->rfft_returned_1[index];
+            temp = (gfloat)data->impulse_response[index];
             gui_impulse_Y[i] = temp;
             // printf(" %g %g ", temp,  gui_impulse_Y[i]);
             if (temp > max_y)
@@ -172,15 +172,15 @@ gboolean gui_idle_func(struct AnalysisSession *data) {
             if (tf)
                 avgY[i][avg_index] =
                     (0.0 +
-                     20.0 * log10((gfloat)data->fft_returned_1[i] /
-                                  (gfloat)data->fft_returned_2[i]));
+                     20.0 * log10((gfloat)data->fft_result_mag_mea[i] /
+                                  (gfloat)data->fft_result_mag_ref[i]));
 				// Transfer function and then scaled to dB
             else
                 avgY[i][avg_index] =
-                    (0.0 + 20.0 * log10((gfloat)data->fft_returned_1[i]));
+                    (0.0 + 20.0 * log10((gfloat)data->fft_result_mag_mea[i]));
 				// Measured FFT scaled to dB
             //      avgY[i][avg_index] =
-            //      (20*log10((gfloat)data->fft_returned_1[index]+1));
+            //      (20*log10((gfloat)data->fft_result_mag_mea[index]+1));
 
             tmp[i] = 0;
             for (k = 0; k < avg_num; k++) {

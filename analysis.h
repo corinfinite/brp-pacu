@@ -66,9 +66,11 @@ struct AnalysisSession {
 	fftw_plan plan1;              // FFT Plan
     fftw_plan plan2;              // FFT Plan
     fftw_plan reverse_plan;       // FFT Plan
-    double *fft_returned_1;
-    double *fft_returned_2;
-    double *rfft_returned_1;
+    double *fft_result_mag_mea;
+    double *fft_result_mag_ref;
+
+	double *transfer_fn;
+    double *impulse_response;
 
     char find_delay;
     char find_impulse;

@@ -37,8 +37,6 @@
 volatile struct AnalysisSession *fill_it;
 volatile struct AnalysisSession
     *temp_frame_data; // tmp copy so mutexes don't need to wait
-static float audio1[8192];
-static float audio2[8192];
 volatile char run = 1;
 static guint timer_id = 0;
 // static guint BUF_SIZE = BUFSIZE;
@@ -63,43 +61,40 @@ volatile enum { Init, Run, Started, Exit } client_state = Init;
 int Fill_Buffer(jack_nframes_t nframes, void *arg) {
     jack_default_audio_sample_t *in_buffer_mea, *in_buffer_ref, *out_buffer;
 	// fprintf(stderr, "# of new frames from JACK: %d\n", nframes);
-    // if (pthread_mutex_trylock(&p_mutex))
-    {
-        jack_transport_state_t ts = jack_transport_query(client, NULL);
+	jack_transport_state_t ts = jack_transport_query(client, NULL);
 
-        if (ts == JackTransportRolling) {
-            if (client_state == Init)
-                client_state = Run;
+	if (ts == JackTransportRolling) {
+		if (client_state == Init)
+			client_state = Run;
 
-			g_mutex_lock(fill_it->input_audio);
-			g_mutex_lock(thread_mutex);
-            in_buffer_mea = jack_port_get_buffer(measured_input_port, nframes);
-            in_buffer_ref = jack_port_get_buffer(reference_input_port, nframes);
-            out_buffer = jack_port_get_buffer(generator_output_port, nframes);
+		g_mutex_lock(fill_it->input_audio);
+		g_mutex_lock(thread_mutex);
+		in_buffer_mea = jack_port_get_buffer(measured_input_port, nframes);
+		in_buffer_ref = jack_port_get_buffer(reference_input_port, nframes);
+		out_buffer = jack_port_get_buffer(generator_output_port, nframes);
 
-            memcpy(fill_it->jack_buffer_mea, in_buffer_mea,
-                   sizeof(jack_default_audio_sample_t) * nframes);
-            memcpy(fill_it->jack_buffer_ref, in_buffer_ref,
-                   sizeof(jack_default_audio_sample_t) * nframes);
+		memcpy(fill_it->jack_buffer_mea, in_buffer_mea,
+			   sizeof(jack_default_audio_sample_t) * nframes);
+		memcpy(fill_it->jack_buffer_ref, in_buffer_ref,
+			   sizeof(jack_default_audio_sample_t) * nframes);
 
-			fill_it->unprocessed_samples += nframes;
+		fill_it->unprocessed_samples += nframes;
 
-			analysis_process_new_input(fill_it);
-			g_mutex_unlock(fill_it->input_audio);
-			g_mutex_unlock(thread_mutex);
-			// TODO: This function should not be called here, instead it should
-			// send a signal to the main thread or a processing thread that
-			// there is new data to be processed
-			// Otherwise the JACK callback may not finish in time
+		analysis_process_new_input(fill_it);
+		g_mutex_unlock(fill_it->input_audio);
+		g_mutex_unlock(thread_mutex);
+		// TODO: This function should not be called here, instead it should
+		// send a signal to the main thread or a processing thread that
+		// there is new data to be processed
+		// Otherwise the JACK callback may not finish in time
 
-			generator_fill_buffer(nframes, out_buffer);
+		generator_fill_buffer(nframes, out_buffer);
 
-        } else if (ts == JackTransportStopped) {
-            if (client_state == Run)
-                client_state = Exit;
-            jack_transport_start(client);
-        }
-    }
+	} else if (ts == JackTransportStopped) {
+		if (client_state == Run)
+			client_state = Exit;
+		jack_transport_start(client);
+	}
 
     return 0;
 }
@@ -123,9 +118,9 @@ static gboolean MyGTKFunction(struct AnalysisSession *frame_data) {
     // frame_data->fft_returned_n
 
     g_mutex_lock(thread_mutex);
-    memcpy(frame_data->fft_returned_1, temp_frame_data->fft_returned_1,
+    memcpy(frame_data->fft_result_mag_mea, temp_frame_data->fft_result_mag_mea,
            N_FFT * sizeof(double));
-    memcpy(frame_data->fft_returned_2, temp_frame_data->fft_returned_2,
+    memcpy(frame_data->fft_result_mag_ref, temp_frame_data->fft_result_mag_ref,
            N_FFT * sizeof(double));
     g_mutex_unlock(thread_mutex);
 
@@ -150,7 +145,7 @@ static gboolean MyGTKFunction(struct AnalysisSession *frame_data) {
         g_mutex_unlock(thread_mutex);
         max = 0.0;
         for (j = 0; j < N_FFT; j++) {
-            tmp = frame_data->rfft_returned_1[j];
+            tmp = frame_data->impulse_response[j];
             // find the maximum impulse response sample to find the
             // delay.
             if (max < (tmp * tmp)) {
@@ -185,15 +180,15 @@ static gboolean MyGTKFunction(struct AnalysisSession *frame_data) {
     temp_frame_data->delay_size = frame_data->delay_size;
     //   memcpy(temp_frame_data->delay_size, frame_data->delay,
     //   N_FFT*sizeof(short));
-    memcpy(temp_frame_data->fft_returned_1, frame_data->fft_returned_1,
+    memcpy(temp_frame_data->fft_result_mag_mea, frame_data->fft_result_mag_mea,
            N_FFT * sizeof(double));
-    memcpy(temp_frame_data->fft_returned_2, frame_data->fft_returned_2,
+    memcpy(temp_frame_data->fft_result_mag_ref, frame_data->fft_result_mag_ref,
            N_FFT * sizeof(double));
     memcpy(temp_frame_data->buffer_data_1, frame_data->buffer_data_1,
            N_FFT * sizeof(short));
     memcpy(temp_frame_data->buffer_data_2, frame_data->buffer_data_2,
            N_FFT * sizeof(short));
-    memcpy(temp_frame_data->rfft_returned_1, frame_data->rfft_returned_1,
+    memcpy(temp_frame_data->impulse_response, frame_data->impulse_response,
            N_FFT * sizeof(double));
     g_mutex_unlock(thread_mutex);
 

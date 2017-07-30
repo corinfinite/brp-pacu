@@ -50,9 +50,10 @@ struct AnalysisSession *analysis_create() {
     session->plan2 = fftw_plan_dft_1d(N_FFT, session->plan_buf2, session->plan_buf2, FFTW_FORWARD, FFTW_ESTIMATE);
     session->reverse_plan = fftw_plan_dft_1d(N_FFT, session->plan_buf1, session->plan_buf1, FFTW_BACKWARD, FFTW_ESTIMATE);
 
-	session->fft_returned_1 = (double *)malloc(sizeof(double) * N_FFT);
-    session->fft_returned_2 = (double *)malloc(sizeof(double) * N_FFT);
-    session->rfft_returned_1 = (double *)malloc(sizeof(double) * N_FFT);
+	session->fft_result_mag_mea = (double *)malloc(sizeof(double) * N_FFT);
+    session->fft_result_mag_ref = (double *)malloc(sizeof(double) * N_FFT);
+	session->transfer_fn = (double *)malloc(sizeof(double) * N_FFT);
+    session->impulse_response = (double *)malloc(sizeof(double) * N_FFT);
 
     session->find_delay = 0;
     session->find_impulse = 0;
@@ -63,8 +64,8 @@ struct AnalysisSession *analysis_create() {
         session->prewin_buffer_data_2[k] = 0;
         session->buffer_data_1[k] = 0;
         session->buffer_data_2[k] = 0;
-        session->fft_returned_1[k] = 0;
-        session->fft_returned_2[k] = 0;
+        session->fft_result_mag_mea[k] = 0;
+        session->fft_result_mag_ref[k] = 0;
         session->delay[k] = 0;
     }
 
@@ -84,9 +85,10 @@ void analysis_destroy(volatile struct AnalysisSession *session) {
     free(session->buffer_data_2);
     free(session->prewin_buffer_data_1);
     free(session->prewin_buffer_data_2);
-    free(session->fft_returned_1);
-    free(session->rfft_returned_1);
-    free(session->fft_returned_2);
+    free(session->fft_result_mag_mea);
+    free(session->fft_result_mag_ref);
+	free(session->transfer_fn);
+	free(session->impulse_response);
     free((struct AnalysisSession *)session);
 }
 
@@ -229,7 +231,7 @@ int fft_capture(struct AnalysisSession *session) {
     }
 	// Put result in
     for (k = 0; k < N_FFT; k++) {
-        session->fft_returned_1[k] = fft[k] / 32767.0 + 0.00000001;
+        session->fft_result_mag_mea[k] = fft[k] / 32767.0 + 0.00000001;
     }
 
 	////////////////////////////////////////////////////////////////////////
@@ -255,7 +257,7 @@ int fft_capture(struct AnalysisSession *session) {
         // fft[k] = 20.0 * log10(datapt + 1);
     }
     for (k = 0; k < N_FFT; k++) {
-        session->fft_returned_2[k] = fft[k] / 32767.0 + 0.00000001;
+        session->fft_result_mag_ref[k] = fft[k] / 32767.0 + 0.00000001;
     }
     free(fft);
     return 0;
@@ -327,7 +329,7 @@ int impulse_capture(struct AnalysisSession *session) {
     fftw_execute(reverse_plan);
 
     for (k = 0; k < N_FFT; k++) {
-        session->rfft_returned_1[k] = c_re(out1[k]) / 32767.0;
+        session->impulse_response[k] = c_re(out1[k]) / 32767.0;
     }
     return 0;
 }
