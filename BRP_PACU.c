@@ -61,9 +61,8 @@ volatile enum { Init, Run, Started, Exit } client_state = Init;
 }*/
 
 int Fill_Buffer(jack_nframes_t nframes, void *arg) {
-    jack_default_audio_sample_t *in_buffer1, *in_buffer2, *out_buffer;
-
-    g_mutex_lock(thread_mutex);
+    jack_default_audio_sample_t *in_buffer_mea, *in_buffer_ref, *out_buffer;
+	// fprintf(stderr, "# of new frames from JACK: %d\n", nframes);
     // if (pthread_mutex_trylock(&p_mutex))
     {
         jack_transport_state_t ts = jack_transport_query(client, NULL);
@@ -72,22 +71,28 @@ int Fill_Buffer(jack_nframes_t nframes, void *arg) {
             if (client_state == Init)
                 client_state = Run;
 
-            in_buffer1 = jack_port_get_buffer(measured_input_port, nframes);
-            in_buffer2 = jack_port_get_buffer(reference_input_port, nframes);
+			g_mutex_lock(fill_it->input_audio);
+			g_mutex_lock(thread_mutex);
+            in_buffer_mea = jack_port_get_buffer(measured_input_port, nframes);
+            in_buffer_ref = jack_port_get_buffer(reference_input_port, nframes);
             out_buffer = jack_port_get_buffer(generator_output_port, nframes);
 
-			generator_fill_buffer(nframes, out_buffer);
-
-            memcpy(audio1, in_buffer1,
+            memcpy(fill_it->jack_buffer_mea, in_buffer_mea,
                    sizeof(jack_default_audio_sample_t) * nframes);
-            memcpy(audio2, in_buffer2,
+            memcpy(fill_it->jack_buffer_ref, in_buffer_ref,
                    sizeof(jack_default_audio_sample_t) * nframes);
 
-			analysis_process_new_input(fill_it, nframes, audio1, audio2);
+			fill_it->unprocessed_samples += nframes;
+
+			analysis_process_new_input(fill_it);
+			g_mutex_unlock(fill_it->input_audio);
+			g_mutex_unlock(thread_mutex);
 			// TODO: This function should not be called here, instead it should
 			// send a signal to the main thread or a processing thread that
 			// there is new data to be processed
 			// Otherwise the JACK callback may not finish in time
+
+			generator_fill_buffer(nframes, out_buffer);
 
         } else if (ts == JackTransportStopped) {
             if (client_state == Run)
@@ -95,7 +100,7 @@ int Fill_Buffer(jack_nframes_t nframes, void *arg) {
             jack_transport_start(client);
         }
     }
-    g_mutex_unlock(thread_mutex);
+
     return 0;
 }
 

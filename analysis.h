@@ -46,6 +46,14 @@
 struct AnalysisSession {
 	// 1 = measured, 2 = reference
 
+	GMutex *input_audio;
+	/* Begin data protected by input_audio mutex */
+	/* This is where samples are passed from JACK to BRP-PACU for analysis */
+	int unprocessed_samples; // Number of samples not processed
+	float *jack_buffer_mea;  // Unprocessed samples from measured input
+	float *jack_buffer_ref;  // Unprocessed samples from reference input
+	/* End data protected by input_audio mutex */
+
 	short *delay;
     int delay_size;
     short *prewin_buffer_data_1; // Data from channel
@@ -70,7 +78,7 @@ struct AnalysisSession *analysis_create();
 
 void analysis_destroy(volatile struct AnalysisSession *session);
 
-void analysis_process_new_input(volatile struct AnalysisSession *session, jack_nframes_t nframes, float measured[8192], float reference[8192]);
+void analysis_process_new_input(volatile struct AnalysisSession *session);
 
 void analysis_apply_window(volatile struct AnalysisSession *session);
 

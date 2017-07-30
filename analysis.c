@@ -21,6 +21,7 @@
 */
 #include "analysis.h"
 #include <fftw3.h>
+#include <glib.h>
 #include <jack/jack.h>
 #include <math.h>
 
@@ -29,6 +30,12 @@ struct AnalysisSession *analysis_create() {
     int k;
     struct AnalysisSession *session =
         (struct AnalysisSession *)malloc(sizeof(struct AnalysisSession));
+
+	session->input_audio = (GMutex *) malloc(sizeof(GMutex));
+	g_mutex_init(session->input_audio);
+	session->unprocessed_samples = 0;
+	session->jack_buffer_mea = (float *)malloc(sizeof(float) * 8192);
+	session->jack_buffer_ref = (float *)malloc(sizeof(float) * 8192);
 
 	session->buffer_data_1 = (short *)malloc(sizeof(short) * N_FFT);
     session->buffer_data_2 = (short *)malloc(sizeof(short) * N_FFT);
@@ -65,6 +72,10 @@ struct AnalysisSession *analysis_create() {
 }
 
 void analysis_destroy(volatile struct AnalysisSession *session) {
+	free(session->input_audio);
+	free(session->jack_buffer_mea);
+	free(session->jack_buffer_ref);
+
 	fftw_destroy_plan(session->plan1);
     fftw_destroy_plan(session->plan2);
     fftw_destroy_plan(session->reverse_plan);
@@ -79,11 +90,10 @@ void analysis_destroy(volatile struct AnalysisSession *session) {
     free((struct AnalysisSession *)session);
 }
 
-void analysis_process_new_input(volatile struct AnalysisSession *session, jack_nframes_t nframes, float measured[8192], float reference[8192]) {
+void analysis_process_new_input(volatile struct AnalysisSession *session) {
 	int k, j, period_size;
-	period_size = nframes;
 
-	period_size = nframes;
+	period_size = session->unprocessed_samples;
 	// fprintf(stderr, "The period size is %d\n",period_size);
 	//
 	// Fill delay with old data
@@ -115,11 +125,11 @@ void analysis_process_new_input(volatile struct AnalysisSession *session, jack_n
 		// copy channels to the end of the data
 
 		session->prewin_buffer_data_1[k] =
-			(short)32767.0 * measured[j]; // Copy Begining of
+			(short)32767.0 * session->jack_buffer_mea[j]; // Copy Begining of
 										// Audio buff to end of
 										// delay from last
 										// buffer fill
-		session->prewin_buffer_data_2[k] = (short)32767.0 * reference[j];
+		session->prewin_buffer_data_2[k] = (short)32767.0 * session->jack_buffer_ref[j];
 		j++;
 	}
 
@@ -150,6 +160,7 @@ void analysis_process_new_input(volatile struct AnalysisSession *session, jack_n
 	}
 
 	analysis_apply_window(session);
+	session->unprocessed_samples = 0;
 }
 
 /*
