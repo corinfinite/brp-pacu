@@ -82,9 +82,5 @@ void analysis_destroy(volatile struct AnalysisSession *session);
 
 gboolean analysis_process(volatile struct AnalysisSession *session);
 
-void analysis_apply_window(volatile struct AnalysisSession *session);
-
-int fft_capture(struct AnalysisSession *session);
-
 int impulse_capture(struct AnalysisSession *session);
 #endif

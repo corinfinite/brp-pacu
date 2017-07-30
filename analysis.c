@@ -91,17 +91,6 @@ void analysis_destroy(volatile struct AnalysisSession *session) {
 	free(session->impulse_response);
     free((struct AnalysisSession *)session);
 }
-/*
- * This function should on be called when the JACK callback signals to the main
- * loop to run it.
- */
-gboolean analysis_process(volatile struct AnalysisSession *session) {
-	static int i = 0;
-	i++;
-	//fprintf(stderr, "analysis_process called %d\n", i);
-	analysis_process_new_input(session);
-	return FALSE; // Tell the main loop to not call it again
-}
 
 void analysis_process_new_input(volatile struct AnalysisSession *session) {
 	int k, j, period_size;
@@ -203,7 +192,7 @@ void analysis_apply_window(volatile struct AnalysisSession *session) {
 	}
 }
 
-int fft_capture(struct AnalysisSession *session) {
+int analysis_apply_fft(volatile struct AnalysisSession *session) {
     int k;
     double datapt;
     ///////////////////////////////////
@@ -346,4 +335,17 @@ int impulse_capture(struct AnalysisSession *session) {
         session->impulse_response[k] = c_re(out1[k]) / 32767.0;
     }
     return 0;
+}
+
+/*
+ * This function should on be called when the JACK callback signals to the main
+ * loop to run it.
+ */
+gboolean analysis_process(volatile struct AnalysisSession *session) {
+	static int i = 0;
+	i++;
+	//fprintf(stderr, "analysis_process called %d\n", i);
+	analysis_process_new_input(session);
+	analysis_apply_fft(session);
+	return FALSE; // Tell the main loop to not call it again
 }

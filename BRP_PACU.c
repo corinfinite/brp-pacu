@@ -35,8 +35,6 @@
 #include <string.h>
 
 volatile struct AnalysisSession *fill_it;
-volatile struct AnalysisSession
-    *temp_frame_data; // tmp copy so mutexes don't need to wait
 volatile char run = 1;
 static guint timer_id = 0;
 // static guint BUF_SIZE = BUFSIZE;
@@ -99,26 +97,6 @@ static gboolean MyGTKFunction(struct AnalysisSession *frame_data) {
     //   float avg[2000], min;
     double max, tmp;
 
-    g_mutex_lock(thread_mutex);
-    memcpy(temp_frame_data->buffer_data_1, frame_data->buffer_data_1,
-           N_FFT * sizeof(short));
-    memcpy(temp_frame_data->buffer_data_2, frame_data->buffer_data_2,
-           N_FFT * sizeof(short));
-    memcpy(temp_frame_data->plan1, frame_data->plan1, sizeof(frame_data->plan1));
-    memcpy(temp_frame_data->plan2, frame_data->plan2, sizeof(frame_data->plan2));
-    g_mutex_unlock(thread_mutex);
-    fft_capture((struct AnalysisSession *)temp_frame_data); // This fxn does the FFT,
-    // frame_data->buffer_data_n
-    // is used to get
-    // frame_data->fft_returned_n
-
-    g_mutex_lock(thread_mutex);
-    memcpy(frame_data->fft_result_mag_mea, temp_frame_data->fft_result_mag_mea,
-           N_FFT * sizeof(double));
-    memcpy(frame_data->fft_result_mag_ref, temp_frame_data->fft_result_mag_ref,
-           N_FFT * sizeof(double));
-    g_mutex_unlock(thread_mutex);
-
     if (frame_data->find_delay ==
         1) // Delay button pressed, set delay to new value
     {
@@ -169,32 +147,7 @@ static gboolean MyGTKFunction(struct AnalysisSession *frame_data) {
         }
     }
 
-    g_mutex_lock(thread_mutex);
-    temp_frame_data->find_delay = frame_data->find_delay;
-    temp_frame_data->find_impulse = frame_data->find_impulse;
-    temp_frame_data->delay_size = frame_data->delay_size;
-    //   memcpy(temp_frame_data->delay_size, frame_data->delay,
-    //   N_FFT*sizeof(short));
-    memcpy(temp_frame_data->fft_result_mag_mea, frame_data->fft_result_mag_mea,
-           N_FFT * sizeof(double));
-    memcpy(temp_frame_data->fft_result_mag_ref, frame_data->fft_result_mag_ref,
-           N_FFT * sizeof(double));
-    memcpy(temp_frame_data->buffer_data_1, frame_data->buffer_data_1,
-           N_FFT * sizeof(short));
-    memcpy(temp_frame_data->buffer_data_2, frame_data->buffer_data_2,
-           N_FFT * sizeof(short));
-    memcpy(temp_frame_data->impulse_response, frame_data->impulse_response,
-           N_FFT * sizeof(double));
-    g_mutex_unlock(thread_mutex);
-
-    gui_idle_func((struct AnalysisSession *)temp_frame_data);
-
-    g_mutex_lock(thread_mutex);
-    frame_data->find_delay = temp_frame_data->find_delay;
-    frame_data->find_impulse = temp_frame_data->find_impulse;
-    frame_data->delay_size = temp_frame_data->delay_size;
-    g_mutex_unlock(thread_mutex);
-
+    gui_idle_func((struct AnalysisSession *)frame_data);
     return TRUE;
 }
 
@@ -340,7 +293,6 @@ int main(int argc, char *argv[]) {
                                "Cannot connect output ports"};
 
     fill_it = analysis_create();
-    temp_frame_data = analysis_create();
 
     GtkWidget *jack_error_dialog = gtk_message_dialog_new(
         NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR,
@@ -405,7 +357,6 @@ int main(int argc, char *argv[]) {
     jack_deactivate(client);
     jack_client_close(client);
 	analysis_destroy(fill_it);
-	//analysis_destroy(temp_frame_data); // this causes a seg fault
     printf("Main has exited. Thank you for using BRP-PACU\n");
     return 0;
 }
