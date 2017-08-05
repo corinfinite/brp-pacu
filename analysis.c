@@ -66,7 +66,6 @@ struct AnalysisSession *analysis_create() {
         session->buffer_data_2[k] = 0;
         session->fft_result_mag_mea[k] = 0;
         session->fft_result_mag_ref[k] = 0;
-        session->delay[k] = 0;
     }
 
     return session;
