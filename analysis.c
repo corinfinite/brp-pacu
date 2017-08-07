@@ -25,6 +25,8 @@
 #include <jack/jack.h>
 #include <math.h>
 
+void analysis_apply_window(volatile struct AnalysisSession *session);
+
 // Creates a new AnalysisSession
 struct AnalysisSession *analysis_create() {
     int k;
@@ -193,75 +195,29 @@ void analysis_apply_window(volatile struct AnalysisSession *session) {
 
 int analysis_apply_fft(volatile struct AnalysisSession *session) {
     int k;
-    double datapt;
-    ///////////////////////////////////
-    double *fft;
-    short *buf;
-    fftw_complex *in, *out;
-
-    fftw_plan plan = session->plan1;
-    fft = (double *)malloc(sizeof(double) * N_FFT);
-
-    //fftw_complex *in, *out; //, power_spectrum[N/2+1];
-    //in = fftw_malloc(sizeof(fftw_complex) * N_FFT);
-    //out = fftw_malloc(sizeof(fftw_complex) * N_FFT);
-
-    ///////////////////////////////////////////////////////////////////
-
-    buf = session->buffer_data_1;
-    in  = session->plan_buf1;
-    out = session->plan_buf1;
-    for (k = 0; k < N_FFT; k++) {
-        // Fill empty slots with 0's, Copy interleaved audio data
-        fft[k] = 0;
-    }
 
 	// Copy real values from buffer into complex fftw array
     for (k = 0; k < N_FFT; k++) {
-        c_re(in[k]) = (double)buf[k];
-        c_im(in[k]) = 0.0;
+        c_re(session->plan_buf1[k]) = (double)session->buffer_data_1[k];
+        c_im(session->plan_buf1[k]) = 0.0;
+
+        c_re(session->plan_buf2[k]) = (double)session->buffer_data_2[k];
+        c_im(session->plan_buf2[k]) = 0.0;
     }
 
-    //fftw_one(plan, in, out);
-    fftw_execute(plan);
+    fftw_execute(session->plan1);
+    fftw_execute(session->plan2);
 
-	// Calculate power:
+	// Calculate power and scale:
     for (k = 0; k < N_FFT; k++) {
-        datapt = (double)(sqrt(c_re(out[k]) * c_re(out[k]) +
-                               c_im(out[k]) * c_im(out[k])));
-        fft[k] = datapt;
-    }
-	// Put result in
-    for (k = 0; k < N_FFT; k++) {
-        session->fft_result_mag_mea[k] = fft[k] / 32767.0 + 0.00000001;
-    }
+        session->fft_result_mag_mea[k] = (double)(sqrt(c_re(session->plan_buf1[k]) * c_re(session->plan_buf1[k]) +
+                                                       c_im(session->plan_buf1[k]) * c_im(session->plan_buf1[k])));
+        session->fft_result_mag_mea[k] = session->fft_result_mag_mea[k] / 32767.0 + 0.00000001;
 
-	////////////////////////////////////////////////////////////////////////
-
-    buf = session->buffer_data_2;
-    for (k = 0; k < N_FFT; k++) {
-        // Fill empty slots with 0's, Copy interleaved audio data
-        fft[k] = 0;
+        session->fft_result_mag_ref[k] = (double)(sqrt(c_re(session->plan_buf2[k]) * c_re(session->plan_buf2[k]) +
+                                                       c_im(session->plan_buf2[k]) * c_im(session->plan_buf2[k])));
+        session->fft_result_mag_ref[k] = session->fft_result_mag_ref[k] / 32767.0 + 0.00000001;
     }
-
-    for (k = 0; k < N_FFT; k++) {
-        c_re(in[k]) = (double)buf[k];
-        c_im(in[k]) = 0.0;
-    }
-
-    //fftw_one(plan, in, out);
-    fftw_execute(plan);
-
-    for (k = 0; k < N_FFT; k++) {
-        datapt = (double)(sqrt(c_re(out[k]) * c_re(out[k]) +
-                               c_im(out[k]) * c_im(out[k])));
-        fft[k] = datapt;
-        // fft[k] = 20.0 * log10(datapt + 1);
-    }
-    for (k = 0; k < N_FFT; k++) {
-        session->fft_result_mag_ref[k] = fft[k] / 32767.0 + 0.00000001;
-    }
-    free(fft);
     return 0;
 }
 
