@@ -172,15 +172,12 @@ gboolean gui_idle_func(struct AnalysisSession *data) {
             if (tf)
                 avgY[i][avg_index] =
                     (0.0 +
-                     20.0 * log10((gfloat)data->fft_result_mag_mea[i] /
-                                  (gfloat)data->fft_result_mag_ref[i]));
-				// Transfer function and then scaled to dB
+                     20.0 * log10((gfloat)data->transfer_fn[i]));
+				// Transfer function scaled to dB
             else
                 avgY[i][avg_index] =
                     (0.0 + 20.0 * log10((gfloat)data->fft_result_mag_mea[i]));
 				// Measured FFT scaled to dB
-            //      avgY[i][avg_index] =
-            //      (20*log10((gfloat)data->fft_result_mag_mea[index]+1));
 
             tmp[i] = 0;
             for (k = 0; k < avg_num; k++) {

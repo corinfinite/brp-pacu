@@ -217,6 +217,8 @@ int analysis_apply_fft(volatile struct AnalysisSession *session) {
         session->fft_result_mag_ref[k] = (double)(sqrt(c_re(session->plan_buf2[k]) * c_re(session->plan_buf2[k]) +
                                                        c_im(session->plan_buf2[k]) * c_im(session->plan_buf2[k])));
         session->fft_result_mag_ref[k] = session->fft_result_mag_ref[k] / 32767.0 + 0.00000001;
+
+        session->transfer_fn[k] = session->fft_result_mag_mea[k] / session->fft_result_mag_ref[k];
     }
     return 0;
 }
