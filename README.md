@@ -1,5 +1,5 @@
 # BRP-PACU - An Audio Configuration utility
-BRP-PACU is a dual channel FFT audio analysis tool. It is designed to aid in the equalization and time alignment of a sound system. It compares the output of the system to the input of the system to obtain the transfer function of the system.u It is similar to commercial products like [Smaart](https://en.wikipedia.org/wiki/Smaart).
+BRP-PACU is a dual channel FFT audio analysis tool. It is designed to aid in the equalization and time alignment of a sound system. It compares the output of the system to the input of the system to obtain the transfer function of the system. It is similar to commercial products like [Smaart](https://en.wikipedia.org/wiki/Smaart).
 
 ## Dependencies
 Development versions of the following packages:
@@ -21,11 +21,11 @@ You can likely tweak this if you are on a different distribution. GTKDatabox mus
 
 ## Building
 
-If you are building from the git repo you must first run `./autogen.sh` to setup the build.
+When you first checkout the repo you must first run `./autogen.sh` to generate some Autotools files. If configure.ac or Makefile.am are changed you must run this script again.
 
-Run the traditional `./configure`, `make`, and `make install` to install BRP-PACU.
+Run the traditional `./configure`, `make`, and `make install` to build BRP-PACU.
 
-You can start BRP-PACU with `./BRP-PACU` if you want to run it before installing.
+You can start BRP-PACU with `./BRP-PACU`.
 
 When BRP-PACU is installed on your system using `make install`, the executable is named “BRP_PACU”. It can be started from the Run dialog (that comes up when pressing ALt-F2), or from a command line which will give extra debugging information.
 
