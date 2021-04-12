@@ -7,10 +7,10 @@ Development versions of the following packages:
 * [jack2](http://jackaudio.org/)
   * Tip: If jack is not already installed on your system, try to install the package `qjackctl` which depends on JACK and provides an easy way to manage JACK connections.
 * [GtK+](https://www.gtk.org/) and [Glade](https://glade.gnome.org/)
-* [GTKdatabox for GTK3](https://github.com/erikd/gtkdatabox)
-  * `git clone https://github.com/erikd/gtkdatabox.git`
-  * Run `./autogen.sh` and then the traditional `./configure`, `make`, and `make install` since this is not a release, but coming straight from the repo.
-  * The original library on SourceForge claims GTK3 support on the [git master branch](https://sourceforge.net/p/gtkdatabox/git/ci/master/tree/) but this has not been tested with BRP-PACU.
+* [GTKdatabox for GTK3](https://sourceforge.net/u/felipo/gtkdatabox/ci/master/tree)
+  * `git clone https://git.code.sf.net/u/felipo/gtkdatabox gtkdatabox3`
+  * Run `./scripts/myAutogen.sh` and then the traditional `./configure`, `make`, and `make install` since this is not a release, but coming straight from the repo.
+  * The original library on SourceForge claims GTK3 support on the [git master branch](https://sourceforge.net/p/gtkdatabox/git/ci/master/tree/) but this has not been tested with BRP-PACU; while the fork from `felipo` indicated above has been tested OK.
 * [FFTW version 3](http://www.fftw.org/)
 
 ### On Ubuntu 16.04:  
