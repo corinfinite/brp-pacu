@@ -9,17 +9,18 @@ How do I learn more about dual channel FFT analysis?
    also need a decent omnidirectional calibrated mic (reasonably flat 20Hz-20kHz).
 
 How do you handle a delay between measured and referenced signals?
-- There is an automatic delay finding button.  You can also insert a custom delay if you want.
+- There is an automatic delay finding button.  There you can also insert a custom delay if you want.
 
 Is there a way to find the impulse response?
-- It is in the menu under action
+- It is in the menu under "View"
 
 ## JACK and PulseAudio co-existense (not unique to BRP-PACU)
 A way to automate the switching between which software that can get direct (and thus exclusive) access to the audio hardware ins and outs.
 
 In Ubuntu (at least) the file /etc/pulse/client.conf needs to have the line:
 autospawn = no
+and put “pulseaudio -k” (or “pactrl exit”) in the jackd start script and “pulseaudio --start” in the jackd stop script (can be done from qjackctl under Setup->Options-> execute script at startup).
 
-and put “pulseaudio -k” in the jackd start script and “pulseaudio --start” in the jackd stop script (can be done from qjackctl under setup->options-> execute script at startup).
+Or you may install the pulseaudio-module-jack package and enable Jack D-Bus (from qjackctl under Setup->Misc-> Enable Jack D-Bus Interface.
 
 Otherwise pulseaudio will grab ownership instantly on any sound card you try and you will never get jackd to start.

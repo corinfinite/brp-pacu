@@ -33,6 +33,8 @@
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 #include <gtkdatabox.h>
+#include <gtkdatabox_lines.h>
+#include <gtkdatabox_grid.h>
 #include <glib.h>
 #include <sys/stat.h> //mkdir
 #include <errno.h>
@@ -940,7 +942,7 @@ gboolean create_gui(struct AnalysisSession *data, char *datadir) {
     background_color.blue = 0.0;
 	background_color.alpha = 1.0;
 
-    gtk_widget_override_background_color (box, GTK_STATE_NORMAL, &background_color);
+    gtk_databox_set_bg_color (GTK_DATABOX (box), "black");
 
     guiX = g_new0(gfloat, PLOT_PTS);
     guiY = g_new0(gfloat, PLOT_PTS);
@@ -1096,7 +1098,7 @@ gboolean create_gui(struct AnalysisSession *data, char *datadir) {
                             "capture.  Please change it back to %d "
                             "* 2. Otherwise making a new capture "
                             "should overwrite the old file\n",
-                    (int)read_plot_pts);
+                    read_plot_pts[0]);
         }
         fclose(file_handle);
     }
