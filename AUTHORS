@@ -1,13 +1,20 @@
-  Brian Phelps electronjunkie at users.sourceforge.net 
+- Brian Phelps electronjunkie at users.sourceforge.net 
+
 Macintosh implementation:
-  Andreas Schwab andreasjs at users.sourceforge.net
+-  Andreas Schwab andreasjs at users.sourceforge.net
 Pink noise filter adapted from:
-  Paul Kellet http://www.musicdsp.org/showone.php?id=76
+-  Paul Kellet http://www.musicdsp.org/showone.php?id=76
 
 Libraries used (and integrated into the Macintosh binary distribution)
 fftw ("Fastest Fourier Transform in the West")
-  Matteo Frigo and Steven G. Johnson http://www.fftw.org/
+-  Matteo Frigo and Steven G. Johnson http://www.fftw.org/
 GTK+ graphical user interface
-  The GTK Team, http://www.gtk.org
+-  The GTK Team, http://www.gtk.org
 GtkDatabox
-  Roland Bock, Brian Phelps https://sourceforge.net/projects/gtkdatabox/
+-  Roland Bock, Brian Phelps https://sourceforge.net/projects/gtkdatabox/
+
+Maintainers
+2016 - 2017
+- Mathew Dews (from https://github.com/matthew-dews/brp-pacu)
+2021
+- Felipe Castro (from https://sourceforge.net/u/felipo/brp-pacu/ci/master/tree/)

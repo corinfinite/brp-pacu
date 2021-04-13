@@ -362,7 +362,7 @@ static gboolean about_ok_cb(GtkWidget *widget) // , gtkwidget *widget)
     gtk_widget_hide(about_me_window);
     return TRUE;
 }
-static void about_me_cb(GtkWidget *widget) // , gtkwidget *widget)
+void about_me_cb(GtkWidget *widget, gpointer data) // , gtkwidget *widget)
 {
     gtk_widget_show_all(about_me_window);
     gtk_window_present(GTK_WINDOW(about_me_window));
@@ -793,8 +793,7 @@ gboolean create_gui(struct AnalysisSession *data, char *datadir) {
 	// About Window
     about_me_window =
         GTK_WIDGET(gtk_builder_get_object(builder, "about_me_window"));
-	sprintf(tmp_string, "BRP-PACU v%s", VERSION);
-    gtk_window_set_title(GTK_WINDOW(about_me_window), tmp_string);
+    gtk_window_set_title(GTK_WINDOW(about_me_window), PACKAGE_STRING);
 	g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "about_menu_item")),
                      "activate", G_CALLBACK(about_me_cb), NULL);
 	g_signal_connect(G_OBJECT(about_me_window), "delete_event",
@@ -811,9 +810,9 @@ gboolean create_gui(struct AnalysisSession *data, char *datadir) {
     gui_sb_label = GTK_WIDGET(gtk_builder_get_object(builder, "delay_label"));
     gui_sb = GTK_WIDGET(gtk_builder_get_object(builder, "spinbutton1"));
     gui_db_label = GTK_WIDGET(gtk_builder_get_object(builder, "label4"));
-    save_as = G_SIMPLE_ACTION(gtk_builder_get_object(builder, "save_as"));
-    save_now = G_SIMPLE_ACTION(gtk_builder_get_object(builder, "save_now"));
-    open_menuitem = G_SIMPLE_ACTION(gtk_builder_get_object(builder, "open"));
+    save_as = G_SIMPLE_ACTION(gtk_builder_get_object(builder, "menuitem_saveas"));
+    save_now = G_SIMPLE_ACTION(gtk_builder_get_object(builder, "menuitem_save"));
+    open_menuitem = G_SIMPLE_ACTION(gtk_builder_get_object(builder, "menuitem_open"));
     box_container_impulse =
         GTK_WIDGET(gtk_builder_get_object(builder, "impulse_box"));
     measured_draw =
@@ -859,13 +858,13 @@ gboolean create_gui(struct AnalysisSession *data, char *datadir) {
     //  g_signal_connect (G_OBJECT (gtk_builder_get_object (builder,
     //  "volumebutton1")), "clicked", G_CALLBACK (volume_popup_gui), NULL);
 
-    g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "quit_ap")),
+    g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "menuitem_quit")),
                      "activate", G_CALLBACK(cleanup_gui), NULL);
-    g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "save_as")),
+    g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "menuitem_saveas")),
                      "activate", G_CALLBACK(save_as_cb), NULL);
-    g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "save_now")),
+    g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "menuitem_save")),
                      "activate", G_CALLBACK(save_now_cb), NULL);
-    g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "open")),
+    g_signal_connect(G_OBJECT(gtk_builder_get_object(builder, "menuitem_open")),
                      "activate", G_CALLBACK(open_cb), NULL);
     g_signal_connect(G_OBJECT(transfer_function_toggle_button), "toggled",
                      G_CALLBACK(transfer_function_toggle_button_toggled_cb), NULL);
@@ -1035,7 +1034,7 @@ gboolean create_gui(struct AnalysisSession *data, char *datadir) {
     GtkWidget *about_item;
 
     menubar1 = GTK_WIDGET(gtk_builder_get_object(builder, "menubar1"));
-    quit_ap = GTK_ACTION(gtk_builder_get_object(builder, "quit_ap"));
+    quit_ap = GTK_ACTION(gtk_builder_get_object(builder, "menuitem_quit"));
     about_item = GTK_WIDGET(gtk_menu_item_new_with_label("About BRP-PACU"));
     gtk_widget_hide(menubar1);
     // Put menu bar to the top of the screen
@@ -1049,7 +1048,7 @@ gboolean create_gui(struct AnalysisSession *data, char *datadir) {
     gtk_action_set_visible(
         GTK_ACTION(gtk_builder_get_object(builder, "about_me")), FALSE);
     gtk_action_set_visible(
-        GTK_ACTION(gtk_builder_get_object(builder, "quit_ap")), FALSE);
+        GTK_ACTION(gtk_builder_get_object(builder, "menuitem_quit")), FALSE);
     // Enable file open from Mac OS
     g_signal_connect(theApp, "NSApplicationOpenFile",
                      G_CALLBACK(deal_with_open), NULL);
