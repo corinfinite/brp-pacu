@@ -34,7 +34,7 @@
 #include <jack/jack.h>
 #include <string.h>
 
-volatile struct AnalysisSession *fill_it;
+volatile struct AnalysisSession *fill_it = NULL;
 volatile char run = 1;
 static guint timer_id = 0;
 // static guint BUF_SIZE = BUFSIZE;
@@ -157,7 +157,7 @@ void jack_shutdown(void *arg) {
 }
 int jack_init() {
     const char **ports;
-    char *client_name = "BRP_PACU";
+    char *client_name = PACKAGE_NAME;
     const char *server_name = NULL;
     jack_options_t options = JackNullOption;
     jack_status_t status;
@@ -276,7 +276,7 @@ int jack_init() {
 int main(int argc, char *argv[]) {
     //        struct AnalysisSession *FFT_Kit = g_new0 (struct AnalysisSession, 1);
     generator_setup();
-    printf("BRP-PACU is starting\n");
+    printf("%s is starting\n", PACKAGE_NAME);
     gtk_init(&argc, &argv);
     int ierr = -1;
 
@@ -296,8 +296,8 @@ int main(int argc, char *argv[]) {
 
     GtkWidget *jack_error_dialog = gtk_message_dialog_new(
         NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR,
-        GTK_BUTTONS_NONE, "Jack initialization Error");
-    gtk_window_set_decorated(GTK_WINDOW(jack_error_dialog), FALSE);
+        GTK_BUTTONS_NONE, "%s: Jack initialization Error", PACKAGE_NAME);
+    gtk_window_set_decorated(GTK_WINDOW(jack_error_dialog), TRUE);
     gtk_window_set_position(GTK_WINDOW(jack_error_dialog), GTK_WIN_POS_CENTER);
     gtk_dialog_add_buttons(GTK_DIALOG(jack_error_dialog), "Continue", 1, "Quit",
                            2, NULL);
@@ -307,18 +307,20 @@ int main(int argc, char *argv[]) {
             break; // If jack init, is successful, run GUI
         if (client != NULL)
             jack_client_close(client);
-        fprintf(stderr, "////////\n BRP_PACU failed to start because "
-                        "jackd failed to initialize\n\n%s\n\nplease "
+        fprintf(stderr, "////////\n %s failed to start because "
+                        "jackd failed to initialize.\nJack: \"%s\"\nPlease "
                         "check your jackd sound card settings.  "
                         "QjackCtl (JackPilot with a mac) is an easy "
                         "way to do this\n////////\n",
-                jackErrMessage[ierr]);
+			PACKAGE_NAME, 
+			jackErrMessage[ierr]);
 #ifdef __APPLE__
         gtk_message_dialog_format_secondary_text(
             GTK_MESSAGE_DIALOG(jack_error_dialog),
-            "BRP_PACU failed to start.\n-- %s --\nCheck the settings "
+            "%s failed to start.\nJack: \"%s\"\nCheck the settings "
             "of Audio MIDI Setup and JackPilot, then click on "
             "\"Continue\"",
+	    PACKAGE_NAME,
             jackErrMessage[ierr]);
         system("open -b gpl.elementicaotici.JackPilot"); // Launch
                                                          // JackPilot so
@@ -329,15 +331,16 @@ int main(int argc, char *argv[]) {
 #else
         gtk_message_dialog_format_secondary_text(
             GTK_MESSAGE_DIALOG(jack_error_dialog),
-            "BRP_PACU failed to start.\n-- %s --\nCheck the settings "
+            "%s failed to start.\nJack: \"%s\"\nCheck the settings "
             "of QjackCtl, then click on \"Continue\"",
+	    PACKAGE_NAME,
             jackErrMessage[ierr]);
 #endif
         if (gtk_dialog_run(GTK_DIALOG(jack_error_dialog)) ==
             2) { // user clicked on "Quit"
             gtk_widget_destroy(GTK_WIDGET(jack_error_dialog));
-            printf("BRP-PACU terminated by user. Thank you for "
-                   "using BRP-PACU\n");
+            printf("%s terminated by user. Thank you for "
+                   "using %s\n", PACKAGE_NAME, PACKAGE_NAME);
             return (64 + ierr); // exit program with non-zero exit status
         };
     }
@@ -356,7 +359,7 @@ int main(int argc, char *argv[]) {
     printf("Main Cleaning up.......\n");
     jack_deactivate(client);
     jack_client_close(client);
-	analysis_destroy(fill_it);
-    printf("Main has exited. Thank you for using BRP-PACU\n");
+    //analysis_destroy(fill_it); FIXME: causing double free segfault on start/close without doing any analysis.
+    printf("Main has exited. Thank you for using %s\n", PACKAGE_NAME);
     return 0;
 }

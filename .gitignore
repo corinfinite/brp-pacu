@@ -1,5 +1,8 @@
 /BRP_PACU
 
+# Backups
+*~
+
 # Object files
 *.o
 *.ko
@@ -32,6 +35,7 @@
 
 # Debug files
 *.dSYM/
+tags
 
 # https://github.com/github/gitignore/blob/master/Autotools.gitignore
 # http://www.gnu.org/software/automake
@@ -52,6 +56,7 @@ Makefile.in
 /compile
 /config.guess
 /config.h.in
+/config.h
 /config.status
 /config.sub
 /configure
